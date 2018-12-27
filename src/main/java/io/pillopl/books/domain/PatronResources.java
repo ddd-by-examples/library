@@ -29,6 +29,7 @@ class PatronResources {
 
     private ResourcesOnHold resourcesOnHold;
 
+    //TODO cannot hold held or collected
     Either<ResourceHoldRequestFailed, ResourceHeld> hold(Resource resource) {
         if (regularPatronIsTryingToExceedMaxNumberOfHolds()) {
             return left(resourceHoldRequestFailed(resource, "Cannot hold resource, patron cannot hold more resources"));
