@@ -1,6 +1,7 @@
 package io.pillopl.books.domain;
 
 
+import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 
@@ -19,28 +20,31 @@ class Patron {
 
     enum PatronType {RESEARCHER, REGULAR}
 
+    private final PatronId patronId;
+
     private final OverdueResources overdueResources;
 
     private final PatronType type;
 
     private int numberOfHolds;
 
-    void hold(Resource resource) {
+    Try<Void> hold(Resource resource) {
+        return Try.run(() -> {
+            if (overdueResources.countAt(resource.branch()) >= MAX_COUNT_OF_OVERDUE_RESOURCES) {
+                throw new ResourceHoldRequestFailed("Cannot hold resource, patron cannot hold in libraryBranch");
+            }
 
-        if (overdueResources.countAt(resource.branch()) >= MAX_COUNT_OF_OVERDUE_RESOURCES) {
-            throw new ResourceHoldRequestFailed("Cannot hold resource, patron cannot hold in libraryBranch");
-        }
+            if (this.isRegular() && numberOfHolds >= REGULAR_PATRON_HOLDS_LIMIT) {
+                throw new ResourceHoldRequestFailed("Cannot hold resource, patron cannot hold more resources");
+            }
 
-        if (this.isRegular() && numberOfHolds >= REGULAR_PATRON_HOLDS_LIMIT) {
-            throw new ResourceHoldRequestFailed("Cannot hold resource, patron cannot hold more resources");
-        }
+            if (this.isRegular() && resource.isRestricted()) {
+                throw new ResourceHoldRequestFailed("Regular patrons cannot hold restricted resources");
+            }
 
-        if(this.isRegular() && resource.isRestricted()) {
-            throw new ResourceHoldRequestFailed("Regular patrons cannot hold restricted resources");
-        }
-
-        resource.hold();
-        numberOfHolds++;
+            resource.hold();
+            numberOfHolds++;
+        });
     }
 
     private boolean isRegular() {
@@ -48,6 +52,14 @@ class Patron {
     }
 
 }
+
+@Value
+class PatronId {
+
+    String resourceId;
+
+}
+
 
 class ResourceHoldRequestFailed extends RuntimeException {
     ResourceHoldRequestFailed(String msg) {
@@ -93,7 +105,7 @@ class Resource {
 
     enum ResourceState {AVAILABLE, ON_HOLD, COLLECTED}
 
-    enum ResourceType {RESTRICTED, NORMAL}
+    enum ResourceType {RESTRICTED, CIRCULATING}
 
     private final LibraryBranchId libraryBranch;
     private final ResourceType type;

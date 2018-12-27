@@ -1,5 +1,6 @@
 package io.pillopl.books.domain
 
+import io.vavr.control.Try
 import spock.lang.Specification
 
 import static io.pillopl.books.domain.PatronFixture.regularPatron
@@ -9,9 +10,10 @@ class RegularPatronRequestingRestrictedResourcesTest extends Specification {
 
     def 'a regular patron cannot hold restricted resource'() {
         when:
-            regularPatron().hold(restrictedResource())
+            Try<Void> hold = regularPatron().hold(restrictedResource())
         then:
-            ResourceHoldRequestFailed e = thrown(ResourceHoldRequestFailed)
+            !hold.isSuccess()
+            ResourceHoldRequestFailed e = hold.getCause()
             e.message.contains("Regular patrons cannot hold restricted resources")
     }
 

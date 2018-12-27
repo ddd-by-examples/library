@@ -4,7 +4,7 @@ import static io.pillopl.books.domain.LibraryBranchFixture.anyBranch;
 import static io.pillopl.books.domain.Resource.ResourceState.AVAILABLE;
 import static io.pillopl.books.domain.Resource.ResourceState.COLLECTED;
 import static io.pillopl.books.domain.Resource.ResourceState.ON_HOLD;
-import static io.pillopl.books.domain.Resource.ResourceType.NORMAL;
+import static io.pillopl.books.domain.Resource.ResourceType.CIRCULATING;
 import static io.pillopl.books.domain.Resource.ResourceType.RESTRICTED;
 
 class ResourceFixture {
@@ -14,15 +14,15 @@ class ResourceFixture {
     }
 
     static Resource resourceOnHold() {
-        return new Resource(anyBranch(), NORMAL, ON_HOLD);
+        return new Resource(anyBranch(), CIRCULATING, ON_HOLD);
     }
 
-    static Resource availableResource() {
-        return new Resource(anyBranch(), NORMAL, AVAILABLE);
+    static Resource circulatingResource() {
+        return new Resource(anyBranch(), CIRCULATING, AVAILABLE);
     }
 
     static Resource collectedResource() {
-        return new Resource(anyBranch(), NORMAL, COLLECTED);
+        return new Resource(anyBranch(), CIRCULATING, COLLECTED);
     }
 
     static Resource restrictedResource() {
