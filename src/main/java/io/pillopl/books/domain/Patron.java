@@ -59,28 +59,6 @@ class Patron {
 }
 
 @Value
-class PatronResourcesOnHold {
-
-    static PatronResourcesOnHold of(List<ResourceOnHold> resourcesOnHold) {
-        return new PatronResourcesOnHold(resourcesOnHold);
-    }
-
-    List<ResourceOnHold> resourcesOnHold;
-
-    PatronResourcesOnHold(List<ResourceOnHold> resourcesOnHolds) {
-        this.resourcesOnHold = resourcesOnHolds;
-    }
-
-}
-
-@Value
-class ResourceOnHold {
-    PatronId patronId;
-    ResourceId resourceId;
-    LibraryBranchId libraryBranchId;
-}
-
-@Value
 class PatronId {
 
     String patronId;
