@@ -1,83 +1,99 @@
 package io.pillopl.books.domain;
 
 
-import io.vavr.control.Try;
+import io.pillopl.books.domain.PatronResourcesEvents.ResourceCollected;
+import io.pillopl.books.domain.PatronResourcesEvents.ResourceCollectingFailed;
+import io.pillopl.books.domain.PatronResourcesEvents.ResourceHeld;
+import io.pillopl.books.domain.PatronResourcesEvents.ResourceHoldRequestFailed;
+import io.vavr.control.Either;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.Value;
 
+import java.time.Instant;
 import java.util.*;
 
-import static io.pillopl.books.domain.Resource.ResourceState.COLLECTED;
+import static io.vavr.control.Either.left;
+import static io.vavr.control.Either.right;
 import static java.util.Collections.emptyList;
 
 @AllArgsConstructor
-@EqualsAndHashCode(of = "patronId")
+@EqualsAndHashCode(of = "patron")
 class PatronResources {
 
-    static final int REGULAR_PATRON_HOLDS_LIMIT = 5;
     static final int MAX_COUNT_OF_OVERDUE_RESOURCES = 2;
 
-    enum PatronType {RESEARCHER, REGULAR}
-
-    @Getter
-    private final PatronId patronId;
-
-    private final PatronType type;
+    private final PatronInformation patron;
 
     private OverdueResources overdueResources;
 
     private ResourcesOnHold resourcesOnHold;
 
-    Try<Void> hold(Resource resource) {
-        return Try.run(() -> {
-            if (this.isRegular() && resourcesOnHold.count() >= REGULAR_PATRON_HOLDS_LIMIT) {
-                throw new ResourceHoldRequestFailed("Cannot hold resource, patron cannot hold more resources");
-            }
+    Either<ResourceHoldRequestFailed, ResourceHeld> hold(Resource resource) {
+        if (regularPatronIsTryingToExceedMaxNumberOfHolds()) {
+            return left(resourceHoldRequestFailed(resource, "Cannot hold resource, patron cannot hold more resources"));
+        }
 
-            if (this.isRegular() && resource.isRestricted()) {
-                throw new ResourceHoldRequestFailed("Regular patrons cannot hold restricted resources");
-            }
+        if (regularPatronIsTryingToRequestRestrictedResource(resource)) {
+            return left(resourceHoldRequestFailed(resource, "Regular patrons cannot hold restricted resources"));
+        }
 
-            if (overdueResources.countAt(resource.getLibraryBranch()) >= MAX_COUNT_OF_OVERDUE_RESOURCES) {
-                throw new ResourceHoldRequestFailed("Cannot hold resource, patron cannot hold in libraryBranch");
-            }
+        if (patronHasMaximumNumberOfOverdueCheckouts(resource)) {
+            return left(resourceHoldRequestFailed(resource, "Cannot hold resource, patron cannot hold in libraryBranch"));
+        }
 
-            resource.hold();
-            resourcesOnHold = resourcesOnHold.with(new ResourceOnHold(patronId, resource.getResourceId(), resource.getLibraryBranch()));
-        });
+        ResourceOnHold resourceOnHold = new ResourceOnHold(patron.getPatronId(), resource.getResourceId(), resource.getLibraryBranch());
+        resourcesOnHold = resourcesOnHold.with(resourceOnHold);
+        return right(resourceOnHold.toResourceHeld());
     }
 
-    Try<Void> collect(Resource resource) {
-        return Try.run(() ->{
-            ResourceOnHold resourceToCollect = new ResourceOnHold(patronId, resource.getResourceId(), resource.getLibraryBranch());
+    Either<ResourceCollectingFailed, ResourceCollected> collect(Resource resource) {
 
-            if(!resourcesOnHold.contains(resourceToCollect)) {
-                throw new ResourceCollectingFailed("resource is not on hold by patron");
+        ResourceOnHold resourceToCollect = new ResourceOnHold(patron.getPatronId(), resource.getResourceId(), resource.getLibraryBranch());
 
-            }
-            resource.collect();
-            resourcesOnHold = resourcesOnHold.without(resourceToCollect);
-        });
+        if (!resourcesOnHold.contains(resourceToCollect)) {
+            return left(resourceCollectingFailed(resource, "resource is not on hold by patron"));
+        }
+        resourcesOnHold = resourcesOnHold.without(resourceToCollect);
+        return right(resourceToCollect.toResourceCollected());
+    }
+
+    private boolean regularPatronIsTryingToExceedMaxNumberOfHolds() {
+        return patron.isRegular() && resourcesOnHold.cannotHoldMore();
     }
 
 
-    private boolean isRegular() {
-        return type.equals(PatronType.REGULAR);
+    private boolean patronHasMaximumNumberOfOverdueCheckouts(Resource resource) {
+        return overdueResources.countAt(resource.getLibraryBranch()) >= MAX_COUNT_OF_OVERDUE_RESOURCES;
     }
 
-}
+    private boolean regularPatronIsTryingToRequestRestrictedResource(Resource resource) {
+        return patron.isRegular() && resource.isRestricted();
+    }
 
-@Value
-class ResourceOnHold {
-    PatronId patronId;
-    ResourceId resourceId;
-    LibraryBranchId libraryBranchId;
+    private ResourceHoldRequestFailed resourceHoldRequestFailed(Resource resource, String reason) {
+        return new ResourceHoldRequestFailed(reason,
+                Instant.now(),
+                patron.getPatronId().getPatronId(),
+                resource.getResourceId().getResourceId(),
+                resource.getLibraryBranch().getLibraryBranchId());
+    }
+
+    private ResourceCollectingFailed resourceCollectingFailed(Resource resource, String reason) {
+        return new ResourceCollectingFailed(reason,
+                Instant.now(),
+                patron.getPatronId().getPatronId(),
+                resource.getResourceId().getResourceId(),
+                resource.getLibraryBranch().getLibraryBranchId());
+    }
+
+
 }
 
 @Value
 class ResourcesOnHold {
+
+    static final int REGULAR_PATRON_HOLDS_LIMIT = 5;
 
     Set<ResourceOnHold> resourcesOnHold;
 
@@ -93,26 +109,27 @@ class ResourcesOnHold {
         return new ResourcesOnHold(newResourcesOnHolds);
     }
 
-    int count() {
-        return resourcesOnHold.size();
-    }
-
     boolean contains(ResourceOnHold resourceOnHold) {
         return resourcesOnHold.contains(resourceOnHold);
     }
 
+    boolean cannotHoldMore() {
+        return resourcesOnHold.size() >= REGULAR_PATRON_HOLDS_LIMIT;
+    }
 }
 
 @Value
-class PatronId {
+class ResourceOnHold {
+    PatronId patronId;
+    ResourceId resourceId;
+    LibraryBranchId libraryBranchId;
 
-    UUID patronId;
+    ResourceHeld toResourceHeld() {
+        return new ResourceHeld(Instant.now(), patronId.getPatronId(), resourceId.getResourceId(), libraryBranchId.getLibraryBranchId());
+    }
 
-}
-
-class ResourceHoldRequestFailed extends RuntimeException {
-    ResourceHoldRequestFailed(String msg) {
-        super(msg);
+    ResourceCollected toResourceCollected() {
+        return new ResourceCollected(Instant.now(), patronId.getPatronId(), resourceId.getResourceId(), libraryBranchId.getLibraryBranchId());
     }
 }
 
@@ -137,78 +154,7 @@ class OverdueResources {
 }
 
 
-@Value
-class LibraryBranchId {
 
-    final UUID libraryBranchId;
-}
-
-
-@AllArgsConstructor
-class Resource {
-
-
-    enum ResourceState {AVAILABLE, ON_HOLD, COLLECTED}
-
-    enum ResourceType {RESTRICTED, CIRCULATING}
-
-    @Getter
-    private final ResourceId resourceId;
-
-    @Getter
-    private final LibraryBranchId libraryBranch;
-
-    private final ResourceType type;
-
-    private ResourceState state;
-
-    void hold() {
-        if (!isAvailable()) {
-            throw new ResourceHoldRequestFailed("Cannot hold resource, resource is currently not available");
-        }
-        this.state = ResourceState.ON_HOLD;
-    }
-
-    void collect() {
-        state = COLLECTED;
-    }
-
-    boolean isRestricted() {
-        return type.equals(ResourceType.RESTRICTED);
-    }
-
-    boolean isCollected() {
-        return state.equals(COLLECTED);
-    }
-
-    boolean isAvailable() {
-        return state.equals(ResourceState.AVAILABLE);
-    }
-
-    boolean isHeld() {
-        return state.equals(ResourceState.ON_HOLD);
-    }
-
-    void returned() {
-        this.state = ResourceState.AVAILABLE;
-    }
-
-
-}
-
-class ResourceCollectingFailed extends RuntimeException {
-    ResourceCollectingFailed(String msg) {
-        super(msg);
-    }
-}
-
-
-@Value
-class ResourceId {
-
-    UUID resourceId;
-
-}
 
 
 

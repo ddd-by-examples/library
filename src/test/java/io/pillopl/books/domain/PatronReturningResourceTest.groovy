@@ -1,10 +1,14 @@
 package io.pillopl.books.domain
 
-
+import io.vavr.control.Either
 import spock.lang.Specification
+
+import java.time.Instant
 
 import static PatronResourcesFixture.regularPatron
 import static io.pillopl.books.domain.ResourceFixture.circulatingResource
+import static io.pillopl.books.domain.PatronResourcesEvents.*
+
 
 class PatronReturningResourceTest extends Specification {
 
@@ -15,7 +19,7 @@ class PatronReturningResourceTest extends Specification {
         and:
             patron.hold(resource)
         when:
-            resource.returned()
+            resource.handle(resourceReturned())
         then:
             resource.isAvailable()
     }
@@ -29,7 +33,7 @@ class PatronReturningResourceTest extends Specification {
         and:
             patron.collect(resource)
         when:
-            resource.returned()
+            resource.handle(resourceReturned())
         then:
             resource.isAvailable()
     }
@@ -43,11 +47,15 @@ class PatronReturningResourceTest extends Specification {
         and:
             patron.collect(resource)
         when:
-            resource.returned()
+            resource.handle(resourceReturned())
         and:
-            patron.hold(resource)
+            Either<ResourceHoldRequestFailed, ResourceHeld> hold = patron.hold(resource)
         then:
-            resource.isHeld()
+            hold.isRight()
+    }
+
+    ResourceReturned resourceReturned() {
+        new ResourceReturned(Instant.now(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID())
     }
 
 }
