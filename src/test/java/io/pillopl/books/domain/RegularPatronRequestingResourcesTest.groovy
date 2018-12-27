@@ -2,8 +2,12 @@ package io.pillopl.books.domain
 
 import spock.lang.Specification
 
-import static io.pillopl.books.domain.Resource.ResourceState.*
-import static io.pillopl.books.domain.Resource.ResourceType.NORMAL
+import static io.pillopl.books.domain.LibraryBranchFixture.anyBranch
+import static io.pillopl.books.domain.PatronFixture.regularPatron
+import static io.pillopl.books.domain.ResourceFixture.availableResource
+import static io.pillopl.books.domain.ResourceFixture.collectedResource
+import static io.pillopl.books.domain.ResourceFixture.resourceId
+import static io.pillopl.books.domain.ResourceFixture.resourceOnHold
 
 class RegularPatronRequestingResourcesTest extends Specification {
 
@@ -11,7 +15,7 @@ class RegularPatronRequestingResourcesTest extends Specification {
         given:
             Resource resourceOnHold = resourceOnHold()
         when:
-            resourceOnHold.holdBy(Patron.regular())
+            resourceOnHold.holdBy(regularPatron())
         then:
             ResourceHoldRequestFailed e = thrown(ResourceHoldRequestFailed)
             e.message.contains("resource is currently ON_HOLD")
@@ -21,7 +25,7 @@ class RegularPatronRequestingResourcesTest extends Specification {
         given:
             Resource collectedResource = collectedResource()
         when:
-            collectedResource.holdBy(Patron.regular())
+            collectedResource.holdBy(regularPatron())
         then:
             ResourceHoldRequestFailed e = thrown(ResourceHoldRequestFailed)
             e.message.contains("resource is currently COLLECTED")
@@ -32,7 +36,7 @@ class RegularPatronRequestingResourcesTest extends Specification {
         given:
             Resource availableResource = availableResource()
         when:
-            availableResource.holdBy(Patron.regularWithHolds(holds))
+            availableResource.holdBy(PatronFixture.regularPatronWithHolds(holds))
         then:
             ResourceHoldRequestFailed e = thrown(ResourceHoldRequestFailed)
             e.message.contains("patron cannot hold in")
@@ -46,7 +50,7 @@ class RegularPatronRequestingResourcesTest extends Specification {
         given:
             Resource resource = availableResource()
         when:
-            resource.holdBy(Patron.regularWithHolds(holds))
+            resource.holdBy(PatronFixture.regularPatronWithHolds(holds))
         then:
             resource.isHeld()
         where:
@@ -58,7 +62,7 @@ class RegularPatronRequestingResourcesTest extends Specification {
         given:
             Resource availableResource = availableResource()
         when:
-            availableResource.holdBy(Patron.regularWithOverdueResource(overdueResources))
+            availableResource.holdBy(PatronFixture.regularPatronWithOverdueResource(overdueResources))
         then:
             ResourceHoldRequestFailed e = thrown(ResourceHoldRequestFailed)
             e.message.contains("patron cannot hold in")
@@ -73,7 +77,7 @@ class RegularPatronRequestingResourcesTest extends Specification {
         given:
             Resource resource = availableResource()
         when:
-            resource.holdBy(Patron.regularWithOverdueResource(overdueResources))
+            resource.holdBy(PatronFixture.regularPatronWithOverdueResource(overdueResources))
         then:
             resource.isHeld()
         where:
@@ -83,7 +87,7 @@ class RegularPatronRequestingResourcesTest extends Specification {
 
     def 'fifth hold after 4th successful consecutive holds shouldnt be possible'() {
         given:
-            Patron patron = Patron.regular()
+            Patron patron = regularPatron()
         and:
             5.times {
                 availableResource().holdBy(patron)
@@ -95,23 +99,5 @@ class RegularPatronRequestingResourcesTest extends Specification {
             e.message.contains("patron cannot hold in")
     }
 
-    ResourceId resourceId(String resourceId) {
-        return new ResourceId(resourceId)
-    }
 
-    Resource resourceOnHold() {
-        return new Resource(anyBranch(), NORMAL, ON_HOLD)
-    }
-
-    Resource availableResource() {
-        return new Resource(anyBranch(), NORMAL, AVAILABLE)
-    }
-
-    Resource collectedResource() {
-        return new Resource(anyBranch(), NORMAL, COLLECTED)
-    }
-
-    LibraryBranchId anyBranch() {
-        return new LibraryBranchId()
-    }
 }

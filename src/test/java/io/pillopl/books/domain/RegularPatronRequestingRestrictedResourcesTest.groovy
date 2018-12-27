@@ -2,8 +2,8 @@ package io.pillopl.books.domain
 
 import spock.lang.Specification
 
-import static io.pillopl.books.domain.Resource.ResourceState.AVAILABLE
-import static io.pillopl.books.domain.Resource.ResourceType.RESTRICTED
+import static io.pillopl.books.domain.PatronFixture.regularPatron
+import static io.pillopl.books.domain.ResourceFixture.restrictedResource
 
 class RegularPatronRequestingRestrictedResourcesTest extends Specification {
 
@@ -11,18 +11,10 @@ class RegularPatronRequestingRestrictedResourcesTest extends Specification {
         given:
             Resource restrictedResource = restrictedResource()
         when:
-            restrictedResource.holdBy(Patron.regular())
+            restrictedResource.holdBy(regularPatron())
         then:
             ResourceHoldRequestFailed e = thrown(ResourceHoldRequestFailed)
             e.message.contains("Regular patrons cannot hold restricted resources")
-    }
-
-    Resource restrictedResource() {
-        return new Resource(anyBranch(), RESTRICTED, AVAILABLE)
-    }
-
-    LibraryBranchId anyBranch() {
-        return new LibraryBranchId()
     }
 
 }

@@ -88,29 +88,6 @@ class Patron {
 
     private int numberOfHolds;
 
-    static Patron regular() {
-        return new Patron(OverdueResources.noOverdueResources(), PatronType.REGULAR, 0);
-    }
-
-    static Patron researcher() {
-        return new Patron(OverdueResources.noOverdueResources(), PatronType.RESEARCHER, 0);
-    }
-
-    static Patron regularWithHolds(int numberOfHolds) {
-        return new Patron(OverdueResources.noOverdueResources(), PatronType.REGULAR, numberOfHolds);
-    }
-
-    static Patron researcherWithHolds(int numberOfHolds) {
-        return new Patron(OverdueResources.noOverdueResources(), PatronType.RESEARCHER, numberOfHolds);
-    }
-
-    static Patron regularWithOverdueResource(OverdueResources overdueResources) {
-        return new Patron(overdueResources, PatronType.REGULAR, 0);
-    }
-
-    static Patron reasearcherWithOverdueResource(OverdueResources overdueResources) {
-        return new Patron(overdueResources, PatronType.RESEARCHER, 0);
-    }
 
     boolean canHoldResourceAt(LibraryBranchId libraryBranch) {
         if (this.isRegular() && numberOfHolds >= REGULAR_PATRON_HOLDS_LIMIT) {
