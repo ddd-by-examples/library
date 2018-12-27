@@ -3,14 +3,14 @@ package io.pillopl.books.domain
 import io.vavr.control.Try
 import spock.lang.Specification
 
-import static io.pillopl.books.domain.PatronFixture.regularPatron
+import static PatronResourcesFixture.regularPatron
 import static io.pillopl.books.domain.ResourceFixture.circulatingResource
 
 class PatronCollectingResourceTest extends Specification {
 
     def 'patron cannot collected resource which is not on hold'() {
         when:
-            Try<Void> collect = circulatingResource().collectBy(regularPatron().getPatronId())
+            Try<Void> collect = regularPatron().collect(circulatingResource())
         then:
             !collect.isSuccess()
             ResourceCollectingFailed e = collect.getCause()
@@ -19,29 +19,29 @@ class PatronCollectingResourceTest extends Specification {
 
     def 'patron cannot collected resource held by another patron'() {
         given:
-            Patron patron = regularPatron("patron")
-            Patron anotherPatron = regularPatron("anotherPatron")
+            PatronResources patron = regularPatron()
+            PatronResources anotherPatron = regularPatron()
         and:
             Resource resource = circulatingResource()
         and:
-            patron.hold(resource)
+            anotherPatron.hold(resource)
         when:
-            Try<Void> collect = resource.collectBy(anotherPatron.getPatronId())
+            Try<Void> collect = patron.collect(resource)
         then:
             !collect.isSuccess()
             ResourceCollectingFailed e = collect.getCause()
-            e.message.contains("resource should be collected by the patron who put it on hold")
+            e.message.contains("resource is not on hold by patron")
     }
 
     def 'patron can collect resource which was held by him'() {
         given:
-            Patron patron = regularPatron('patron')
+            PatronResources patron = regularPatron()
         and:
             Resource resource = circulatingResource()
         and:
             patron.hold(resource)
         when:
-            Try<Void> collect = resource.collectBy(patron.getPatronId())
+            Try<Void> collect = patron.collect(resource)
         then:
             collect.isSuccess()
             resource.isCollected()

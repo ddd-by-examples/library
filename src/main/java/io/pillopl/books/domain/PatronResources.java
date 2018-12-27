@@ -7,17 +7,14 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static io.pillopl.books.domain.Resource.ResourceState.COLLECTED;
-import static java.util.Collections.EMPTY_MAP;
 import static java.util.Collections.emptyList;
 
 @AllArgsConstructor
 @EqualsAndHashCode(of = "patronId")
-class Patron {
+class PatronResources {
 
     static final int REGULAR_PATRON_HOLDS_LIMIT = 5;
     static final int MAX_COUNT_OF_OVERDUE_RESOURCES = 2;
@@ -27,19 +24,15 @@ class Patron {
     @Getter
     private final PatronId patronId;
 
-    private final OverdueResources overdueResources;
-
     private final PatronType type;
 
-    private int numberOfHolds;
+    private OverdueResources overdueResources;
+
+    private ResourcesOnHold resourcesOnHold;
 
     Try<Void> hold(Resource resource) {
         return Try.run(() -> {
-            if (overdueResources.countAt(resource.getLibraryBranch()) >= MAX_COUNT_OF_OVERDUE_RESOURCES) {
-                throw new ResourceHoldRequestFailed("Cannot hold resource, patron cannot hold in libraryBranch");
-            }
-
-            if (this.isRegular() && numberOfHolds >= REGULAR_PATRON_HOLDS_LIMIT) {
+            if (this.isRegular() && resourcesOnHold.count() >= REGULAR_PATRON_HOLDS_LIMIT) {
                 throw new ResourceHoldRequestFailed("Cannot hold resource, patron cannot hold more resources");
             }
 
@@ -47,10 +40,28 @@ class Patron {
                 throw new ResourceHoldRequestFailed("Regular patrons cannot hold restricted resources");
             }
 
-            resource.holdBy(this);
-            numberOfHolds++;
+            if (overdueResources.countAt(resource.getLibraryBranch()) >= MAX_COUNT_OF_OVERDUE_RESOURCES) {
+                throw new ResourceHoldRequestFailed("Cannot hold resource, patron cannot hold in libraryBranch");
+            }
+
+            resource.hold();
+            resourcesOnHold = resourcesOnHold.with(new ResourceOnHold(patronId, resource.getResourceId(), resource.getLibraryBranch()));
         });
     }
+
+    Try<Void> collect(Resource resource) {
+        return Try.run(() ->{
+            ResourceOnHold resourceToCollect = new ResourceOnHold(patronId, resource.getResourceId(), resource.getLibraryBranch());
+
+            if(!resourcesOnHold.contains(resourceToCollect)) {
+                throw new ResourceCollectingFailed("resource is not on hold by patron");
+
+            }
+            resource.collect();
+            resourcesOnHold = resourcesOnHold.without(resourceToCollect);
+        });
+    }
+
 
     private boolean isRegular() {
         return type.equals(PatronType.REGULAR);
@@ -59,9 +70,43 @@ class Patron {
 }
 
 @Value
+class ResourceOnHold {
+    PatronId patronId;
+    ResourceId resourceId;
+    LibraryBranchId libraryBranchId;
+}
+
+@Value
+class ResourcesOnHold {
+
+    Set<ResourceOnHold> resourcesOnHold;
+
+    ResourcesOnHold with(ResourceOnHold resourceOnHold) {
+        Set<ResourceOnHold> newResourcesOnHolds = new HashSet<>(resourcesOnHold);
+        newResourcesOnHolds.add(resourceOnHold);
+        return new ResourcesOnHold(newResourcesOnHolds);
+    }
+
+    ResourcesOnHold without(ResourceOnHold resourceOnHold) {
+        Set<ResourceOnHold> newResourcesOnHolds = new HashSet<>(resourcesOnHold);
+        newResourcesOnHolds.remove(resourceOnHold);
+        return new ResourcesOnHold(newResourcesOnHolds);
+    }
+
+    int count() {
+        return resourcesOnHold.size();
+    }
+
+    boolean contains(ResourceOnHold resourceOnHold) {
+        return resourcesOnHold.contains(resourceOnHold);
+    }
+
+}
+
+@Value
 class PatronId {
 
-    String patronId;
+    UUID patronId;
 
 }
 
@@ -77,7 +122,7 @@ class OverdueResources {
     Map<LibraryBranchId, List<ResourceId>> overdueResources;
 
     static OverdueResources noOverdueResources() {
-        return new OverdueResources(EMPTY_MAP);
+        return new OverdueResources(new HashMap<>());
     }
 
     static OverdueResources atBranch(LibraryBranchId libraryBranch, List<ResourceId> resourcesId) {
@@ -95,16 +140,20 @@ class OverdueResources {
 @Value
 class LibraryBranchId {
 
-    final String libraryBranchId;
+    final UUID libraryBranchId;
 }
 
 
 @AllArgsConstructor
 class Resource {
 
+
     enum ResourceState {AVAILABLE, ON_HOLD, COLLECTED}
 
     enum ResourceType {RESTRICTED, CIRCULATING}
+
+    @Getter
+    private final ResourceId resourceId;
 
     @Getter
     private final LibraryBranchId libraryBranch;
@@ -113,14 +162,15 @@ class Resource {
 
     private ResourceState state;
 
-    private PatronId heldBy;
-
-    void holdBy(Patron patron) {
+    void hold() {
         if (!isAvailable()) {
             throw new ResourceHoldRequestFailed("Cannot hold resource, resource is currently not available");
         }
-        this.heldBy = patron.getPatronId();
         this.state = ResourceState.ON_HOLD;
+    }
+
+    void collect() {
+        state = COLLECTED;
     }
 
     boolean isRestricted() {
@@ -137,19 +187,6 @@ class Resource {
 
     boolean isHeld() {
         return state.equals(ResourceState.ON_HOLD);
-    }
-
-    Try<Void> collectBy(PatronId collectingPatron) {
-        return Try.run(() ->{
-            if(!isHeld()) {
-                throw new ResourceCollectingFailed("resource is not on hold");
-            }
-            if(!collectingPatron.equals(this.heldBy)) {
-                throw new ResourceCollectingFailed("resource should be collected by the patron who put it on hold");
-            }
-            this.heldBy = null;
-            this.state = COLLECTED;
-        });
     }
 
     void returned() {
@@ -169,7 +206,7 @@ class ResourceCollectingFailed extends RuntimeException {
 @Value
 class ResourceId {
 
-    String resourceId;
+    UUID resourceId;
 
 }
 

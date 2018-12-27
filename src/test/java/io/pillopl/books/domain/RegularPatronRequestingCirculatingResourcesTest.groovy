@@ -4,7 +4,7 @@ import io.vavr.control.Try
 import spock.lang.Specification
 
 import static io.pillopl.books.domain.LibraryBranchFixture.anyBranch
-import static io.pillopl.books.domain.PatronFixture.*
+import static PatronResourcesFixture.*
 import static io.pillopl.books.domain.ResourceFixture.*
 
 class RegularPatronRequestingCirculatingResourcesTest extends Specification {
@@ -55,15 +55,21 @@ class RegularPatronRequestingCirculatingResourcesTest extends Specification {
     }
 
     def 'a regular patron cannot hold anymore when he has at least two overdue checkouts  '() {
+        given:
+            LibraryBranchId libraryBranchId = anyBranch()
+        and:
+            OverdueResources overdueResources = OverdueResources.atBranch(libraryBranchId, resources)
         when:
-            Try<Void> hold = regularPatronWithOverdueResource(overdueResources).hold(circulatingResource())
+            Try<Void> hold = regularPatronWithOverdueResource(overdueResources).hold(circulatingResource(libraryBranchId))
         then:
             !hold.isSuccess()
             ResourceHoldRequestFailed e = hold.getCause()
             e.message.contains("patron cannot hold in")
         where:
-            overdueResources << [OverdueResources.atBranch(anyBranch(), [resourceId("123"), resourceId("456")]),
-                                 OverdueResources.atBranch(anyBranch(), [resourceId("123"), resourceId("456"), resourceId("789")])]
+            resources << [
+                    [anyResourceId(), anyResourceId()],
+                    [anyResourceId(), anyResourceId(), anyResourceId()]
+            ]
 
 
     }
@@ -77,13 +83,13 @@ class RegularPatronRequestingCirculatingResourcesTest extends Specification {
             hold.isSuccess()
             resource.isHeld()
         where:
-            overdueResources <<  [OverdueResources.atBranch(anyBranch(), [resourceId("123")]),
+            overdueResources <<  [OverdueResources.atBranch(anyBranch(), [anyResourceId()]),
                                  OverdueResources.noOverdueResources()]
     }
 
     def 'fifth hold after 4th successful consecutive holds shouldnt be possible'() {
         given:
-            Patron patron = regularPatron()
+            PatronResources patron = regularPatron()
         and:
             5.times {
                 patron.hold(circulatingResource())

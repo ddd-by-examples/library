@@ -3,7 +3,7 @@ package io.pillopl.books.domain
 import io.vavr.control.Try
 import spock.lang.Specification
 
-import static io.pillopl.books.domain.PatronFixture.regularPatron
+import static PatronResourcesFixture.regularPatron
 import static io.pillopl.books.domain.ResourceFixture.restrictedResource
 
 class RegularPatronRequestingRestrictedResourcesTest extends Specification {
