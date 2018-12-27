@@ -8,10 +8,8 @@ import static io.pillopl.books.domain.ResourceFixture.restrictedResource
 class RegularPatronRequestingRestrictedResourcesTest extends Specification {
 
     def 'a regular patron cannot hold restricted resource'() {
-        given:
-            Resource restrictedResource = restrictedResource()
         when:
-            restrictedResource.holdBy(regularPatron())
+            regularPatron().hold(restrictedResource())
         then:
             ResourceHoldRequestFailed e = thrown(ResourceHoldRequestFailed)
             e.message.contains("Regular patrons cannot hold restricted resources")

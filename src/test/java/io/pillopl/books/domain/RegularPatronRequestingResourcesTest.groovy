@@ -4,42 +4,35 @@ import spock.lang.Specification
 
 import static io.pillopl.books.domain.LibraryBranchFixture.anyBranch
 import static io.pillopl.books.domain.PatronFixture.regularPatron
-import static io.pillopl.books.domain.ResourceFixture.availableResource
-import static io.pillopl.books.domain.ResourceFixture.collectedResource
-import static io.pillopl.books.domain.ResourceFixture.resourceId
-import static io.pillopl.books.domain.ResourceFixture.resourceOnHold
+import static io.pillopl.books.domain.PatronFixture.regularPatronWithHolds
+import static io.pillopl.books.domain.PatronFixture.regularPatronWithOverdueResource
+import static io.pillopl.books.domain.ResourceFixture.*
 
 class RegularPatronRequestingResourcesTest extends Specification {
 
     def 'a regular patron cannot hold resource which is already held'() {
-        given:
-            Resource resourceOnHold = resourceOnHold()
         when:
-            resourceOnHold.holdBy(regularPatron())
+            regularPatron().hold(resourceOnHold())
         then:
             ResourceHoldRequestFailed e = thrown(ResourceHoldRequestFailed)
-            e.message.contains("resource is currently ON_HOLD")
+            e.message.contains("resource is currently not available")
     }
 
     def 'a regular patron cannot hold resource which is collected'() {
-        given:
-            Resource collectedResource = collectedResource()
         when:
-            collectedResource.holdBy(regularPatron())
+            regularPatron().hold(collectedResource())
         then:
             ResourceHoldRequestFailed e = thrown(ResourceHoldRequestFailed)
-            e.message.contains("resource is currently COLLECTED")
+            e.message.contains("resource is currently not available")
     }
 
     //TODO: per month
     def 'a regular patron cannot hold more than 5 resources (not per month)'() {
-        given:
-            Resource availableResource = availableResource()
         when:
-            availableResource.holdBy(PatronFixture.regularPatronWithHolds(holds))
+            regularPatronWithHolds(holds).hold(availableResource())
         then:
             ResourceHoldRequestFailed e = thrown(ResourceHoldRequestFailed)
-            e.message.contains("patron cannot hold in")
+            e.message.contains("patron cannot hold more resources")
         where:
             holds << [5, 6, 3000]
 
@@ -50,7 +43,7 @@ class RegularPatronRequestingResourcesTest extends Specification {
         given:
             Resource resource = availableResource()
         when:
-            resource.holdBy(PatronFixture.regularPatronWithHolds(holds))
+            regularPatronWithHolds(holds).hold(resource)
         then:
             resource.isHeld()
         where:
@@ -59,10 +52,8 @@ class RegularPatronRequestingResourcesTest extends Specification {
     }
 
     def 'a regular patron cannot hold anymore when he has at least two overdue checkouts  '() {
-        given:
-            Resource availableResource = availableResource()
         when:
-            availableResource.holdBy(PatronFixture.regularPatronWithOverdueResource(overdueResources))
+            regularPatronWithOverdueResource(overdueResources).hold(availableResource())
         then:
             ResourceHoldRequestFailed e = thrown(ResourceHoldRequestFailed)
             e.message.contains("patron cannot hold in")
@@ -77,11 +68,11 @@ class RegularPatronRequestingResourcesTest extends Specification {
         given:
             Resource resource = availableResource()
         when:
-            resource.holdBy(PatronFixture.regularPatronWithOverdueResource(overdueResources))
+            regularPatronWithOverdueResource(overdueResources).hold(resource)
         then:
             resource.isHeld()
         where:
-            overdueResources << [OverdueResources.atBranch(anyBranch(), [resourceId("123")]),
+            overdueResources <<  [OverdueResources.atBranch(anyBranch(), [resourceId("123")]),
                                  OverdueResources.noOverdueResources()]
     }
 
@@ -90,13 +81,13 @@ class RegularPatronRequestingResourcesTest extends Specification {
             Patron patron = regularPatron()
         and:
             5.times {
-                availableResource().holdBy(patron)
+                patron.hold(availableResource())
             }
         when:
-            availableResource().holdBy(patron)
+            patron.hold(availableResource())
         then:
             ResourceHoldRequestFailed e = thrown(ResourceHoldRequestFailed)
-            e.message.contains("patron cannot hold in")
+            e.message.contains("patron cannot hold more resources")
     }
 
 

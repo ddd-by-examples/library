@@ -7,12 +7,11 @@ import static io.pillopl.books.domain.ResourceFixture.availableResource
 
 class ResearcherPatronRequestingResourcesTest extends Specification {
 
-
     def 'a researcher patron can hold any number of resources'() {
         given:
             Resource resource = availableResource()
         when:
-            resource.holdBy(researcherPatronWithHolds(holds))
+            researcherPatronWithHolds(holds).hold(resource)
         then:
             resource.isHeld()
         where:
