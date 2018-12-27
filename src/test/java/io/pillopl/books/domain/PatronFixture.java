@@ -8,6 +8,9 @@ class PatronFixture {
     static Patron regularPatron() {
         return new Patron(anyPatronId(), OverdueResources.noOverdueResources(), REGULAR, 0);
     }
+    static Patron regularPatron(String patronId) {
+        return new Patron(patronId(patronId), OverdueResources.noOverdueResources(), REGULAR, 0);
+    }
 
     static Patron researcherPatron() {
         return new Patron(anyPatronId(), OverdueResources.noOverdueResources(), RESEARCHER, 0);
@@ -30,6 +33,13 @@ class PatronFixture {
     }
 
     static PatronId anyPatronId() {
-        return new PatronId("Patron");
+        return patronId("Patron");
     }
+
+
+    static PatronId patronId(String patronId) {
+        return new PatronId(patronId);
+    }
+
+
 }

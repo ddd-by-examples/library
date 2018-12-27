@@ -3,16 +3,20 @@ package io.pillopl.books.domain;
 
 import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.Value;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.pillopl.books.domain.Resource.ResourceState.COLLECTED;
 import static java.util.Collections.EMPTY_MAP;
 import static java.util.Collections.emptyList;
 
 @AllArgsConstructor
+@EqualsAndHashCode(of = "patronId")
 class Patron {
 
     static final int REGULAR_PATRON_HOLDS_LIMIT = 5;
@@ -20,6 +24,7 @@ class Patron {
 
     enum PatronType {RESEARCHER, REGULAR}
 
+    @Getter
     private final PatronId patronId;
 
     private final OverdueResources overdueResources;
@@ -30,7 +35,7 @@ class Patron {
 
     Try<Void> hold(Resource resource) {
         return Try.run(() -> {
-            if (overdueResources.countAt(resource.branch()) >= MAX_COUNT_OF_OVERDUE_RESOURCES) {
+            if (overdueResources.countAt(resource.getLibraryBranch()) >= MAX_COUNT_OF_OVERDUE_RESOURCES) {
                 throw new ResourceHoldRequestFailed("Cannot hold resource, patron cannot hold in libraryBranch");
             }
 
@@ -42,7 +47,7 @@ class Patron {
                 throw new ResourceHoldRequestFailed("Regular patrons cannot hold restricted resources");
             }
 
-            resource.hold();
+            resource.holdBy(this);
             numberOfHolds++;
         });
     }
@@ -54,19 +59,39 @@ class Patron {
 }
 
 @Value
-class PatronId {
+class PatronResourcesOnHold {
 
-    String resourceId;
+    static PatronResourcesOnHold of(List<ResourceOnHold> resourcesOnHold) {
+        return new PatronResourcesOnHold(resourcesOnHold);
+    }
+
+    List<ResourceOnHold> resourcesOnHold;
+
+    PatronResourcesOnHold(List<ResourceOnHold> resourcesOnHolds) {
+        this.resourcesOnHold = resourcesOnHolds;
+    }
 
 }
 
+@Value
+class ResourceOnHold {
+    PatronId patronId;
+    ResourceId resourceId;
+    LibraryBranchId libraryBranchId;
+}
+
+@Value
+class PatronId {
+
+    String patronId;
+
+}
 
 class ResourceHoldRequestFailed extends RuntimeException {
     ResourceHoldRequestFailed(String msg) {
         super(msg);
     }
 }
-
 
 @Value
 class OverdueResources {
@@ -99,22 +124,24 @@ class LibraryBranchId {
 @AllArgsConstructor
 class Resource {
 
-    LibraryBranchId branch() {
-        return libraryBranch;
-    }
-
     enum ResourceState {AVAILABLE, ON_HOLD, COLLECTED}
 
     enum ResourceType {RESTRICTED, CIRCULATING}
 
+    @Getter
     private final LibraryBranchId libraryBranch;
+
     private final ResourceType type;
+
     private ResourceState state;
 
-    void hold() {
+    private PatronId heldBy;
+
+    void holdBy(Patron patron) {
         if (!isAvailable()) {
             throw new ResourceHoldRequestFailed("Cannot hold resource, resource is currently not available");
         }
+        this.heldBy = patron.getPatronId();
         this.state = ResourceState.ON_HOLD;
     }
 
@@ -122,20 +149,41 @@ class Resource {
         return type.equals(ResourceType.RESTRICTED);
     }
 
-    private boolean isAvailable() {
+    boolean isCollected() {
+        return state.equals(COLLECTED);
+    }
+
+    boolean isAvailable() {
         return state.equals(ResourceState.AVAILABLE);
-    }
-
-    void collectBy(Patron patron) {
-
-    }
-
-    void returnedBy(Patron patron) {
-
     }
 
     boolean isHeld() {
         return state.equals(ResourceState.ON_HOLD);
+    }
+
+    Try<Void> collectBy(PatronId collectingPatron) {
+        return Try.run(() ->{
+            if(!isHeld()) {
+                throw new ResourceCollectingFailed("resource is not on hold");
+            }
+            if(!collectingPatron.equals(this.heldBy)) {
+                throw new ResourceCollectingFailed("resource should be collected by the patron who put it on hold");
+            }
+            this.heldBy = null;
+            this.state = COLLECTED;
+        });
+    }
+
+    void returned() {
+        this.state = ResourceState.AVAILABLE;
+    }
+
+
+}
+
+class ResourceCollectingFailed extends RuntimeException {
+    ResourceCollectingFailed(String msg) {
+        super(msg);
     }
 }
 

@@ -14,19 +14,20 @@ class ResourceFixture {
     }
 
     static Resource resourceOnHold() {
-        return new Resource(anyBranch(), CIRCULATING, ON_HOLD);
+        return new Resource(anyBranch(), CIRCULATING, ON_HOLD, null);
     }
 
     static Resource circulatingResource() {
-        return new Resource(anyBranch(), CIRCULATING, AVAILABLE);
+        return new Resource(anyBranch(), CIRCULATING, AVAILABLE, null);
     }
 
     static Resource collectedResource() {
-        return new Resource(anyBranch(), CIRCULATING, COLLECTED);
+        return new Resource(anyBranch(), CIRCULATING, COLLECTED, null);
     }
 
     static Resource restrictedResource() {
-        return new Resource(anyBranch(), RESTRICTED, AVAILABLE);
+        return new Resource(anyBranch(), RESTRICTED, AVAILABLE, null);
     }
+
 
 }
