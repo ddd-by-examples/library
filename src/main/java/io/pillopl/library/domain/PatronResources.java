@@ -1,10 +1,10 @@
-package io.pillopl.books.domain;
+package io.pillopl.library.domain;
 
 
-import io.pillopl.books.domain.PatronResourcesEvents.ResourceCollected;
-import io.pillopl.books.domain.PatronResourcesEvents.ResourceCollectingFailed;
-import io.pillopl.books.domain.PatronResourcesEvents.ResourceHoldFailed;
-import io.pillopl.books.domain.PatronResourcesEvents.ResourcePlacedOnHold;
+import io.pillopl.library.domain.PatronResourcesEvents.ResourceCollected;
+import io.pillopl.library.domain.PatronResourcesEvents.ResourceCollectingFailed;
+import io.pillopl.library.domain.PatronResourcesEvents.ResourceHoldFailed;
+import io.pillopl.library.domain.PatronResourcesEvents.ResourcePlacedOnHold;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 import io.vavr.control.Option;

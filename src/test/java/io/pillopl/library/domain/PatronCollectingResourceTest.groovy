@@ -1,11 +1,11 @@
-package io.pillopl.books.domain
+package io.pillopl.library.domain
 
 import io.vavr.control.Either
 import spock.lang.Specification
 
 import static PatronResourcesFixture.regularPatron
-import static io.pillopl.books.domain.ResourceFixture.circulatingResource
-import static io.pillopl.books.domain.PatronResourcesEvents.*
+import static ResourceFixture.circulatingResource
+import static PatronResourcesEvents.*
 
 
 class PatronCollectingResourceTest extends Specification {

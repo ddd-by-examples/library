@@ -1,13 +1,13 @@
-package io.pillopl.books.domain;
+package io.pillopl.library.domain;
 
 import java.util.UUID;
 
-import static io.pillopl.books.domain.LibraryBranchFixture.anyBranch;
-import static io.pillopl.books.domain.Resource.ResourceState.AVAILABLE;
-import static io.pillopl.books.domain.Resource.ResourceState.COLLECTED;
-import static io.pillopl.books.domain.Resource.ResourceState.ON_HOLD;
-import static io.pillopl.books.domain.Resource.ResourceType.CIRCULATING;
-import static io.pillopl.books.domain.Resource.ResourceType.RESTRICTED;
+import static io.pillopl.library.domain.LibraryBranchFixture.anyBranch;
+import static io.pillopl.library.domain.Resource.ResourceState.AVAILABLE;
+import static io.pillopl.library.domain.Resource.ResourceState.COLLECTED;
+import static io.pillopl.library.domain.Resource.ResourceState.ON_HOLD;
+import static io.pillopl.library.domain.Resource.ResourceType.CIRCULATING;
+import static io.pillopl.library.domain.Resource.ResourceType.RESTRICTED;
 
 class ResourceFixture {
 

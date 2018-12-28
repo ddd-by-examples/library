@@ -1,4 +1,4 @@
-package io.pillopl.books.domain;
+package io.pillopl.library.domain;
 
 import java.util.UUID;
 

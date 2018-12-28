@@ -1,12 +1,12 @@
-package io.pillopl.books.domain
+package io.pillopl.library.domain
 
 import io.vavr.control.Either
 import spock.lang.Specification
 
 import static PatronResourcesFixture.regularPatron
-import static io.pillopl.books.domain.PatronResourcesEvents.ResourcePlacedOnHold
-import static io.pillopl.books.domain.PatronResourcesEvents.ResourceHoldFailed
-import static io.pillopl.books.domain.ResourceFixture.restrictedResource
+import static PatronResourcesEvents.ResourcePlacedOnHold
+import static PatronResourcesEvents.ResourceHoldFailed
+import static ResourceFixture.restrictedResource
 
 class RegularPatronRequestingRestrictedResourcesTest extends Specification {
 

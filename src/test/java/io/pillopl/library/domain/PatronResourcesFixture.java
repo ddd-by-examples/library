@@ -1,16 +1,11 @@
-package io.pillopl.books.domain;
+package io.pillopl.library.domain;
 
-import io.pillopl.books.domain.PatronInformation.PatronType;
 import io.vavr.collection.List;
 
 import java.util.HashSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static io.pillopl.books.domain.LibraryBranchFixture.anyBranch;
-import static io.pillopl.books.domain.OverdueCheckouts.noOverdueCheckouts;
-import static io.pillopl.books.domain.PatronInformation.PatronType.REGULAR;
-import static io.pillopl.books.domain.PatronInformation.PatronType.RESEARCHER;
 import static io.vavr.collection.List.of;
 import static java.util.stream.IntStream.rangeClosed;
 
@@ -18,51 +13,51 @@ class PatronResourcesFixture {
 
     static PatronResources regularPatron() {
         return new PatronResources(
-                patronInformation(anyPatronId(), REGULAR),
+                patronInformation(anyPatronId(), PatronInformation.PatronType.REGULAR),
                 allCommonPlacingOnHoldPolicies(),
-                noOverdueCheckouts(),
+                OverdueCheckouts.noOverdueCheckouts(),
                 noHolds());
     }
 
-    static PatronInformation patronInformation(PatronId id, PatronType type) {
+    static PatronInformation patronInformation(PatronId id, PatronInformation.PatronType type) {
         return new PatronInformation(id, type);
     }
 
     static PatronResources researcherPatron() {
         return new PatronResources(
-                patronInformation(anyPatronId(), RESEARCHER),
+                patronInformation(anyPatronId(), PatronInformation.PatronType.RESEARCHER),
                 allCommonPlacingOnHoldPolicies(),
-                noOverdueCheckouts(),
+                OverdueCheckouts.noOverdueCheckouts(),
                 noHolds());
     }
 
     static PatronResources regularPatronWithHolds(int numberOfHolds) {
         PatronId patronId = anyPatronId();
         return new PatronResources(
-                patronInformation(patronId, REGULAR),
+                patronInformation(patronId, PatronInformation.PatronType.REGULAR),
                 allCommonPlacingOnHoldPolicies(),
-                noOverdueCheckouts(),
+                OverdueCheckouts.noOverdueCheckouts(),
                 resourcesOnHold(numberOfHolds, patronId));
     }
 
     static ResourcesOnHold resourcesOnHold(int numberOfHolds, PatronId patronId) {
         return new ResourcesOnHold(rangeClosed(1, numberOfHolds)
-                .mapToObj(i -> new ResourceOnHold(patronId, ResourceFixture.anyResourceId(), anyBranch()))
+                .mapToObj(i -> new ResourceOnHold(patronId, ResourceFixture.anyResourceId(), LibraryBranchFixture.anyBranch()))
                 .collect(Collectors.toSet()));
     }
 
     static PatronResources researcherPatronWithHolds(int numberOfHolds) {
         PatronId patronId = anyPatronId();
         return new PatronResources(
-                patronInformation(patronId, RESEARCHER),
+                patronInformation(patronId, PatronInformation.PatronType.RESEARCHER),
                 allCommonPlacingOnHoldPolicies(),
-                noOverdueCheckouts(),
+                OverdueCheckouts.noOverdueCheckouts(),
                 resourcesOnHold(numberOfHolds, patronId));
     }
 
     static PatronResources regularPatronWithOverdueCheckouts(OverdueCheckouts overdueCheckouts) {
         return new PatronResources(
-                patronInformation(anyPatronId(), REGULAR),
+                patronInformation(anyPatronId(), PatronInformation.PatronType.REGULAR),
                 allCommonPlacingOnHoldPolicies(),
                 overdueCheckouts,
                 noHolds());
@@ -70,7 +65,7 @@ class PatronResourcesFixture {
 
     static PatronResources researcherPatronWithOverdueCheckouts(OverdueCheckouts overdueCheckouts) {
         return new PatronResources(
-                patronInformation(anyPatronId(), RESEARCHER),
+                patronInformation(anyPatronId(), PatronInformation.PatronType.RESEARCHER),
                 allCommonPlacingOnHoldPolicies(),
                 overdueCheckouts,
                 noHolds());

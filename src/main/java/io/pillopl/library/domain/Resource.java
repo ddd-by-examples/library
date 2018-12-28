@@ -1,16 +1,13 @@
-package io.pillopl.books.domain;
+package io.pillopl.library.domain;
 
-import io.pillopl.books.domain.PatronResourcesEvents.ResourceCollected;
-import io.pillopl.books.domain.PatronResourcesEvents.ResourcePlacedOnHold;
-import io.pillopl.books.domain.PatronResourcesEvents.ResourceReturned;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Value;
 
 import java.util.UUID;
 
-import static io.pillopl.books.domain.Resource.ResourceState.COLLECTED;
-import static io.pillopl.books.domain.Resource.ResourceState.ON_HOLD;
+import static io.pillopl.library.domain.Resource.ResourceState.COLLECTED;
+import static io.pillopl.library.domain.Resource.ResourceState.ON_HOLD;
 
 @AllArgsConstructor
 class Resource {
@@ -45,15 +42,15 @@ class Resource {
         return state.equals(ON_HOLD);
     }
 
-    void handle(ResourceReturned event) {
+    void handle(PatronResourcesEvents.ResourceReturned event) {
         this.state = ResourceState.AVAILABLE;
     }
 
-    void handle(ResourcePlacedOnHold event) {
+    void handle(PatronResourcesEvents.ResourcePlacedOnHold event) {
         state = ON_HOLD;
     }
 
-    void handle(ResourceCollected event) {
+    void handle(PatronResourcesEvents.ResourceCollected event) {
         state = COLLECTED;
     }
 }
