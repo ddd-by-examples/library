@@ -30,16 +30,8 @@ class Resource {
         return type.equals(ResourceType.RESTRICTED);
     }
 
-    boolean isCollected() {
-        return state.equals(COLLECTED);
-    }
-
     boolean isAvailable() {
         return state.equals(ResourceState.AVAILABLE);
-    }
-
-    boolean isHeld() {
-        return state.equals(ON_HOLD);
     }
 
     void handle(PatronResourcesEvents.ResourceReturned event) {
