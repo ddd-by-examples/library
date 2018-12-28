@@ -14,7 +14,6 @@ import lombok.Value;
 
 import java.time.Instant;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -46,19 +45,17 @@ class PatronResources {
                     resource,
                     patron));
         }
-        ResourceOnHold resourceOnHold = createResourceOnHold(resource);
-        resourcesOnHold = resourcesOnHold.newActive(resourceOnHold);
-        return right(resourceOnHold.toResourceHeld());
+        ResourcePlacedOnHold resourcePlacedOnHold = resourcesOnHold.hold(resource, patron);
+        return right(resourcePlacedOnHold);
     }
 
     Either<ResourceCollectingFailed, ResourceCollected> collect(Resource resource) {
-        ResourceOnHold resourceToCollect = createResourceOnHold(resource);
+        ResourceOnHold resourceToCollect = new ResourceOnHold(patron, resource);
         if (resourcesOnHold.doesNotContain(resourceToCollect)) {
-            return left(ResourceCollectingFailed.now(
-                    "resource is not on hold by patron", resource, patron));
+            return left(ResourceCollectingFailed.now("resource is not on hold by patron", resource, patron));
         }
-        resourcesOnHold = resourcesOnHold.completed(resourceToCollect);
-        return right(resourceToCollect.toResourceCollected());
+        ResourceCollected resourceCollected = resourcesOnHold.completed(resourceToCollect);
+        return right(resourceCollected);
     }
 
     private Option<Rejection> tryPlacingOnHold(Resource resource) {
@@ -66,10 +63,6 @@ class PatronResources {
                 .map(policy -> policy.canPlaceOnHold(resource, this))
                 .find(Either::isLeft)
                 .map(Either::getLeft);
-    }
-
-    private ResourceOnHold createResourceOnHold(Resource resource) {
-        return new ResourceOnHold(patron, resource);
     }
 
     boolean isRegular() {
@@ -92,16 +85,15 @@ class ResourcesOnHold {
 
     Set<ResourceOnHold> resourcesOnHold;
 
-    ResourcesOnHold newActive(ResourceOnHold resourceOnHold) {
-        Set<ResourceOnHold> newResourcesOnHolds = new HashSet<>(resourcesOnHold);
-        newResourcesOnHolds.add(resourceOnHold);
-        return new ResourcesOnHold(newResourcesOnHolds);
+    ResourcePlacedOnHold hold(Resource resourceToHold, PatronInformation patronInformation) {
+        ResourceOnHold resourceOnHold = new ResourceOnHold(patronInformation, resourceToHold);
+        resourcesOnHold.add(resourceOnHold);
+        return resourceOnHold.toResourceHeld();
     }
 
-    ResourcesOnHold completed(ResourceOnHold resourceOnHold) {
-        Set<ResourceOnHold> newResourcesOnHolds = new HashSet<>(resourcesOnHold);
-        newResourcesOnHolds.remove(resourceOnHold);
-        return new ResourcesOnHold(newResourcesOnHolds);
+    ResourceCollected completed(ResourceOnHold resourceToCollect) {
+        resourcesOnHold.remove(resourceToCollect);
+        return resourceToCollect.toResourceCollected();
     }
 
     boolean doesNotContain(ResourceOnHold resourceOnHold) {
