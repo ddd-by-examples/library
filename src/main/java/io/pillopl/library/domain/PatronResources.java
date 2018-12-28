@@ -42,7 +42,7 @@ class PatronResources {
         Option<Rejection> rejection = checkRejectionPolicy(resource);
         if (!rejection.isEmpty()) {
             return left(ResourceHoldFailed.now(
-                    rejection.map(Rejection::getReason).getOrElse("couldnt hold"),
+                    rejection.map(Rejection::getReason).getOrElse("couldn't hold resource"),
                     resource,
                     patron));
         }
