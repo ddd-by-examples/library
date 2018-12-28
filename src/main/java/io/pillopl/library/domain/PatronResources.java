@@ -33,13 +33,13 @@ class PatronResources {
 
     private final List<PlacingOnHoldPolicy> placingOnHoldPolicies;
 
-    private OverdueCheckouts overdueCheckouts;
+    private final OverdueCheckouts overdueCheckouts;
 
     private ResourcesOnHold resourcesOnHold;
 
     //TODO cannot hold held or collected - separate transaction
     Either<ResourceHoldFailed, ResourcePlacedOnHold> placeOnHold(Resource resource) {
-        Option<Rejection> rejection = checkRejectionPolicy(resource);
+        Option<Rejection> rejection = tryPlacingOnHold(resource);
         if (!rejection.isEmpty()) {
             return left(ResourceHoldFailed.now(
                     rejection.map(Rejection::getReason).getOrElse("couldn't hold resource"),
@@ -61,7 +61,7 @@ class PatronResources {
         return right(resourceToCollect.toResourceCollected());
     }
 
-    private Option<Rejection> checkRejectionPolicy(Resource resource) {
+    private Option<Rejection> tryPlacingOnHold(Resource resource) {
         return placingOnHoldPolicies
                 .map(policy -> policy.canPlaceOnHold(resource, this))
                 .find(Either::isLeft)
