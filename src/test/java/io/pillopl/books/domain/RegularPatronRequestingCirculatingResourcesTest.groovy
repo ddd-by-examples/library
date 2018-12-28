@@ -11,12 +11,12 @@ import static io.pillopl.books.domain.PatronResourcesEvents.*
 class RegularPatronRequestingCirculatingResourcesTest extends Specification {
 
     //TODO: per month
-    def 'a regular patron cannot hold more than 5 resources (not per month)'() {
+    def 'a regular patron cannot place on hold more than 5 resources'() {
         when:
-            Either<ResourceHoldRequestFailed, ResourceHeld> hold = regularPatronWithHolds(holds).hold(circulatingResource())
+            Either<ResourceHoldFailed, ResourcePlacedOnHold> hold = regularPatronWithHolds(holds).placeOnHold(circulatingResource())
         then:
             hold.isLeft()
-            ResourceHoldRequestFailed e = hold.getLeft()
+            ResourceHoldFailed e = hold.getLeft()
             e.reason.contains("patron cannot hold more resources")
         where:
             holds << [5, 6, 3000]
@@ -24,11 +24,11 @@ class RegularPatronRequestingCirculatingResourcesTest extends Specification {
     }
 
     //TODO: per month
-    def 'a regular patron can book available resource when he doesnt hold more than 4 resources'() {
+    def 'a regular patron can place on hold resource when he didnt placed on hold more than 4 resources'() {
         given:
             Resource resource = circulatingResource()
         when:
-            Either<ResourceHoldRequestFailed, ResourceHeld> hold = regularPatronWithHolds(holds).hold(resource)
+            Either<ResourceHoldFailed, ResourcePlacedOnHold> hold = regularPatronWithHolds(holds).placeOnHold(resource)
         then:
             hold.isRight()
         where:
@@ -36,17 +36,17 @@ class RegularPatronRequestingCirculatingResourcesTest extends Specification {
 
     }
 
-    def 'a regular patron cannot hold anymore when he has at least two overdue checkouts  '() {
+    def 'a regular patron cannot place on hold resources anymore when he has at least two overdue checkouts'() {
         given:
             LibraryBranchId libraryBranchId = anyBranch()
         and:
-            OverdueResources overdueResources = OverdueResources.atBranch(libraryBranchId, resources)
+            OverdueCheckouts overdueResources = OverdueCheckouts.atBranch(libraryBranchId, resources as Set)
         when:
-            Either<ResourceHoldRequestFailed, ResourceHeld> hold = regularPatronWithOverdueResource(overdueResources).hold(circulatingResource(libraryBranchId))
+            Either<ResourceHoldFailed, ResourcePlacedOnHold> hold = regularPatronWithOverdueCheckouts(overdueResources).placeOnHold(circulatingResource(libraryBranchId))
         then:
             hold.isLeft()
-            ResourceHoldRequestFailed e = hold.getLeft()
-            e.reason.contains("patron cannot hold in")
+            ResourceHoldFailed e = hold.getLeft()
+            e.reason.contains("cannot place on hold when there are overdue checkouts")
         where:
             resources << [
                     [anyResourceId(), anyResourceId()],
@@ -56,30 +56,30 @@ class RegularPatronRequestingCirculatingResourcesTest extends Specification {
 
     }
 
-    def 'a regular patron can book available resource when he doesnt have 2 overdues'() {
+    def 'a regular patron can place on hold resources when he doesnt have 2 overdues'() {
         given:
             Resource resource = circulatingResource()
         when:
-            Either<ResourceHoldRequestFailed, ResourceHeld> hold = regularPatronWithOverdueResource(overdueResources).hold(resource)
+            Either<ResourceHoldFailed, ResourcePlacedOnHold> hold = regularPatronWithOverdueCheckouts(overdueResources).placeOnHold(resource)
         then:
             hold.isRight()
         where:
-            overdueResources <<  [OverdueResources.atBranch(anyBranch(), [anyResourceId()]),
-                                 OverdueResources.noOverdueResources()]
+            overdueResources <<  [OverdueCheckouts.atBranch(anyBranch(), [anyResourceId()] as Set),
+                                  OverdueCheckouts.noOverdueCheckouts()]
     }
 
-    def 'fifth hold after 4th successful consecutive holds shouldnt be possible'() {
+    def 'tryinf to place a resource on hold after 4th successful consecutive holds shouldnt be possible'() {
         given:
             PatronResources patron = regularPatron()
         and:
             5.times {
-                patron.hold(circulatingResource())
+                patron.placeOnHold(circulatingResource())
             }
         when:
-            Either<ResourceHoldRequestFailed, ResourceHeld> hold = patron.hold(circulatingResource())
+            Either<ResourceHoldFailed, ResourcePlacedOnHold> hold = patron.placeOnHold(circulatingResource())
         then:
             hold.isLeft()
-            ResourceHoldRequestFailed e = hold.getLeft()
+            ResourceHoldFailed e = hold.getLeft()
             e.reason.contains("patron cannot hold more resources")
     }
 

@@ -14,7 +14,7 @@ class ResearcherPatronRequestingCirculatingResourcesTest extends Specification {
         given:
             Resource resource = circulatingResource()
         when:
-            Either<ResourceHoldRequestFailed, ResourceHeld> hold = researcherPatronWithHolds(holds).hold(resource)
+            Either<ResourceHoldFailed, ResourcePlacedOnHold> hold = researcherPatronWithHolds(holds).placeOnHold(resource)
         then:
             hold.isRight()
         where:

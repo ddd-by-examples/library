@@ -5,6 +5,7 @@ import lombok.Value;
 import java.util.UUID;
 
 @Value
+//TODO add not null
 class PatronInformation {
 
     enum PatronType {RESEARCHER, REGULAR}
@@ -19,6 +20,7 @@ class PatronInformation {
 }
 
 @Value
+//TODO add not null
 class PatronId {
     UUID patronId;
 }

@@ -10,7 +10,7 @@ import static io.pillopl.books.domain.PatronResourcesEvents.*
 
 class PatronCollectingResourceTest extends Specification {
 
-    def 'patron cannot collected resource which is not on hold'() {
+    def 'patron cannot collect resource which is not placed on hold'() {
         when:
             Either<ResourceCollectingFailed, ResourceCollected> collect = regularPatron().collect(circulatingResource())
         then:
@@ -19,14 +19,14 @@ class PatronCollectingResourceTest extends Specification {
             e.reason.contains("resource is not on hold")
     }
 
-    def 'patron cannot collected resource held by another patron'() {
+    def 'patron cannot collect resource which is placed on hold by another patron'() {
         given:
             PatronResources patron = regularPatron()
             PatronResources anotherPatron = regularPatron()
         and:
             Resource resource = circulatingResource()
         and:
-            anotherPatron.hold(resource)
+            anotherPatron.placeOnHold(resource)
         when:
             Either<ResourceCollectingFailed, ResourceCollected> collect = patron.collect(resource)
         then:
@@ -35,13 +35,13 @@ class PatronCollectingResourceTest extends Specification {
             e.reason.contains("resource is not on hold by patron")
     }
 
-    def 'patron can collect resource which was held by him'() {
+    def 'patron can collect resource which was placed on hold by him'() {
         given:
             PatronResources patron = regularPatron()
         and:
             Resource resource = circulatingResource()
         and:
-            patron.hold(resource)
+            patron.placeOnHold(resource)
         when:
             Either<ResourceCollectingFailed, ResourceCollected> collect = patron.collect(resource)
         then:

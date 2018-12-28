@@ -12,24 +12,24 @@ import static io.pillopl.books.domain.PatronResourcesEvents.*
 
 class PatronReturningResourceTest extends Specification {
 
-    def 'patron can return resource which is on hold in the system'() {
+    def 'patron can return resource which is marked as placed on hold in the system'() {
         given:
             PatronResources patron = regularPatron()
             Resource resource = circulatingResource()
         and:
-            patron.hold(resource)
+            patron.placeOnHold(resource)
         when:
             resource.handle(resourceReturned())
         then:
             resource.isAvailable()
     }
 
-    def 'patron can return resource which is collected'() {
+    def 'patron can return resource which is marked as collected in the syastem'() {
         given:
             PatronResources patron = regularPatron()
             Resource resource = circulatingResource()
         and:
-            patron.hold(resource)
+            patron.placeOnHold(resource)
         and:
             patron.collect(resource)
         when:
@@ -38,18 +38,18 @@ class PatronReturningResourceTest extends Specification {
             resource.isAvailable()
     }
 
-    def 'a patron can hold resource which was just returned'() {
+    def 'a patron can place on hold resource which was just returned'() {
         given:
             PatronResources patron = regularPatron()
             Resource resource = circulatingResource()
         and:
-            patron.hold(resource)
+            patron.placeOnHold(resource)
         and:
             patron.collect(resource)
         when:
             resource.handle(resourceReturned())
         and:
-            Either<ResourceHoldRequestFailed, ResourceHeld> hold = patron.hold(resource)
+            Either<ResourceHoldFailed, ResourcePlacedOnHold> hold = patron.placeOnHold(resource)
         then:
             hold.isRight()
     }

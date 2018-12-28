@@ -1,7 +1,7 @@
 package io.pillopl.books.domain;
 
 import io.pillopl.books.domain.PatronResourcesEvents.ResourceCollected;
-import io.pillopl.books.domain.PatronResourcesEvents.ResourceHeld;
+import io.pillopl.books.domain.PatronResourcesEvents.ResourcePlacedOnHold;
 import io.pillopl.books.domain.PatronResourcesEvents.ResourceReturned;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -49,7 +49,7 @@ class Resource {
         this.state = ResourceState.AVAILABLE;
     }
 
-    void handle(ResourceHeld event) {
+    void handle(ResourcePlacedOnHold event) {
         state = ON_HOLD;
     }
 
@@ -59,6 +59,7 @@ class Resource {
 }
 
 @Value
+//TODO add not null
 class ResourceId {
 
     UUID resourceId;

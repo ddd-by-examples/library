@@ -3,92 +3,86 @@ package io.pillopl.books.domain;
 
 import io.pillopl.books.domain.PatronResourcesEvents.ResourceCollected;
 import io.pillopl.books.domain.PatronResourcesEvents.ResourceCollectingFailed;
-import io.pillopl.books.domain.PatronResourcesEvents.ResourceHeld;
-import io.pillopl.books.domain.PatronResourcesEvents.ResourceHoldRequestFailed;
+import io.pillopl.books.domain.PatronResourcesEvents.ResourceHoldFailed;
+import io.pillopl.books.domain.PatronResourcesEvents.ResourcePlacedOnHold;
+import io.vavr.collection.List;
 import io.vavr.control.Either;
+import io.vavr.control.Option;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import static io.vavr.control.Either.left;
 import static io.vavr.control.Either.right;
-import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 
+//TODO - open/close
+//TODO - play with types
+//TODO -
 @AllArgsConstructor
 @EqualsAndHashCode(of = "patron")
 class PatronResources {
 
-    static final int MAX_COUNT_OF_OVERDUE_RESOURCES = 2;
-
     private final PatronInformation patron;
 
-    private OverdueResources overdueResources;
+    private final List<PlacingOnHoldPolicy> placingOnHoldPolicies;
+
+    private OverdueCheckouts overdueCheckouts;
 
     private ResourcesOnHold resourcesOnHold;
 
-    //TODO cannot hold held or collected
-    Either<ResourceHoldRequestFailed, ResourceHeld> hold(Resource resource) {
-        if (regularPatronIsTryingToExceedMaxNumberOfHolds()) {
-            return left(resourceHoldRequestFailed(resource, "Cannot hold resource, patron cannot hold more resources"));
+    //TODO cannot hold held or collected - separate transaction
+    Either<ResourceHoldFailed, ResourcePlacedOnHold> placeOnHold(Resource resource) {
+        Option<Rejection> rejection = checkRejectionPolicy(resource);
+        if (!rejection.isEmpty()) {
+            return left(ResourceHoldFailed.now(
+                    rejection.map(Rejection::getReason).getOrElse("couldnt hold"),
+                    resource,
+                    patron));
         }
-
-        if (regularPatronIsTryingToRequestRestrictedResource(resource)) {
-            return left(resourceHoldRequestFailed(resource, "Regular patrons cannot hold restricted resources"));
-        }
-
-        if (patronHasMaximumNumberOfOverdueCheckouts(resource)) {
-            return left(resourceHoldRequestFailed(resource, "Cannot hold resource, patron cannot hold in libraryBranch"));
-        }
-
-        ResourceOnHold resourceOnHold = new ResourceOnHold(patron.getPatronId(), resource.getResourceId(), resource.getLibraryBranch());
-        resourcesOnHold = resourcesOnHold.with(resourceOnHold);
+        ResourceOnHold resourceOnHold = createResourceOnHold(resource);
+        resourcesOnHold = resourcesOnHold.newActive(resourceOnHold);
         return right(resourceOnHold.toResourceHeld());
     }
 
     Either<ResourceCollectingFailed, ResourceCollected> collect(Resource resource) {
-
-        ResourceOnHold resourceToCollect = new ResourceOnHold(patron.getPatronId(), resource.getResourceId(), resource.getLibraryBranch());
-
-        if (!resourcesOnHold.contains(resourceToCollect)) {
-            return left(resourceCollectingFailed(resource, "resource is not on hold by patron"));
+        ResourceOnHold resourceToCollect = createResourceOnHold(resource);
+        if (resourcesOnHold.doesNotContain(resourceToCollect)) {
+            return left(ResourceCollectingFailed.now(
+                    "resource is not on hold by patron", resource, patron));
         }
-        resourcesOnHold = resourcesOnHold.without(resourceToCollect);
+        resourcesOnHold = resourcesOnHold.completed(resourceToCollect);
         return right(resourceToCollect.toResourceCollected());
     }
 
-    private boolean regularPatronIsTryingToExceedMaxNumberOfHolds() {
-        return patron.isRegular() && resourcesOnHold.cannotHoldMore();
+    private Option<Rejection> checkRejectionPolicy(Resource resource) {
+        return placingOnHoldPolicies
+                .map(policy -> policy.canPlaceOnHold(resource, this))
+                .find(Either::isLeft)
+                .map(Either::getLeft);
     }
 
-
-    private boolean patronHasMaximumNumberOfOverdueCheckouts(Resource resource) {
-        return overdueResources.countAt(resource.getLibraryBranch()) >= MAX_COUNT_OF_OVERDUE_RESOURCES;
+    private ResourceOnHold createResourceOnHold(Resource resource) {
+        return new ResourceOnHold(patron, resource);
     }
 
-    private boolean regularPatronIsTryingToRequestRestrictedResource(Resource resource) {
-        return patron.isRegular() && resource.isRestricted();
+    boolean isRegular() {
+        return patron.isRegular();
     }
 
-    private ResourceHoldRequestFailed resourceHoldRequestFailed(Resource resource, String reason) {
-        return new ResourceHoldRequestFailed(reason,
-                Instant.now(),
-                patron.getPatronId().getPatronId(),
-                resource.getResourceId().getResourceId(),
-                resource.getLibraryBranch().getLibraryBranchId());
+    int overdueCheckoutsAt(LibraryBranchId libraryBranch) {
+        return overdueCheckouts.countAt(libraryBranch);
     }
 
-    private ResourceCollectingFailed resourceCollectingFailed(Resource resource, String reason) {
-        return new ResourceCollectingFailed(reason,
-                Instant.now(),
-                patron.getPatronId().getPatronId(),
-                resource.getResourceId().getResourceId(),
-                resource.getLibraryBranch().getLibraryBranchId());
+    int numberOfHolds() {
+        return resourcesOnHold.count();
     }
-
-
 }
 
 @Value
@@ -98,59 +92,75 @@ class ResourcesOnHold {
 
     Set<ResourceOnHold> resourcesOnHold;
 
-    ResourcesOnHold with(ResourceOnHold resourceOnHold) {
+    ResourcesOnHold newActive(ResourceOnHold resourceOnHold) {
         Set<ResourceOnHold> newResourcesOnHolds = new HashSet<>(resourcesOnHold);
         newResourcesOnHolds.add(resourceOnHold);
         return new ResourcesOnHold(newResourcesOnHolds);
     }
 
-    ResourcesOnHold without(ResourceOnHold resourceOnHold) {
+    ResourcesOnHold completed(ResourceOnHold resourceOnHold) {
         Set<ResourceOnHold> newResourcesOnHolds = new HashSet<>(resourcesOnHold);
         newResourcesOnHolds.remove(resourceOnHold);
         return new ResourcesOnHold(newResourcesOnHolds);
     }
 
-    boolean contains(ResourceOnHold resourceOnHold) {
-        return resourcesOnHold.contains(resourceOnHold);
+    boolean doesNotContain(ResourceOnHold resourceOnHold) {
+        return !resourcesOnHold.contains(resourceOnHold);
     }
 
-    boolean cannotHoldMore() {
-        return resourcesOnHold.size() >= REGULAR_PATRON_HOLDS_LIMIT;
+    int count() {
+        return resourcesOnHold.size();
     }
 }
 
+//TODO add not null
 @Value
+@AllArgsConstructor
 class ResourceOnHold {
+
     PatronId patronId;
     ResourceId resourceId;
     LibraryBranchId libraryBranchId;
 
-    ResourceHeld toResourceHeld() {
-        return new ResourceHeld(Instant.now(), patronId.getPatronId(), resourceId.getResourceId(), libraryBranchId.getLibraryBranchId());
+    ResourceOnHold(PatronInformation patron, Resource resource) {
+        this(patron.getPatronId(), resource.getResourceId(), resource.getLibraryBranch());
+    }
+
+    ResourcePlacedOnHold toResourceHeld() {
+        return new ResourcePlacedOnHold(
+                Instant.now(),
+                patronId.getPatronId(),
+                resourceId.getResourceId(),
+                libraryBranchId.getLibraryBranchId());
     }
 
     ResourceCollected toResourceCollected() {
-        return new ResourceCollected(Instant.now(), patronId.getPatronId(), resourceId.getResourceId(), libraryBranchId.getLibraryBranchId());
+        return new ResourceCollected(
+                Instant.now(),
+                patronId.getPatronId(),
+                resourceId.getResourceId(),
+                libraryBranchId.getLibraryBranchId());
     }
 }
 
 @Value
-class OverdueResources {
+//TODO add not null
+class OverdueCheckouts {
 
-    Map<LibraryBranchId, List<ResourceId>> overdueResources;
+    Map<LibraryBranchId, Set<ResourceId>> overdueCheckouts;
 
-    static OverdueResources noOverdueResources() {
-        return new OverdueResources(new HashMap<>());
+    static OverdueCheckouts noOverdueCheckouts() {
+        return new OverdueCheckouts(new HashMap<>());
     }
 
-    static OverdueResources atBranch(LibraryBranchId libraryBranch, List<ResourceId> resourcesId) {
-        Map<LibraryBranchId, List<ResourceId>> overdueResources = new HashMap<>();
+    static OverdueCheckouts atBranch(LibraryBranchId libraryBranch, Set<ResourceId> resourcesId) {
+        Map<LibraryBranchId, Set<ResourceId>> overdueResources = new HashMap<>();
         overdueResources.put(libraryBranch, resourcesId);
-        return new OverdueResources(overdueResources);
+        return new OverdueCheckouts(overdueResources);
     }
 
     int countAt(LibraryBranchId libraryBranchId) {
-        return overdueResources.getOrDefault(libraryBranchId, emptyList()).size();
+        return overdueCheckouts.getOrDefault(libraryBranchId, emptySet()).size();
     }
 }
 
