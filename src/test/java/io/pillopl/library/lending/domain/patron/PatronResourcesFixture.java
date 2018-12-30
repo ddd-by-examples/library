@@ -1,5 +1,7 @@
-package io.pillopl.library.domain;
+package io.pillopl.library.lending.domain.patron;
 
+import io.pillopl.library.lending.domain.resource.ResourceFixture;
+import io.pillopl.library.lending.domain.library.LibraryBranchFixture;
 import io.vavr.collection.List;
 
 import java.util.HashSet;
@@ -9,9 +11,9 @@ import java.util.stream.Collectors;
 import static io.vavr.collection.List.of;
 import static java.util.stream.IntStream.rangeClosed;
 
-class PatronResourcesFixture {
+public class PatronResourcesFixture {
 
-    static PatronResources regularPatron() {
+    public static PatronResources regularPatron() {
         return new PatronResources(
                 patronInformation(anyPatronId(), PatronInformation.PatronType.REGULAR),
                 allCommonPlacingOnHoldPolicies(),
@@ -42,7 +44,7 @@ class PatronResourcesFixture {
 
     static ResourcesOnHold resourcesOnHold(int numberOfHolds, PatronId patronId) {
         return new ResourcesOnHold(rangeClosed(1, numberOfHolds)
-                .mapToObj(i -> new ResourceOnHold(patronId, ResourceFixture.anyResourceId(), LibraryBranchFixture.anyBranch()))
+                .mapToObj(i -> new ResourceOnHold(ResourceFixture.anyResourceId(), LibraryBranchFixture.anyBranch()))
                 .collect(Collectors.toSet()));
     }
 

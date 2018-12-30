@@ -1,18 +1,19 @@
-package io.pillopl.library.domain
+package io.pillopl.library.lending.domain.patron
 
+import io.pillopl.library.lending.domain.resource.Resource
+import io.pillopl.library.lending.domain.resource.ResourceFixture
 import io.vavr.control.Either
 import spock.lang.Specification
 
-import static PatronResourcesFixture.regularPatron
-import static ResourceFixture.circulatingResource
-import static PatronResourcesEvents.*
-
+import static io.pillopl.library.lending.domain.patron.PatronResourcesEvents.ResourceCollected
+import static io.pillopl.library.lending.domain.patron.PatronResourcesEvents.ResourceCollectingFailed
+import static io.pillopl.library.lending.domain.patron.PatronResourcesFixture.regularPatron
 
 class PatronCollectingResourceTest extends Specification {
 
     def 'patron cannot collect resource which is not placed on hold'() {
         when:
-            Either<ResourceCollectingFailed, ResourceCollected> collect = regularPatron().collect(circulatingResource())
+            Either<ResourceCollectingFailed, ResourceCollected> collect = regularPatron().collect(ResourceFixture.circulatingResource())
         then:
             collect.isLeft()
             ResourceCollectingFailed e = collect.getLeft()
@@ -24,7 +25,7 @@ class PatronCollectingResourceTest extends Specification {
             PatronResources patron = regularPatron()
             PatronResources anotherPatron = regularPatron()
         and:
-            Resource resource = circulatingResource()
+            Resource resource = ResourceFixture.circulatingResource()
         and:
             anotherPatron.placeOnHold(resource)
         when:
@@ -39,7 +40,7 @@ class PatronCollectingResourceTest extends Specification {
         given:
             PatronResources patron = regularPatron()
         and:
-            Resource resource = circulatingResource()
+            Resource resource = ResourceFixture.circulatingResource()
         and:
             patron.placeOnHold(resource)
         when:

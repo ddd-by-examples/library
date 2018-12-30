@@ -1,18 +1,21 @@
-package io.pillopl.library.domain;
+package io.pillopl.library.lending.domain.patron;
 
 
-import io.pillopl.library.domain.PatronResourcesEvents.ResourceCollected;
-import io.pillopl.library.domain.PatronResourcesEvents.ResourceCollectingFailed;
-import io.pillopl.library.domain.PatronResourcesEvents.ResourceHoldFailed;
-import io.pillopl.library.domain.PatronResourcesEvents.ResourcePlacedOnHold;
+import io.pillopl.library.lending.domain.resource.Resource;
+import io.pillopl.library.lending.domain.resource.ResourceId;
+import io.pillopl.library.lending.domain.patron.PatronResourcesEvents.ResourceCollected;
+import io.pillopl.library.lending.domain.patron.PatronResourcesEvents.ResourceCollectingFailed;
+import io.pillopl.library.lending.domain.patron.PatronResourcesEvents.ResourceHoldFailed;
+import io.pillopl.library.lending.domain.patron.PatronResourcesEvents.ResourcePlacedOnHold;
+import io.pillopl.library.lending.domain.library.LibraryBranchId;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 import io.vavr.control.Option;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.Value;
 
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -23,11 +26,11 @@ import static java.util.Collections.emptySet;
 
 //TODO - open/close
 //TODO - play with types
-//TODO -
 @AllArgsConstructor
 @EqualsAndHashCode(of = "patron")
-class PatronResources {
+public class PatronResources {
 
+    @Getter
     private final PatronInformation patron;
 
     private final List<PlacingOnHoldPolicy> placingOnHoldPolicies;
@@ -36,30 +39,28 @@ class PatronResources {
 
     private ResourcesOnHold resourcesOnHold;
 
-    //TODO cannot hold held or collected - separate transaction
-    Either<ResourceHoldFailed, ResourcePlacedOnHold> placeOnHold(Resource resource) {
+    public Either<ResourceHoldFailed, ResourcePlacedOnHold> placeOnHold(Resource resource) {
         Option<Rejection> rejection = tryPlacingOnHold(resource);
         if (!rejection.isEmpty()) {
-            return left(ResourceHoldFailed.now(
-                    rejection.map(Rejection::getReason).getOrElse("couldn't hold resource"),
-                    resource,
-                    patron));
+            return left(
+                    ResourceHoldFailed.now(rejection.get().getReason(), resource.getResourceId(), resource.getLibraryBranch(), patron));
         }
         ResourcePlacedOnHold resourcePlacedOnHold = resourcesOnHold.hold(resource, patron);
         return right(resourcePlacedOnHold);
     }
 
     Either<ResourceCollectingFailed, ResourceCollected> collect(Resource resource) {
-        ResourceOnHold resourceToCollect = new ResourceOnHold(patron, resource);
+        ResourceOnHold resourceToCollect = new ResourceOnHold(resource);
         if (resourcesOnHold.doesNotContain(resourceToCollect)) {
-            return left(ResourceCollectingFailed.now("resource is not on hold by patron", resource, patron));
+            return left(ResourceCollectingFailed.now("resource is not on hold by patron", resource.getResourceId(), resource.getLibraryBranch(), patron));
         }
-        ResourceCollected resourceCollected = resourcesOnHold.completed(resourceToCollect);
+        ResourceCollected resourceCollected = resourcesOnHold.completed(resourceToCollect, patron);
         return right(resourceCollected);
     }
 
     private Option<Rejection> tryPlacingOnHold(Resource resource) {
         return placingOnHoldPolicies
+                .toStream()
                 .map(policy -> policy.canPlaceOnHold(resource, this))
                 .find(Either::isLeft)
                 .map(Either::getLeft);
@@ -76,24 +77,27 @@ class PatronResources {
     int numberOfHolds() {
         return resourcesOnHold.count();
     }
+
+    public PatronId patronId() {
+        return patron.getPatronId();
+    }
 }
 
-@Value
+@AllArgsConstructor
+//TODO add not null
 class ResourcesOnHold {
-
-    static final int REGULAR_PATRON_HOLDS_LIMIT = 5;
 
     Set<ResourceOnHold> resourcesOnHold;
 
     ResourcePlacedOnHold hold(Resource resourceToHold, PatronInformation patronInformation) {
-        ResourceOnHold resourceOnHold = new ResourceOnHold(patronInformation, resourceToHold);
+        ResourceOnHold resourceOnHold = new ResourceOnHold(resourceToHold);
         resourcesOnHold.add(resourceOnHold);
-        return resourceOnHold.toResourceHeld();
+        return ResourcePlacedOnHold.now(resourceOnHold.getResourceId(), resourceOnHold.getLibraryBranchId(), patronInformation);
     }
 
-    ResourceCollected completed(ResourceOnHold resourceToCollect) {
+    ResourceCollected completed(ResourceOnHold resourceToCollect, PatronInformation patronInformation) {
         resourcesOnHold.remove(resourceToCollect);
-        return resourceToCollect.toResourceCollected();
+        return ResourceCollected.now(resourceToCollect.getResourceId(), resourceToCollect.getLibraryBranchId(), patronInformation.getPatronId());
     }
 
     boolean doesNotContain(ResourceOnHold resourceOnHold) {
@@ -110,29 +114,13 @@ class ResourcesOnHold {
 @AllArgsConstructor
 class ResourceOnHold {
 
-    PatronId patronId;
     ResourceId resourceId;
     LibraryBranchId libraryBranchId;
 
-    ResourceOnHold(PatronInformation patron, Resource resource) {
-        this(patron.getPatronId(), resource.getResourceId(), resource.getLibraryBranch());
+    ResourceOnHold(Resource resource) {
+        this(resource.getResourceId(), resource.getLibraryBranch());
     }
 
-    ResourcePlacedOnHold toResourceHeld() {
-        return new ResourcePlacedOnHold(
-                Instant.now(),
-                patronId.getPatronId(),
-                resourceId.getResourceId(),
-                libraryBranchId.getLibraryBranchId());
-    }
-
-    ResourceCollected toResourceCollected() {
-        return new ResourceCollected(
-                Instant.now(),
-                patronId.getPatronId(),
-                resourceId.getResourceId(),
-                libraryBranchId.getLibraryBranchId());
-    }
 }
 
 @Value

@@ -1,19 +1,21 @@
-package io.pillopl.library.domain
+package io.pillopl.library.lending.domain.patron
 
+import io.pillopl.library.lending.domain.resource.Resource
+import io.pillopl.library.lending.domain.resource.ResourceFixture
+import io.pillopl.library.lending.domain.library.LibraryBranchId
 import io.vavr.control.Either
 import spock.lang.Specification
 
-import static LibraryBranchFixture.anyBranch
-import static PatronResourcesFixture.*
-import static ResourceFixture.*
-import static PatronResourcesEvents.*
+import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
+import static io.pillopl.library.lending.domain.patron.PatronResourcesFixture.*
+import static io.pillopl.library.lending.domain.patron.PatronResourcesEvents.*
 
 class RegularPatronRequestingCirculatingResourcesTest extends Specification {
 
     //TODO: per month
     def 'a regular patron cannot place on hold more than 5 resources'() {
         when:
-            Either<ResourceHoldFailed, ResourcePlacedOnHold> hold = regularPatronWithHolds(holds).placeOnHold(circulatingResource())
+            Either<ResourceHoldFailed, ResourcePlacedOnHold> hold = regularPatronWithHolds(holds).placeOnHold(ResourceFixture.circulatingResource())
         then:
             hold.isLeft()
             ResourceHoldFailed e = hold.getLeft()
@@ -26,7 +28,7 @@ class RegularPatronRequestingCirculatingResourcesTest extends Specification {
     //TODO: per month
     def 'a regular patron can place on hold resource when he didnt placed on hold more than 4 resources'() {
         given:
-            Resource resource = circulatingResource()
+            Resource resource = ResourceFixture.circulatingResource()
         when:
             Either<ResourceHoldFailed, ResourcePlacedOnHold> hold = regularPatronWithHolds(holds).placeOnHold(resource)
         then:
@@ -42,15 +44,15 @@ class RegularPatronRequestingCirculatingResourcesTest extends Specification {
         and:
             OverdueCheckouts overdueResources = OverdueCheckouts.atBranch(libraryBranchId, resources as Set)
         when:
-            Either<ResourceHoldFailed, ResourcePlacedOnHold> hold = regularPatronWithOverdueCheckouts(overdueResources).placeOnHold(circulatingResource(libraryBranchId))
+            Either<ResourceHoldFailed, ResourcePlacedOnHold> hold = regularPatronWithOverdueCheckouts(overdueResources).placeOnHold(ResourceFixture.circulatingResource(libraryBranchId))
         then:
             hold.isLeft()
             ResourceHoldFailed e = hold.getLeft()
             e.reason.contains("cannot place on hold when there are overdue checkouts")
         where:
             resources << [
-                    [anyResourceId(), anyResourceId()],
-                    [anyResourceId(), anyResourceId(), anyResourceId()]
+                    [ResourceFixture.anyResourceId(), ResourceFixture.anyResourceId()],
+                    [ResourceFixture.anyResourceId(), ResourceFixture.anyResourceId(), ResourceFixture.anyResourceId()]
             ]
 
 
@@ -58,13 +60,13 @@ class RegularPatronRequestingCirculatingResourcesTest extends Specification {
 
     def 'a regular patron can place on hold resources when he doesnt have 2 overdues'() {
         given:
-            Resource resource = circulatingResource()
+            Resource resource = ResourceFixture.circulatingResource()
         when:
             Either<ResourceHoldFailed, ResourcePlacedOnHold> hold = regularPatronWithOverdueCheckouts(overdueResources).placeOnHold(resource)
         then:
             hold.isRight()
         where:
-            overdueResources <<  [OverdueCheckouts.atBranch(anyBranch(), [anyResourceId()] as Set),
+            overdueResources <<  [OverdueCheckouts.atBranch(anyBranch(), [ResourceFixture.anyResourceId()] as Set),
                                   OverdueCheckouts.noOverdueCheckouts()]
     }
 
@@ -73,10 +75,10 @@ class RegularPatronRequestingCirculatingResourcesTest extends Specification {
             PatronResources patron = regularPatron()
         and:
             5.times {
-                patron.placeOnHold(circulatingResource())
+                patron.placeOnHold(ResourceFixture.circulatingResource())
             }
         when:
-            Either<ResourceHoldFailed, ResourcePlacedOnHold> hold = patron.placeOnHold(circulatingResource())
+            Either<ResourceHoldFailed, ResourcePlacedOnHold> hold = patron.placeOnHold(ResourceFixture.circulatingResource())
         then:
             hold.isLeft()
             ResourceHoldFailed e = hold.getLeft()

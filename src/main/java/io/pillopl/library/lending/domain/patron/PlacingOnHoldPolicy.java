@@ -1,5 +1,6 @@
-package io.pillopl.library.domain;
+package io.pillopl.library.lending.domain.patron;
 
+import io.pillopl.library.lending.domain.resource.Resource;
 import io.vavr.control.Either;
 import lombok.Value;
 

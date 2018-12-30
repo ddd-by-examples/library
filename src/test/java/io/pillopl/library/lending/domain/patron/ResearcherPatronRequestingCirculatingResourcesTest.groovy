@@ -1,18 +1,19 @@
-package io.pillopl.library.domain
+package io.pillopl.library.lending.domain.patron
 
+import io.pillopl.library.lending.domain.resource.Resource
+import io.pillopl.library.lending.domain.resource.ResourceFixture
 import io.vavr.control.Either
 import spock.lang.Specification
 
-import static PatronResourcesFixture.researcherPatronWithHolds
-import static ResourceFixture.circulatingResource
-import static PatronResourcesEvents.*
+import static io.pillopl.library.lending.domain.patron.PatronResourcesFixture.researcherPatronWithHolds
+import static io.pillopl.library.lending.domain.patron.PatronResourcesEvents.*
 
 
 class ResearcherPatronRequestingCirculatingResourcesTest extends Specification {
 
     def 'a researcher patron can hold any number of resources'() {
         given:
-            Resource resource = circulatingResource()
+            Resource resource = ResourceFixture.circulatingResource()
         when:
             Either<ResourceHoldFailed, ResourcePlacedOnHold> hold = researcherPatronWithHolds(holds).placeOnHold(resource)
         then:
