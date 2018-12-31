@@ -39,6 +39,9 @@ public class PatronResources {
     private final ResourcesOnHold resourcesOnHold;
 
     public Either<ResourceHoldFailed, ResourcePlacedOnHold> placeOnHold(Resource resource) {
+        if(!resource.isAvailable()) {
+            return left(ResourceHoldFailed.now(new Reason("resource is not available"), resource.getResourceId(), resource.getLibraryBranch(), patron));
+        }
         Option<Rejection> rejection = tryPlacingOnHold(resource);
         if (!rejection.isEmpty()) {
             return left(ResourceHoldFailed.now(rejection.get().getReason(), resource.getResourceId(), resource.getLibraryBranch(), patron));

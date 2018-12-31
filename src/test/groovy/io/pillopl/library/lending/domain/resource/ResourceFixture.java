@@ -27,7 +27,7 @@ public class ResourceFixture {
     }
 
     public static Resource resourceOnHold() {
-        return new Resource(anyResourceId(), anyBranch(), CIRCULATING, AVAILABLE);
+        return new Resource(anyResourceId(), anyBranch(), CIRCULATING, ON_HOLD);
     }
 
     public static ResourceOnHold onHold() {

@@ -17,7 +17,7 @@ import static io.pillopl.library.lending.domain.resource.ResourceFixture.circula
 //TODO - add archtests for domain/application/infra
 @ContextConfiguration(classes = TestDatabaseConfig.class)
 @SpringBootTest
-class PatronResourcesDatabaseRepositoryTest extends Specification {
+class PatronResourcesDatabaseRepositoryIntegrationTest extends Specification {
 
     final PatronId patronId = PatronResourcesFixture.anyPatronId()
 
@@ -27,7 +27,7 @@ class PatronResourcesDatabaseRepositoryTest extends Specification {
     @Autowired
     PatronResourcesEntityRepository patronResourcesEntityRepository
 
-    def 'should be able to map domain model to data model in the infrastructure layer'() {
+    def 'persistance in real database should work'() {
         given:
             PatronResources regular = PatronResourcesFixture.regularPatron(patronId)
             Resource resource = circulatingResource()

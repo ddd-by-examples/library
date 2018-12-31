@@ -11,9 +11,20 @@ import static io.pillopl.library.lending.domain.patron.PatronResourcesFixture.*
 import static PatronResourcesEvent.*
 import static io.pillopl.library.lending.domain.resource.ResourceFixture.circulatingResource
 import static io.pillopl.library.lending.domain.resource.ResourceFixture.circulatingResourceAt
+import static io.pillopl.library.lending.domain.resource.ResourceFixture.resourceOnHold
 import static java.util.Collections.emptySet
 
 class RegularPatronRequestingCirculatingResourcesTest extends Specification {
+
+    def 'a regular patron cannot place on hold resource which is on hold'() {
+        when:
+            Either<ResourceHoldFailed, ResourcePlacedOnHold> hold = regularPatron().placeOnHold(resourceOnHold())
+        then:
+            hold.isLeft()
+            ResourceHoldFailed e = hold.getLeft()
+            e.reason.contains("resource is not available")
+
+    }
 
     //TODO: per month
     def 'a regular patron cannot place on hold more than 5 resources'() {

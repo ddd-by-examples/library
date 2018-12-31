@@ -8,7 +8,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 //TODO add notNull
-//TODO add id do events
+//TODO add id to events
 public interface PatronResourcesEvent {
 
     default PatronId patronId() {
