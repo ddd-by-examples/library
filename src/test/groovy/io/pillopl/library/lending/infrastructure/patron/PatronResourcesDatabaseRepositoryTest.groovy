@@ -36,7 +36,7 @@ class PatronResourcesDatabaseRepositoryTest extends Specification {
         then:
             PatronResources patronResources = patronShouldBeFoundInDatabaseWithOneResourceOnHold(patronId)
         when:
-            patronResources.collect(resource)
+            patronResources.collect(tusresource)
         and:
             patronResourcesRepository.save(patronResources)
         then:
