@@ -1,6 +1,7 @@
 package io.pillopl.library.lending.domain.resource;
 
 import io.pillopl.library.lending.domain.library.LibraryBranchId;
+import io.pillopl.library.lending.domain.patron.ResourceOnHold;
 
 import java.util.UUID;
 
@@ -17,12 +18,20 @@ public class ResourceFixture {
         return new ResourceId(resourceId);
     }
 
-    static Resource resourceOnHold() {
-        return new Resource(anyResourceId(), anyBranch(), CIRCULATING, ON_HOLD);
+    public static Resource resourceOnHold(ResourceId resourceId, LibraryBranchId libraryBranchId) {
+        return new Resource(resourceId, libraryBranchId, CIRCULATING, ON_HOLD);
     }
 
     public static Resource circulatingResource() {
         return new Resource(anyResourceId(), anyBranch(), CIRCULATING, AVAILABLE);
+    }
+
+    public static Resource resourceOnHold() {
+        return new Resource(anyResourceId(), anyBranch(), CIRCULATING, AVAILABLE);
+    }
+
+    public static ResourceOnHold onHold() {
+        return new ResourceOnHold(anyResourceId(), anyBranch());
     }
 
     public static Resource circulatingResourceAt(LibraryBranchId libraryBranchId) {

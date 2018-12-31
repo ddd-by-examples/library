@@ -47,6 +47,16 @@ public class PatronResourcesFixture {
                 resourcesOnHold(numberOfHolds, patronId));
     }
 
+    static PatronResources regularPatronWith(ResourceOnHold resourceOnHold) {
+        PatronId patronId = anyPatronId();
+        ResourcesOnHold resourcesOnHold = new ResourcesOnHold(Collections.singleton(resourceOnHold));
+        return new PatronResources(
+                patronInformation(patronId, PatronInformation.PatronType.REGULAR),
+                allCommonPlacingOnHoldPolicies(),
+                OverdueCheckouts.noOverdueCheckouts(),
+                resourcesOnHold);
+    }
+
     static ResourcesOnHold resourcesOnHold(int numberOfHolds, PatronId patronId) {
         return new ResourcesOnHold(rangeClosed(1, numberOfHolds)
                 .mapToObj(i -> new ResourceOnHold(ResourceFixture.anyResourceId(), LibraryBranchFixture.anyBranch()))

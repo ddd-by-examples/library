@@ -8,6 +8,7 @@ import spock.lang.Specification
 import static PatronResourcesEvent.ResourceCollected
 import static PatronResourcesEvent.ResourceCollectingFailed
 import static io.pillopl.library.lending.domain.patron.PatronResourcesFixture.regularPatron
+import static io.pillopl.library.lending.domain.patron.PatronResourcesFixture.regularPatronWith
 
 class PatronCollectingResourceTest extends Specification {
 
@@ -38,15 +39,17 @@ class PatronCollectingResourceTest extends Specification {
 
     def 'patron can collect resource which was placed on hold by him'() {
         given:
-            PatronResources patron = regularPatron()
+            ResourceOnHold resourceOnHold = ResourceFixture.onHold()
         and:
-            Resource resource = ResourceFixture.circulatingResource()
-        and:
-            patron.placeOnHold(resource)
+            PatronResources patron = regularPatronWith(resourceOnHold)
         when:
-            Either<ResourceCollectingFailed, ResourceCollected> collect = patron.collect(resource)
+            Either<ResourceCollectingFailed, ResourceCollected> collect = patron.collect(resource(resourceOnHold))
         then:
             collect.isRight()
+    }
+
+    private Resource resource(ResourceOnHold resourceOnHold) {
+        return ResourceFixture.resourceOnHold(resourceOnHold.resourceId, resourceOnHold.libraryBranchId)
     }
 
 }

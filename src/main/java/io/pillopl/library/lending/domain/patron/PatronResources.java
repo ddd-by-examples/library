@@ -15,7 +15,6 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -37,7 +36,7 @@ public class PatronResources {
 
     private final OverdueCheckouts overdueCheckouts;
 
-    private ResourcesOnHold resourcesOnHold;
+    private final ResourcesOnHold resourcesOnHold;
 
     public Either<ResourceHoldFailed, ResourcePlacedOnHold> placeOnHold(Resource resource) {
         Option<Rejection> rejection = tryPlacingOnHold(resource);
@@ -90,19 +89,10 @@ class OverdueCheckouts {
         return new OverdueCheckouts(new HashMap<>());
     }
 
-    static OverdueCheckouts atBranch(LibraryBranchId libraryBranch, Set<ResourceId> resourcesId) {
-        Map<LibraryBranchId, Set<ResourceId>> overdueResources = new HashMap<>();
-        overdueResources.put(libraryBranch, resourcesId);
-        return new OverdueCheckouts(overdueResources);
-    }
-
     int countAt(LibraryBranchId libraryBranchId) {
         return overdueCheckouts.getOrDefault(libraryBranchId, emptySet()).size();
     }
 
-    Map<LibraryBranchId, Set<ResourceId>> toSnapshot() {
-        return Collections.unmodifiableMap(overdueCheckouts);
-    }
 }
 
 

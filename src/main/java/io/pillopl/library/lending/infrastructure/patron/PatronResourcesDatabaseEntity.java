@@ -80,7 +80,6 @@ class ResourceOnHoldDatabaseEntity {
                 this.libraryBranchId.equals(event.getLibraryBranchId());
     }
 
-
 }
 
 class OverdueCheckoutDatabaseEntity {

@@ -34,15 +34,15 @@ public class Resource {
     }
 
     //TODO events upper
-    void handle(PatronResourcesEvent.ResourceReturned event) {
+    public void handle(PatronResourcesEvent.ResourceReturned event) {
         this.state = ResourceState.AVAILABLE;
     }
 
-    void handle(PatronResourcesEvent.ResourcePlacedOnHold event) {
+    public void handle(PatronResourcesEvent.ResourcePlacedOnHold event) {
         state = ON_HOLD;
     }
 
-    void handle(PatronResourcesEvent.ResourceCollected event) {
+    public void handle(PatronResourcesEvent.ResourceCollected event) {
         state = COLLECTED;
     }
 }

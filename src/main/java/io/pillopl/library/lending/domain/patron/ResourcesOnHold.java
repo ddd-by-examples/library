@@ -3,11 +3,11 @@ package io.pillopl.library.lending.domain.patron;
 import io.pillopl.library.lending.domain.patron.PatronResourcesEvent.ResourceCollected;
 import io.pillopl.library.lending.domain.patron.PatronResourcesEvent.ResourcePlacedOnHold;
 import io.pillopl.library.lending.domain.resource.Resource;
-import lombok.AllArgsConstructor;
+import lombok.Value;
 
 import java.util.Set;
 
-@AllArgsConstructor
+@Value
 //TODO add not null
 public class ResourcesOnHold {
 
@@ -15,12 +15,12 @@ public class ResourcesOnHold {
 
     ResourcePlacedOnHold hold(Resource resourceToHold, PatronInformation patronInformation) {
         ResourceOnHold resourceOnHold = new ResourceOnHold(resourceToHold);
-        resourcesOnHold.add(resourceOnHold);
+        //resourcesOnHold.add(resourceOnHold);
         return ResourcePlacedOnHold.now(resourceOnHold.getResourceId(), resourceOnHold.getLibraryBranchId(), patronInformation);
     }
 
     ResourceCollected complete(ResourceOnHold resourceToCollect, PatronInformation patronInformation) {
-        resourcesOnHold.remove(resourceToCollect);
+        //resourcesOnHold.remove(resourceToCollect);
         return ResourceCollected.now(resourceToCollect.getResourceId(), resourceToCollect.getLibraryBranchId(), patronInformation.getPatronId());
     }
 

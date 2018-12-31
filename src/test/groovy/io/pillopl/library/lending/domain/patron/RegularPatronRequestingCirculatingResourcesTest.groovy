@@ -29,7 +29,7 @@ class RegularPatronRequestingCirculatingResourcesTest extends Specification {
     }
 
     //TODO: per month
-    def 'a regular patron can place on hold resource when he didnt placed on hold more than 4 resources'() {
+    def 'a regular patron can place on hold resource when he did not place on hold more than 4 resources'() {
         given:
             Resource resource = circulatingResource()
         when:
@@ -70,21 +70,6 @@ class RegularPatronRequestingCirculatingResourcesTest extends Specification {
         where:
             resources <<  [[ResourceFixture.anyResourceId()] as Set,
                            emptySet()]
-    }
-
-    def 'tryinf to place a resource on hold after 4th successful consecutive holds shouldnt be possible'() {
-        given:
-            PatronResources patron = regularPatron()
-        and:
-            5.times {
-                patron.placeOnHold(circulatingResource())
-            }
-        when:
-            Either<ResourceHoldFailed, ResourcePlacedOnHold> hold = patron.placeOnHold(circulatingResource())
-        then:
-            hold.isLeft()
-            ResourceHoldFailed e = hold.getLeft()
-            e.reason.contains("patron cannot hold more resources")
     }
 
 
