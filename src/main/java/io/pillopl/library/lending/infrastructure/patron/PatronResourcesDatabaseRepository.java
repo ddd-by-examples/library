@@ -29,7 +29,6 @@ class PatronResourcesDatabaseRepository implements PatronResourcesRepository {
     }
 
     @Override
-    @Transactional
     public Try<PatronResources> save(PatronResources patronResources) {
         //TODO add optimistic locking
         return Try.ofSupplier(() -> {

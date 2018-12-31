@@ -9,6 +9,7 @@ import io.pillopl.library.lending.domain.resource.Resource;
 import io.pillopl.library.lending.domain.resource.ResourceId;
 import io.vavr.control.Either;
 import lombok.AllArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 import static io.pillopl.library.lending.application.holding.PlacingOnHold.Result.FAILURE;
 import static io.pillopl.library.lending.application.holding.PlacingOnHold.Result.SUCCESS;
@@ -26,6 +27,7 @@ public class PlacingOnHold {
     private final FindResource findResource;
     private final PatronResourcesRepository patronResourcesRepository;
 
+    @Transactional
     public Result placeOnHold(ResourceId id, PatronId patronId) {
         Resource resource = findResource(id);
         PatronResources patronResources = findPatronCurrentResources(patronId);
