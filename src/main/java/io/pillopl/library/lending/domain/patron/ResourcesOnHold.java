@@ -15,12 +15,10 @@ public class ResourcesOnHold {
 
     ResourcePlacedOnHold hold(Resource resourceToHold, PatronInformation patronInformation) {
         ResourceOnHold resourceOnHold = new ResourceOnHold(resourceToHold);
-        //resourcesOnHold.add(resourceOnHold);
         return ResourcePlacedOnHold.now(resourceOnHold.getResourceId(), resourceOnHold.getLibraryBranchId(), patronInformation);
     }
 
     ResourceCollected complete(ResourceOnHold resourceToCollect, PatronInformation patronInformation) {
-        //resourcesOnHold.remove(resourceToCollect);
         return ResourceCollected.now(resourceToCollect.getResourceId(), resourceToCollect.getLibraryBranchId(), patronInformation.getPatronId());
     }
 
