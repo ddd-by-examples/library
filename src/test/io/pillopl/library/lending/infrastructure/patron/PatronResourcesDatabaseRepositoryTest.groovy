@@ -4,9 +4,6 @@ import io.pillopl.library.lending.domain.patron.PatronId
 import io.pillopl.library.lending.domain.patron.PatronResources
 import io.pillopl.library.lending.domain.patron.PatronResourcesFixture
 import io.pillopl.library.lending.domain.resource.Resource
-import io.pillopl.library.lending.infrastructure.patron.PatronResourcesDatabaseRepository
-import io.pillopl.library.lending.infrastructure.patron.PatronResourcesEntityRepository
-import io.pillopl.library.lending.infrastructure.patron.TestDatabaseConfig
 import io.vavr.control.Option
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -28,7 +25,7 @@ class PatronResourcesDatabaseRepositoryTest extends Specification {
     @Autowired
     PatronResourcesEntityRepository patronResourcesEntityRepository
 
-    def 'should bla bla'() {
+    def 'should be able to map domain model to data model in the infrastructure layer'() {
         given:
             PatronResources regular = PatronResourcesFixture.regularPatron(patronId)
             Resource resource = circulatingResource()
@@ -36,21 +33,34 @@ class PatronResourcesDatabaseRepositoryTest extends Specification {
             regular.placeOnHold(resource)
         when:
             patronResourcesRepository.save(regular)
-        and:
-            Option<PatronResources> loaded = patronResourcesRepository.findBy(patronId)
         then:
-            PatronResources patronResources = loaded.getOrElseThrow({ new IllegalStateException("should have been persisted") })
-            patronResources.toSnapshot().resourcesOnHold.size() == 1
+            PatronResources patronResources = patronShouldBeFoundInDatabaseWithOneResourceOnHold(patronId)
         when:
             patronResources.collect(resource)
         and:
             patronResourcesRepository.save(patronResources)
-        and:
-            Option<PatronResources> againLoaded = patronResourcesRepository.findBy(patronId)
         then:
-            PatronResources finalPatronResources = againLoaded.getOrElseThrow({ new IllegalStateException("should have been persisted") })
-            finalPatronResources.toSnapshot().resourcesOnHold.size() == 0
+            patronShouldBeFoundInDatabaseWithZeroResourceOnHold(patronId)
 
+    }
 
+    PatronResources patronShouldBeFoundInDatabaseWithOneResourceOnHold(PatronId patronId) {
+        PatronResources patronResources = loadPersistedPatron(patronId)
+        assert patronResources.toSnapshot().resourcesOnHold.size() == 1
+        return patronResources
+    }
+
+    PatronResources patronShouldBeFoundInDatabaseWithZeroResourceOnHold(PatronId patronId) {
+        PatronResources patronResources = loadPersistedPatron(patronId)
+        assert patronResources.toSnapshot().resourcesOnHold.size() == 0
+        return patronResources
+    }
+
+    PatronResources loadPersistedPatron(PatronId patronId) {
+        Option<PatronResources> loaded = patronResourcesRepository.findBy(patronId)
+        PatronResources patronResources = loaded.getOrElseThrow({
+            new IllegalStateException("should have been persisted")
+        })
+        return patronResources
     }
 }
