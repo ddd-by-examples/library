@@ -7,11 +7,9 @@ import io.pillopl.library.lending.domain.patron.PatronResourcesFixture
 import io.vavr.control.Option
 import spock.lang.Specification
 
-import static io.pillopl.library.lending.domain.resource.ResourceFixture.anyResourceId
-import static io.pillopl.library.lending.domain.resource.ResourceFixture.circulatingResource
-import static io.pillopl.library.lending.domain.resource.ResourceFixture.restrictedResource
+import static io.pillopl.library.lending.domain.resource.ResourceFixture.*
 
-class HoldingTest extends Specification {
+class PlacingOnHoldTest extends Specification {
 
     InMemoryPatronResourcesRepository repository = new InMemoryPatronResourcesRepository()
     FindResource willFindResource = { id -> Option.of(circulatingResource()) }
@@ -22,9 +20,9 @@ class HoldingTest extends Specification {
         given:
             PatronId patron = persistedRegularPatron()
         and:
-            Holding holding = new Holding(willFindResource, repository)
+            PlacingOnHold holding = new PlacingOnHold(willFindResource, repository)
         expect:
-            holding.placeOnHold(anyResourceId(), patron) == Holding.Result.SUCCESS
+            holding.placeOnHold(anyResourceId(), patron) == PlacingOnHold.Result.SUCCESS
 
     }
 
@@ -32,9 +30,9 @@ class HoldingTest extends Specification {
         given:
             PatronId patron = persistedRegularPatron()
         and:
-            Holding holding = new Holding(willFindRestrictedResource, repository)
+            PlacingOnHold holding = new PlacingOnHold(willFindRestrictedResource, repository)
         expect:
-            holding.placeOnHold(anyResourceId(), patron) == Holding.Result.FAILURE
+            holding.placeOnHold(anyResourceId(), patron) == PlacingOnHold.Result.FAILURE
 
     }
 
@@ -42,13 +40,13 @@ class HoldingTest extends Specification {
         given:
             PatronId patron = persistedRegularPatron()
         and:
-            Holding holding = new Holding(willFindResource, repository)
+            PlacingOnHold holding = new PlacingOnHold(willFindResource, repository)
         and:
             5.times {
                 holding.placeOnHold(anyResourceId(), patron)
             }
         expect:
-            holding.placeOnHold(anyResourceId(), patron) == Holding.Result.FAILURE
+            holding.placeOnHold(anyResourceId(), patron) == PlacingOnHold.Result.FAILURE
 
     }
 
@@ -56,7 +54,7 @@ class HoldingTest extends Specification {
         given:
             PatronId patron = unknownPatron()
         when:
-            new Holding(willFindResource, repository).placeOnHold(anyResourceId(), patron)
+            new PlacingOnHold(willFindResource, repository).placeOnHold(anyResourceId(), patron)
         then:
             thrown(IllegalArgumentException)
 
@@ -67,19 +65,21 @@ class HoldingTest extends Specification {
         given:
             PatronId patron = persistedRegularPatron()
         when:
-            new Holding(willNotFindResource, repository).placeOnHold(anyResourceId(), patron)
+            new PlacingOnHold(willNotFindResource, repository).placeOnHold(anyResourceId(), patron)
         then:
             thrown(IllegalArgumentException)
     }
 
     PatronId persistedRegularPatron() {
-        PatronResources patron = PatronResourcesFixture.regularPatron()
+        PatronId patronId = PatronResourcesFixture.anyPatronId();
+        PatronResources patron = PatronResourcesFixture.regularPatron(patronId)
         repository.save(patron)
-        return patron.patronId();
+        return patronId
     }
 
     PatronId unknownPatron() {
-        PatronResources patron = PatronResourcesFixture.regularPatron()
-        return patron.patronId();
+        PatronId patronId = PatronResourcesFixture.anyPatronId();
+        PatronResources patron = PatronResourcesFixture.regularPatron(patronId)
+        return patronId
     }
 }

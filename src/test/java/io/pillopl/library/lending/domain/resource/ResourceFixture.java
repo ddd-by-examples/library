@@ -25,7 +25,7 @@ public class ResourceFixture {
         return new Resource(anyResourceId(), anyBranch(), CIRCULATING, AVAILABLE);
     }
 
-    static Resource circulatingResource(LibraryBranchId libraryBranchId) {
+    public static Resource circulatingResourceAt(LibraryBranchId libraryBranchId) {
         return new Resource(anyResourceId(), libraryBranchId, CIRCULATING, AVAILABLE);
     }
 

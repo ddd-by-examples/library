@@ -10,14 +10,14 @@ import io.pillopl.library.lending.domain.resource.ResourceId;
 import io.vavr.control.Either;
 import lombok.AllArgsConstructor;
 
-import static io.pillopl.library.lending.application.holding.Holding.Result.FAILURE;
-import static io.pillopl.library.lending.application.holding.Holding.Result.SUCCESS;
+import static io.pillopl.library.lending.application.holding.PlacingOnHold.Result.FAILURE;
+import static io.pillopl.library.lending.application.holding.PlacingOnHold.Result.SUCCESS;
 import static io.vavr.API.*;
 import static io.vavr.Patterns.$Left;
 import static io.vavr.Patterns.$Right;
 
 @AllArgsConstructor
-public class Holding {
+public class PlacingOnHold {
 
     enum Result {
         SUCCESS, FAILURE

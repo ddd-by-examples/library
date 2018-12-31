@@ -1,6 +1,7 @@
 package io.pillopl.library.lending.domain.patron;
 
 import io.pillopl.library.lending.domain.resource.Resource;
+import io.vavr.collection.List;
 import io.vavr.control.Either;
 import lombok.Value;
 
@@ -10,6 +11,13 @@ import static io.vavr.control.Either.right;
 interface PlacingOnHoldPolicy {
 
     Either<Rejection, Allowance> canPlaceOnHold(Resource toHold, PatronResources by);
+
+    static List<PlacingOnHoldPolicy> allCurrentPolicies() {
+        return List.of(
+                new OnlyResearcherPatronsCanBookRestrictedResourcePolicy(),
+                new OverdueCheckoutsRejectionPolicy(),
+                new RegularPatronMaximumNumberOfHoldsPolicy());
+    }
 
 }
 

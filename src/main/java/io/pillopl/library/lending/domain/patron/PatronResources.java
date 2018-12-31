@@ -1,24 +1,25 @@
 package io.pillopl.library.lending.domain.patron;
 
 
-import io.pillopl.library.lending.domain.resource.Resource;
-import io.pillopl.library.lending.domain.resource.ResourceId;
+import io.pillopl.library.lending.domain.library.LibraryBranchId;
 import io.pillopl.library.lending.domain.patron.PatronResourcesEvents.ResourceCollected;
 import io.pillopl.library.lending.domain.patron.PatronResourcesEvents.ResourceCollectingFailed;
 import io.pillopl.library.lending.domain.patron.PatronResourcesEvents.ResourceHoldFailed;
 import io.pillopl.library.lending.domain.patron.PatronResourcesEvents.ResourcePlacedOnHold;
-import io.pillopl.library.lending.domain.library.LibraryBranchId;
+import io.pillopl.library.lending.domain.resource.Resource;
+import io.pillopl.library.lending.domain.resource.ResourceId;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 import io.vavr.control.Option;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.Value;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static io.vavr.control.Either.left;
 import static io.vavr.control.Either.right;
@@ -30,7 +31,6 @@ import static java.util.Collections.emptySet;
 @EqualsAndHashCode(of = "patron")
 public class PatronResources {
 
-    @Getter
     private final PatronInformation patron;
 
     private final List<PlacingOnHoldPolicy> placingOnHoldPolicies;
@@ -49,12 +49,12 @@ public class PatronResources {
         return right(resourcePlacedOnHold);
     }
 
-    Either<ResourceCollectingFailed, ResourceCollected> collect(Resource resource) {
+    public Either<ResourceCollectingFailed, ResourceCollected> collect(Resource resource) {
         ResourceOnHold resourceToCollect = new ResourceOnHold(resource);
         if (resourcesOnHold.doesNotContain(resourceToCollect)) {
             return left(ResourceCollectingFailed.now("resource is not on hold by patron", resource.getResourceId(), resource.getLibraryBranch(), patron));
         }
-        ResourceCollected resourceCollected = resourcesOnHold.completed(resourceToCollect, patron);
+        ResourceCollected resourceCollected = resourcesOnHold.complete(resourceToCollect, patron);
         return right(resourceCollected);
     }
 
@@ -78,8 +78,8 @@ public class PatronResources {
         return resourcesOnHold.count();
     }
 
-    public PatronId patronId() {
-        return patron.getPatronId();
+    public PatronResourcesSnapshot toSnapshot() {
+        return new PatronResourcesSnapshot(patron, resourcesOnHold.toSnapshot(), overdueCheckouts.toSnapshot());
     }
 }
 
@@ -95,7 +95,7 @@ class ResourcesOnHold {
         return ResourcePlacedOnHold.now(resourceOnHold.getResourceId(), resourceOnHold.getLibraryBranchId(), patronInformation);
     }
 
-    ResourceCollected completed(ResourceOnHold resourceToCollect, PatronInformation patronInformation) {
+    ResourceCollected complete(ResourceOnHold resourceToCollect, PatronInformation patronInformation) {
         resourcesOnHold.remove(resourceToCollect);
         return ResourceCollected.now(resourceToCollect.getResourceId(), resourceToCollect.getLibraryBranchId(), patronInformation.getPatronId());
     }
@@ -106,6 +106,13 @@ class ResourcesOnHold {
 
     int count() {
         return resourcesOnHold.size();
+    }
+
+    Set<ResourceOnHoldSnapshot> toSnapshot() {
+        return resourcesOnHold
+                .stream()
+                .map(ResourceOnHold::toSnapshot)
+                .collect(Collectors.toSet());
     }
 }
 
@@ -119,6 +126,10 @@ class ResourceOnHold {
 
     ResourceOnHold(Resource resource) {
         this(resource.getResourceId(), resource.getLibraryBranch());
+    }
+
+    ResourceOnHoldSnapshot toSnapshot() {
+        return new ResourceOnHoldSnapshot(resourceId, libraryBranchId);
     }
 
 }
@@ -141,6 +152,10 @@ class OverdueCheckouts {
 
     int countAt(LibraryBranchId libraryBranchId) {
         return overdueCheckouts.getOrDefault(libraryBranchId, emptySet()).size();
+    }
+
+    Map<LibraryBranchId, Set<ResourceId>> toSnapshot() {
+        return Collections.unmodifiableMap(overdueCheckouts);
     }
 }
 

@@ -1,21 +1,26 @@
 package io.pillopl.library.lending.domain.patron;
 
-import io.pillopl.library.lending.domain.resource.ResourceFixture;
 import io.pillopl.library.lending.domain.library.LibraryBranchFixture;
+import io.pillopl.library.lending.domain.library.LibraryBranchId;
+import io.pillopl.library.lending.domain.resource.ResourceFixture;
+import io.pillopl.library.lending.domain.resource.ResourceId;
 import io.vavr.collection.List;
 
-import java.util.HashSet;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import static io.vavr.collection.List.of;
+import static io.pillopl.library.lending.domain.patron.PlacingOnHoldPolicy.allCurrentPolicies;
 import static java.util.stream.IntStream.rangeClosed;
 
 public class PatronResourcesFixture {
 
     public static PatronResources regularPatron() {
+        return regularPatron(anyPatronId());
+    }
+
+    public static PatronResources regularPatron(PatronId patronId) {
         return new PatronResources(
-                patronInformation(anyPatronId(), PatronInformation.PatronType.REGULAR),
+                patronInformation(patronId, PatronInformation.PatronType.REGULAR),
                 allCommonPlacingOnHoldPolicies(),
                 OverdueCheckouts.noOverdueCheckouts(),
                 noHolds());
@@ -57,23 +62,17 @@ public class PatronResourcesFixture {
                 resourcesOnHold(numberOfHolds, patronId));
     }
 
-    static PatronResources regularPatronWithOverdueCheckouts(OverdueCheckouts overdueCheckouts) {
+    static PatronResources regularPatronWithOverdueCheckouts(LibraryBranchId libraryBranchId, Set<ResourceId> overdueResources) {
+        Map<LibraryBranchId, Set<ResourceId>> overdueCheckouts = new HashMap<>();
+        overdueCheckouts.put(libraryBranchId, overdueResources);
         return new PatronResources(
                 patronInformation(anyPatronId(), PatronInformation.PatronType.REGULAR),
                 allCommonPlacingOnHoldPolicies(),
-                overdueCheckouts,
+                new OverdueCheckouts(overdueCheckouts),
                 noHolds());
     }
 
-    static PatronResources researcherPatronWithOverdueCheckouts(OverdueCheckouts overdueCheckouts) {
-        return new PatronResources(
-                patronInformation(anyPatronId(), PatronInformation.PatronType.RESEARCHER),
-                allCommonPlacingOnHoldPolicies(),
-                overdueCheckouts,
-                noHolds());
-    }
-
-    static PatronId anyPatronId() {
+    public static PatronId anyPatronId() {
         return patronId(UUID.randomUUID());
     }
 
@@ -87,10 +86,7 @@ public class PatronResourcesFixture {
     }
 
     static List<PlacingOnHoldPolicy> allCommonPlacingOnHoldPolicies() {
-        return of(
-                new OverdueCheckoutsRejectionPolicy(),
-                new RegularPatronMaximumNumberOfHoldsPolicy(),
-                new OnlyResearcherPatronsCanBookRestrictedResourcePolicy());
+        return allCurrentPolicies();
     }
 
 }
