@@ -6,7 +6,7 @@ import io.vavr.control.Either
 import spock.lang.Specification
 
 import static io.pillopl.library.lending.domain.patron.PatronResourcesFixture.researcherPatronWithHolds
-import static io.pillopl.library.lending.domain.patron.PatronResourcesEvents.*
+import static PatronResourcesEvent.*
 
 
 class ResearcherPatronRequestingCirculatingResourcesTest extends Specification {

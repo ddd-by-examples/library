@@ -2,8 +2,8 @@ package io.pillopl.library.lending.application.holding;
 
 import io.pillopl.library.lending.domain.patron.PatronId;
 import io.pillopl.library.lending.domain.patron.PatronResources;
-import io.pillopl.library.lending.domain.patron.PatronResourcesEvents.ResourceHoldFailed;
-import io.pillopl.library.lending.domain.patron.PatronResourcesEvents.ResourcePlacedOnHold;
+import io.pillopl.library.lending.domain.patron.PatronResourcesEvent.ResourceHoldFailed;
+import io.pillopl.library.lending.domain.patron.PatronResourcesEvent.ResourcePlacedOnHold;
 import io.pillopl.library.lending.domain.patron.PatronResourcesRepository;
 import io.pillopl.library.lending.domain.resource.Resource;
 import io.pillopl.library.lending.domain.resource.ResourceId;
@@ -32,25 +32,20 @@ public class PlacingOnHold {
         Resource resource = findResource(id);
         PatronResources patronResources = findPatronCurrentResources(patronId);
         Either<ResourceHoldFailed, ResourcePlacedOnHold> result = patronResources.placeOnHold(resource);
-        savePatronResources(patronResources);
         return Match(result).of(
-                Case($Left($()), this::publish),
-                Case($Right($()), this::publish)
+                Case($Left($()), this::publishEvents),
+                Case($Right($()), this::saveAndPublishEvents)
         );
-
     }
 
-    private void savePatronResources(PatronResources patronResources) {
-        patronResourcesRepository.save(patronResources);
-    }
-
-    private Result publish(ResourceHoldFailed resourceHoldFailed) {
+    private Result publishEvents(ResourceHoldFailed resourceHoldFailed) {
         //TODO publish events
         return FAILURE;
     }
 
-    private Result publish(ResourcePlacedOnHold placedOnHold) {
+    private Result saveAndPublishEvents(ResourcePlacedOnHold placedOnHold) {
         //TODO publish events
+        patronResourcesRepository.reactTo(placedOnHold);
         return SUCCESS;
     }
 

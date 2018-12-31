@@ -8,10 +8,17 @@ import java.time.Instant;
 import java.util.UUID;
 
 //TODO add notNull
-public class PatronResourcesEvents {
+//TODO add id do events
+public interface PatronResourcesEvent {
+
+    default PatronId patronId() {
+        return new PatronId(getPatronId());
+    }
+
+    UUID getPatronId();
 
     @Value
-    public static class ResourcePlacedOnHold {
+    class ResourcePlacedOnHold implements PatronResourcesEvent {
         Instant when;
         UUID patronId;
         UUID resourceId;
@@ -27,7 +34,7 @@ public class PatronResourcesEvents {
     }
 
     @Value
-    public static class ResourceCollected {
+    class ResourceCollected implements PatronResourcesEvent {
         Instant when;
         UUID patronId;
         UUID resourceId;
@@ -43,7 +50,7 @@ public class PatronResourcesEvents {
     }
 
     @Value
-    public static class ResourceReturned {
+    class ResourceReturned implements PatronResourcesEvent {
         Instant when;
         UUID patronId;
         UUID resourceId;
@@ -51,16 +58,16 @@ public class PatronResourcesEvents {
     }
 
     @Value
-    public static class ResourceHoldFailed {
+    class ResourceHoldFailed implements PatronResourcesEvent {
         String reason;
         Instant when;
         UUID patronId;
         UUID resourceId;
         UUID libraryBranchId;
 
-        static ResourceHoldFailed now(String reason, ResourceId resourceId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
+        static ResourceHoldFailed now(Reason reason, ResourceId resourceId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
             return new ResourceHoldFailed(
-                    reason,
+                    reason.getReason(),
                     Instant.now(),
                     patronInformation.getPatronId().getPatronId(),
                     resourceId.getResourceId(),
@@ -69,16 +76,16 @@ public class PatronResourcesEvents {
     }
 
     @Value
-    public static class ResourceCollectingFailed {
+    class ResourceCollectingFailed implements PatronResourcesEvent {
         String reason;
         Instant when;
         UUID patronId;
         UUID resourceId;
         UUID libraryBranchId;
 
-        static ResourceCollectingFailed now(String reason, ResourceId resourceId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
+        static ResourceCollectingFailed now(Reason reason, ResourceId resourceId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
             return new ResourceCollectingFailed(
-                    reason,
+                    reason.getReason(),
                     Instant.now(),
                     patronInformation.getPatronId().getPatronId(),
                     resourceId.getResourceId(),

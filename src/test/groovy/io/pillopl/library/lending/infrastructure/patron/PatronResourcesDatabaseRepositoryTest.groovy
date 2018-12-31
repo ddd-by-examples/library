@@ -2,6 +2,7 @@ package io.pillopl.library.lending.infrastructure.patron
 
 import io.pillopl.library.lending.domain.patron.PatronId
 import io.pillopl.library.lending.domain.patron.PatronResources
+import io.pillopl.library.lending.domain.patron.PatronResourcesEvent
 import io.pillopl.library.lending.domain.patron.PatronResourcesFixture
 import io.pillopl.library.lending.domain.resource.Resource
 import io.vavr.control.Option
@@ -13,6 +14,7 @@ import spock.lang.Specification
 import static io.pillopl.library.lending.domain.resource.ResourceFixture.circulatingResource
 
 //TODO - move integration tests away of unit ones
+//TODO - add archtests for domain/application/infra
 @ContextConfiguration(classes = TestDatabaseConfig.class)
 @SpringBootTest
 class PatronResourcesDatabaseRepositoryTest extends Specification {
@@ -30,15 +32,16 @@ class PatronResourcesDatabaseRepositoryTest extends Specification {
             PatronResources regular = PatronResourcesFixture.regularPatron(patronId)
             Resource resource = circulatingResource()
         and:
-            regular.placeOnHold(resource)
+            PatronResourcesEvent.ResourcePlacedOnHold event = regular.placeOnHold(resource).get()
         when:
-            patronResourcesRepository.save(regular)
+            patronResourcesRepository.reactTo(event)
         then:
-            PatronResources patronResources = patronShouldBeFoundInDatabaseWithOneResourceOnHold(patronId)
+            PatronResources patronResources =
+                    patronShouldBeFoundInDatabaseWithOneResourceOnHold(patronId)
         when:
-            patronResources.collect(tusresource)
+            PatronResourcesEvent.ResourceCollected newEvent = patronResources.collect(resource).get()
         and:
-            patronResourcesRepository.save(patronResources)
+            patronResourcesRepository.reactTo(newEvent)
         then:
             patronShouldBeFoundInDatabaseWithZeroResourceOnHold(patronId)
 
@@ -46,13 +49,13 @@ class PatronResourcesDatabaseRepositoryTest extends Specification {
 
     PatronResources patronShouldBeFoundInDatabaseWithOneResourceOnHold(PatronId patronId) {
         PatronResources patronResources = loadPersistedPatron(patronId)
-        assert patronResources.toSnapshot().resourcesOnHold.size() == 1
+        assert patronResources.numberOfHolds() == 1
         return patronResources
     }
 
     PatronResources patronShouldBeFoundInDatabaseWithZeroResourceOnHold(PatronId patronId) {
         PatronResources patronResources = loadPersistedPatron(patronId)
-        assert patronResources.toSnapshot().resourcesOnHold.size() == 0
+        assert patronResources.numberOfHolds() == 0
         return patronResources
     }
 

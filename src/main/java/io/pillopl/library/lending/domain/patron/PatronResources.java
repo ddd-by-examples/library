@@ -2,10 +2,10 @@ package io.pillopl.library.lending.domain.patron;
 
 
 import io.pillopl.library.lending.domain.library.LibraryBranchId;
-import io.pillopl.library.lending.domain.patron.PatronResourcesEvents.ResourceCollected;
-import io.pillopl.library.lending.domain.patron.PatronResourcesEvents.ResourceCollectingFailed;
-import io.pillopl.library.lending.domain.patron.PatronResourcesEvents.ResourceHoldFailed;
-import io.pillopl.library.lending.domain.patron.PatronResourcesEvents.ResourcePlacedOnHold;
+import io.pillopl.library.lending.domain.patron.PatronResourcesEvent.ResourceCollected;
+import io.pillopl.library.lending.domain.patron.PatronResourcesEvent.ResourceCollectingFailed;
+import io.pillopl.library.lending.domain.patron.PatronResourcesEvent.ResourceHoldFailed;
+import io.pillopl.library.lending.domain.patron.PatronResourcesEvent.ResourcePlacedOnHold;
 import io.pillopl.library.lending.domain.resource.Resource;
 import io.pillopl.library.lending.domain.resource.ResourceId;
 import io.vavr.collection.List;
@@ -19,8 +19,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
+import static io.pillopl.library.lending.domain.patron.Reason.withReason;
 import static io.vavr.control.Either.left;
 import static io.vavr.control.Either.right;
 import static java.util.Collections.emptySet;
@@ -52,7 +52,7 @@ public class PatronResources {
     public Either<ResourceCollectingFailed, ResourceCollected> collect(Resource resource) {
         ResourceOnHold resourceToCollect = new ResourceOnHold(resource);
         if (resourcesOnHold.doesNotContain(resourceToCollect)) {
-            return left(ResourceCollectingFailed.now("resource is not on hold by patron", resource.getResourceId(), resource.getLibraryBranch(), patron));
+            return left(ResourceCollectingFailed.now(withReason("resource is not on hold by patron"), resource.getResourceId(), resource.getLibraryBranch(), patron));
         }
         ResourceCollected resourceCollected = resourcesOnHold.complete(resourceToCollect, patron);
         return right(resourceCollected);
@@ -76,60 +76,6 @@ public class PatronResources {
 
     int numberOfHolds() {
         return resourcesOnHold.count();
-    }
-
-    public PatronResourcesSnapshot toSnapshot() {
-        return new PatronResourcesSnapshot(patron, resourcesOnHold.toSnapshot(), overdueCheckouts.toSnapshot());
-    }
-}
-
-@AllArgsConstructor
-//TODO add not null
-class ResourcesOnHold {
-
-    Set<ResourceOnHold> resourcesOnHold;
-
-    ResourcePlacedOnHold hold(Resource resourceToHold, PatronInformation patronInformation) {
-        ResourceOnHold resourceOnHold = new ResourceOnHold(resourceToHold);
-        resourcesOnHold.add(resourceOnHold);
-        return ResourcePlacedOnHold.now(resourceOnHold.getResourceId(), resourceOnHold.getLibraryBranchId(), patronInformation);
-    }
-
-    ResourceCollected complete(ResourceOnHold resourceToCollect, PatronInformation patronInformation) {
-        resourcesOnHold.remove(resourceToCollect);
-        return ResourceCollected.now(resourceToCollect.getResourceId(), resourceToCollect.getLibraryBranchId(), patronInformation.getPatronId());
-    }
-
-    boolean doesNotContain(ResourceOnHold resourceOnHold) {
-        return !resourcesOnHold.contains(resourceOnHold);
-    }
-
-    int count() {
-        return resourcesOnHold.size();
-    }
-
-    Set<ResourceOnHoldSnapshot> toSnapshot() {
-        return resourcesOnHold
-                .stream()
-                .map(ResourceOnHold::toSnapshot)
-                .collect(Collectors.toSet());
-    }
-}
-
-//TODO add not null
-@Value
-@AllArgsConstructor
-class ResourceOnHold {
-
-    ResourceId resourceId;
-    LibraryBranchId libraryBranchId;
-
-    ResourceOnHold(Resource resource) {
-        this(resource.getResourceId(), resource.getLibraryBranch());
-    }
-
-    ResourceOnHoldSnapshot toSnapshot() {
-        return new ResourceOnHoldSnapshot(resourceId, libraryBranchId);
     }
 
 }

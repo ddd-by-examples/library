@@ -5,8 +5,8 @@ import io.pillopl.library.lending.domain.resource.ResourceFixture
 import io.vavr.control.Either
 import spock.lang.Specification
 
-import static io.pillopl.library.lending.domain.patron.PatronResourcesEvents.ResourceCollected
-import static io.pillopl.library.lending.domain.patron.PatronResourcesEvents.ResourceCollectingFailed
+import static PatronResourcesEvent.ResourceCollected
+import static PatronResourcesEvent.ResourceCollectingFailed
 import static io.pillopl.library.lending.domain.patron.PatronResourcesFixture.regularPatron
 
 class PatronCollectingResourceTest extends Specification {

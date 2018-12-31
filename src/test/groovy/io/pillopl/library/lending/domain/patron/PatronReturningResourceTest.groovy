@@ -7,7 +7,7 @@ import spock.lang.Specification
 
 import java.time.Instant
 
-import static io.pillopl.library.lending.domain.patron.PatronResourcesEvents.*
+import static PatronResourcesEvent.*
 import static io.pillopl.library.lending.domain.patron.PatronResourcesFixture.regularPatron
 
 class PatronReturningResourceTest extends Specification {

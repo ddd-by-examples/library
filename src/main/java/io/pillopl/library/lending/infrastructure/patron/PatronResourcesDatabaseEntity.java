@@ -1,31 +1,32 @@
 package io.pillopl.library.lending.infrastructure.patron;
 
 
-import io.pillopl.library.lending.domain.library.LibraryBranchId;
-import io.pillopl.library.lending.domain.patron.PatronId;
 import io.pillopl.library.lending.domain.patron.PatronInformation;
 import io.pillopl.library.lending.domain.patron.PatronInformation.PatronType;
-import io.pillopl.library.lending.domain.patron.PatronResourcesSnapshot;
-import io.pillopl.library.lending.domain.patron.ResourceOnHoldSnapshot;
-import io.pillopl.library.lending.domain.resource.ResourceId;
+import io.pillopl.library.lending.domain.patron.PatronResourcesEvent;
+import io.pillopl.library.lending.domain.patron.PatronResourcesEvent.ResourceCollected;
+import io.pillopl.library.lending.domain.patron.PatronResourcesEvent.ResourcePlacedOnHold;
+import io.vavr.API;
+import io.vavr.Predicates;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import static java.util.stream.Collectors.toSet;
+import static io.vavr.API.$;
+import static io.vavr.API.Case;
 
 @NoArgsConstructor
 class PatronResourcesDatabaseEntity {
 
-    @Id Long id;
+    @Id
+    Long id;
     UUID patronId;
     PatronType patronType;
     Set<ResourceOnHoldDatabaseEntity> resourcesOnHold;
-
 
     PatronResourcesDatabaseEntity(PatronInformation patronInformation) {
         this.patronId = patronInformation.getPatronId().getPatronId();
@@ -33,52 +34,58 @@ class PatronResourcesDatabaseEntity {
         this.resourcesOnHold = new HashSet<>();
     }
 
-    void synchronizeWith(PatronResourcesSnapshot snapshot) {
-        this.recreateResourcesOnHoldFrom(snapshot);
+    PatronResourcesDatabaseEntity reactTo(PatronResourcesEvent event) {
+        return API.Match(event).of(
+                Case($(Predicates.instanceOf(ResourcePlacedOnHold.class)), this::handle),
+                Case($(Predicates.instanceOf(ResourceCollected.class)), this::handle)
+
+        );
     }
 
-    void recreateResourcesOnHoldFrom(PatronResourcesSnapshot snapshot) {
-        resourcesOnHold =
-                snapshot
-                .getResourcesOnHold()
+    private PatronResourcesDatabaseEntity handle(ResourcePlacedOnHold event) {
+        resourcesOnHold.add(new ResourceOnHoldDatabaseEntity(event.getResourceId(), event.getPatronId(), event.getLibraryBranchId()));
+        return this;
+    }
+
+    private PatronResourcesDatabaseEntity handle(ResourceCollected event) {
+        resourcesOnHold
                 .stream()
-                .map(resourceOnHoldSnapshot -> new ResourceOnHoldDatabaseEntity(resourceOnHoldSnapshot, snapshot.getPatronInformation().getPatronId()))
-                .collect(toSet());
+                .filter(entity -> entity.hasSamePropertiesAs(event))
+                .findAny()
+                .ifPresent(entity -> resourcesOnHold.remove(entity));
+        return this;
     }
 
-    void recreateOverdueCheckoutsFrom(PatronResourcesSnapshot snapshot) {
-
-    }
-
-    PatronResourcesSnapshot toSnapshot() {
-        //TODO add checkouts
-        Set<ResourceOnHoldSnapshot> snapshot =
-                resourcesOnHold
-                .stream()
-                .map(resourceOnHoldDatabaseEntity ->
-                        new ResourceOnHoldSnapshot(new ResourceId(resourceOnHoldDatabaseEntity.resourceId), new LibraryBranchId(resourceOnHoldDatabaseEntity.libraryBranchId)))
-                .collect(toSet());
-        return new PatronResourcesSnapshot(new PatronInformation(new PatronId(patronId), patronType), snapshot, Collections.emptyMap());
-    }
 }
 
+
 @NoArgsConstructor
+@EqualsAndHashCode
 class ResourceOnHoldDatabaseEntity {
-    @Id Long id;
+    @Id
+    Long id;
     UUID patronId;
     UUID resourceId;
     UUID libraryBranchId;
 
-    ResourceOnHoldDatabaseEntity(ResourceOnHoldSnapshot resourceOnHoldSnapshot, PatronId patronId) {
-        this.patronId = patronId.getPatronId();
-        this.resourceId = resourceOnHoldSnapshot.getResourceId().getResourceId();
-        this.libraryBranchId = resourceOnHoldSnapshot.getLibraryBranchId().getLibraryBranchId();
+    ResourceOnHoldDatabaseEntity(UUID resourceId, UUID patronId, UUID libraryBranchId) {
+        this.resourceId = resourceId;
+        this.patronId = patronId;
+        this.libraryBranchId = libraryBranchId;
     }
+
+    boolean hasSamePropertiesAs(ResourceCollected event) {
+        return  this.patronId.equals(event.getPatronId()) &&
+                this.resourceId.equals(event.getResourceId()) &&
+                this.libraryBranchId.equals(event.getLibraryBranchId());
+    }
+
 
 }
 
 class OverdueCheckoutDatabaseEntity {
-    @Id Long id;
+    @Id
+    Long id;
     UUID resourceId;
     UUID libraryBranchId;
 

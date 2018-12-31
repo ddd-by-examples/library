@@ -8,7 +8,7 @@ import spock.lang.Specification
 
 import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.domain.patron.PatronResourcesFixture.*
-import static io.pillopl.library.lending.domain.patron.PatronResourcesEvents.*
+import static PatronResourcesEvent.*
 import static io.pillopl.library.lending.domain.resource.ResourceFixture.circulatingResource
 import static io.pillopl.library.lending.domain.resource.ResourceFixture.circulatingResourceAt
 import static java.util.Collections.emptySet

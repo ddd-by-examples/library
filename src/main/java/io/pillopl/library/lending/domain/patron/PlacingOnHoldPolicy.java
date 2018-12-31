@@ -5,6 +5,7 @@ import io.vavr.collection.List;
 import io.vavr.control.Either;
 import lombok.Value;
 
+import static io.pillopl.library.lending.domain.patron.Reason.withReason;
 import static io.vavr.control.Either.left;
 import static io.vavr.control.Either.right;
 
@@ -26,7 +27,7 @@ class OnlyResearcherPatronsCanBookRestrictedResourcePolicy implements PlacingOnH
     @Override
     public Either<Rejection, Allowance> canPlaceOnHold(Resource toHold, PatronResources patron) {
         if (toHold.isRestricted() && patron.isRegular()) {
-            return left(new Rejection("Regular patrons cannot hold restricted resources"));
+            return left(new Rejection(withReason("Regular patrons cannot hold restricted resources")));
         }
         return right(new Allowance());
     }
@@ -40,7 +41,7 @@ class OverdueCheckoutsRejectionPolicy implements PlacingOnHoldPolicy {
         final int MAX_COUNT_OF_OVERDUE_RESOURCES = 2;
 
         if (patron.overdueCheckoutsAt(toHold.getLibraryBranch()) >= MAX_COUNT_OF_OVERDUE_RESOURCES) {
-            return left(new Rejection("cannot place on hold when there are overdue checkouts"));
+            return left(new Rejection(withReason("cannot place on hold when there are overdue checkouts")));
         }
         return right(new Allowance());
     }
@@ -54,7 +55,7 @@ class RegularPatronMaximumNumberOfHoldsPolicy implements PlacingOnHoldPolicy {
         final int MAX_NUMBER_OF_HOLDS = 5;
 
         if (patron.isRegular() && patron.numberOfHolds() >= MAX_NUMBER_OF_HOLDS) {
-            return left(new Rejection("patron cannot hold more resources"));
+            return left(new Rejection(withReason("patron cannot hold more resources")));
         }
         return right(new Allowance());
     }
@@ -65,5 +66,14 @@ class Allowance { }
 
 @Value
 class Rejection {
+    Reason reason;
+}
+
+@Value
+class Reason {
     String reason;
+
+    static Reason withReason(String reason) {
+        return new Reason(reason);
+    }
 }

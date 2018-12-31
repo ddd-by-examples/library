@@ -7,5 +7,5 @@ public interface PatronResourcesRepository {
 
     Option<PatronResources> findBy(PatronId patronId);
 
-    Try<PatronResources> save(PatronResources patronResources);
+    Try<Void> reactTo(PatronResourcesEvent event);
 }

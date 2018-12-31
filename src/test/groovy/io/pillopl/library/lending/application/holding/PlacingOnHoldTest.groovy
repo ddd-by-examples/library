@@ -1,17 +1,18 @@
 package io.pillopl.library.lending.application.holding
 
-import io.pillopl.library.lending.application.InMemoryPatronResourcesRepository
+import io.pillopl.library.lending.application.FakePatronResourcesRepository
 import io.pillopl.library.lending.domain.patron.PatronId
-import io.pillopl.library.lending.domain.patron.PatronResources
+import io.pillopl.library.lending.domain.patron.PatronResourcesEvent
 import io.pillopl.library.lending.domain.patron.PatronResourcesFixture
 import io.vavr.control.Option
+import lombok.Value
 import spock.lang.Specification
 
 import static io.pillopl.library.lending.domain.resource.ResourceFixture.*
 
 class PlacingOnHoldTest extends Specification {
 
-    InMemoryPatronResourcesRepository repository = new InMemoryPatronResourcesRepository()
+    FakePatronResourcesRepository repository = new FakePatronResourcesRepository()
     FindResource willFindResource = { id -> Option.of(circulatingResource()) }
     FindResource willNotFindResource = { id -> Option.none() }
     FindResource willFindRestrictedResource = { id -> Option.of(restrictedResource()) }
@@ -31,20 +32,6 @@ class PlacingOnHoldTest extends Specification {
             PatronId patron = persistedRegularPatron()
         and:
             PlacingOnHold holding = new PlacingOnHold(willFindRestrictedResource, repository)
-        expect:
-            holding.placeOnHold(anyResourceId(), patron) == PlacingOnHold.Result.FAILURE
-
-    }
-
-    def 'persistence works (trying to hold more than 5 resources requires persistence mechanism to work)'() {
-        given:
-            PatronId patron = persistedRegularPatron()
-        and:
-            PlacingOnHold holding = new PlacingOnHold(willFindResource, repository)
-        and:
-            5.times {
-                holding.placeOnHold(anyResourceId(), patron)
-            }
         expect:
             holding.placeOnHold(anyResourceId(), patron) == PlacingOnHold.Result.FAILURE
 
@@ -72,14 +59,22 @@ class PlacingOnHoldTest extends Specification {
 
     PatronId persistedRegularPatron() {
         PatronId patronId = PatronResourcesFixture.anyPatronId();
-        PatronResources patron = PatronResourcesFixture.regularPatron(patronId)
-        repository.save(patron)
+        repository.reactTo(new FakePatronCreatedEvent(patronId))
         return patronId
     }
 
     PatronId unknownPatron() {
-        PatronId patronId = PatronResourcesFixture.anyPatronId();
-        PatronResources patron = PatronResourcesFixture.regularPatron(patronId)
-        return patronId
+        return PatronResourcesFixture.anyPatronId();
     }
+}
+
+@Value
+class FakePatronCreatedEvent implements PatronResourcesEvent {
+
+    FakePatronCreatedEvent(PatronId patronId) {
+        this.patronId = patronId.patronId
+    }
+
+    UUID patronId;
+
 }

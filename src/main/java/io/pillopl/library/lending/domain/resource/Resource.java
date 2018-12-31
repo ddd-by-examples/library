@@ -1,7 +1,7 @@
 package io.pillopl.library.lending.domain.resource;
 
 import io.pillopl.library.lending.domain.library.LibraryBranchId;
-import io.pillopl.library.lending.domain.patron.PatronResourcesEvents;
+import io.pillopl.library.lending.domain.patron.PatronResourcesEvent;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -34,15 +34,15 @@ public class Resource {
     }
 
     //TODO events upper
-    void handle(PatronResourcesEvents.ResourceReturned event) {
+    void handle(PatronResourcesEvent.ResourceReturned event) {
         this.state = ResourceState.AVAILABLE;
     }
 
-    void handle(PatronResourcesEvents.ResourcePlacedOnHold event) {
+    void handle(PatronResourcesEvent.ResourcePlacedOnHold event) {
         state = ON_HOLD;
     }
 
-    void handle(PatronResourcesEvents.ResourceCollected event) {
+    void handle(PatronResourcesEvent.ResourceCollected event) {
         state = COLLECTED;
     }
 }
