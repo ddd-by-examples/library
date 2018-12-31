@@ -29,10 +29,6 @@
             <artifactId>vavr</artifactId>
             <version>0.9.2</version>
         </dependency>
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.springframework.data</groupId>
