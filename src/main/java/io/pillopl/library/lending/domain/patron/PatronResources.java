@@ -41,11 +41,9 @@ public class PatronResources {
     public Either<ResourceHoldFailed, ResourcePlacedOnHold> placeOnHold(Resource resource) {
         Option<Rejection> rejection = tryPlacingOnHold(resource);
         if (!rejection.isEmpty()) {
-            return left(
-                    ResourceHoldFailed.now(rejection.get().getReason(), resource.getResourceId(), resource.getLibraryBranch(), patron));
+            return left(ResourceHoldFailed.now(rejection.get().getReason(), resource.getResourceId(), resource.getLibraryBranch(), patron));
         }
-        ResourcePlacedOnHold resourcePlacedOnHold = resourcesOnHold.hold(resource, patron);
-        return right(resourcePlacedOnHold);
+        return right(ResourcePlacedOnHold.now(resource.getResourceId(), resource.getLibraryBranch(), patron));
     }
 
     public Either<ResourceCollectingFailed, ResourceCollected> collect(Resource resource) {
@@ -53,8 +51,7 @@ public class PatronResources {
         if (resourcesOnHold.doesNotContain(resourceToCollect)) {
             return left(ResourceCollectingFailed.now(withReason("resource is not on hold by patron"), resource.getResourceId(), resource.getLibraryBranch(), patron));
         }
-        ResourceCollected resourceCollected = resourcesOnHold.complete(resourceToCollect, patron);
-        return right(resourceCollected);
+        return right(ResourceCollected.now(resourceToCollect.getResourceId(), resourceToCollect.getLibraryBranchId(), patron.getPatronId()));
     }
 
     private Option<Rejection> tryPlacingOnHold(Resource resource) {
