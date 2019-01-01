@@ -6,12 +6,12 @@ import java.util.Set;
 
 @Value
 //TODO add not null
-public class ResourcesOnHold {
+public class BooksOnHold {
 
-    Set<ResourceOnHold> resourcesOnHold;
+    Set<BookOnHold> resourcesOnHold;
 
-    boolean doesNotContain(ResourceOnHold resourceOnHold) {
-        return !resourcesOnHold.contains(resourceOnHold);
+    boolean doesNotContain(BookOnHold bookOnHold) {
+        return !resourcesOnHold.contains(bookOnHold);
     }
 
     int count() {

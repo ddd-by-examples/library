@@ -1,6 +1,6 @@
 package io.pillopl.library.lending.domain.patron;
 
-import io.pillopl.library.lending.domain.resource.Resource;
+import io.pillopl.library.lending.domain.book.Book;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 import lombok.Value;
@@ -11,16 +11,16 @@ import static io.pillopl.library.lending.domain.patron.Reason.withReason;
 import static io.vavr.control.Either.left;
 import static io.vavr.control.Either.right;
 
-interface PlacingOnHoldPolicy extends BiFunction<Resource, PatronResources, Either<Rejection, Allowance>> {
+interface PlacingOnHoldPolicy extends BiFunction<Book, PatronBooks, Either<Rejection, Allowance>> {
 
-    PlacingOnHoldPolicy onlyResearcherPatronsCanBookRestrictedResourcePolicy = (Resource toHold, PatronResources patron) -> {
+    PlacingOnHoldPolicy onlyResearcherPatronsCanBookRestrictedBooksPolicy = (Book toHold, PatronBooks patron) -> {
         if (toHold.isRestricted() && patron.isRegular()) {
-            return left(new Rejection(withReason("Regular patrons cannot hold restricted resources")));
+            return left(new Rejection(withReason("Regular patrons cannot hold restricted books")));
         }
         return right(new Allowance());
     };
 
-    PlacingOnHoldPolicy overdueCheckoutsRejectionPolicy = (Resource toHold, PatronResources patron) -> {
+    PlacingOnHoldPolicy overdueCheckoutsRejectionPolicy = (Book toHold, PatronBooks patron) -> {
         final int MAX_COUNT_OF_OVERDUE_RESOURCES = 2;
 
         if (patron.overdueCheckoutsAt(toHold.getLibraryBranch()) >= MAX_COUNT_OF_OVERDUE_RESOURCES) {
@@ -29,18 +29,18 @@ interface PlacingOnHoldPolicy extends BiFunction<Resource, PatronResources, Eith
         return right(new Allowance());
     };
 
-    PlacingOnHoldPolicy regularPatronMaximumNumberOfHoldsPolicy = (Resource toHold, PatronResources patron) -> {
+    PlacingOnHoldPolicy regularPatronMaximumNumberOfHoldsPolicy = (Book toHold, PatronBooks patron) -> {
         final int MAX_NUMBER_OF_HOLDS = 5;
 
         if (patron.isRegular() && patron.numberOfHolds() >= MAX_NUMBER_OF_HOLDS) {
-            return left(new Rejection(withReason("patron cannot hold more resources")));
+            return left(new Rejection(withReason("patron cannot hold more books")));
         }
         return right(new Allowance());
     };
 
     static List<PlacingOnHoldPolicy> allCurrentPolicies() {
         return List.of(
-                onlyResearcherPatronsCanBookRestrictedResourcePolicy,
+                onlyResearcherPatronsCanBookRestrictedBooksPolicy,
                 overdueCheckoutsRejectionPolicy,
                 regularPatronMaximumNumberOfHoldsPolicy);
     }

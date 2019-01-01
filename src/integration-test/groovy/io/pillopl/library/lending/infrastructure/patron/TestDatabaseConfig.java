@@ -1,7 +1,7 @@
 package io.pillopl.library.lending.infrastructure.patron;
 
-import io.pillopl.library.lending.domain.patron.PatronResourcesFactory;
-import io.pillopl.library.lending.domain.patron.PatronResourcesRepository;
+import io.pillopl.library.lending.domain.patron.PatronBooksFactory;
+import io.pillopl.library.lending.domain.patron.PatronBooksRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
@@ -39,8 +39,8 @@ class TestDatabaseConfig extends JdbcConfiguration {
     }
 
     @Bean
-    PatronResourcesRepository patronResourcesRepository(PatronResourcesEntityRepository patronResourcesEntityRepository) {
-        return new PatronResourcesDatabaseRepository(patronResourcesEntityRepository, new PatronResourcesFactory());
+    PatronBooksRepository patronBooksRepository(PatronBooksEntityRepository patronBooksEntityRepository) {
+        return new PatronBooksDatabaseRepository(patronBooksEntityRepository, new PatronBooksFactory());
     }
 
 

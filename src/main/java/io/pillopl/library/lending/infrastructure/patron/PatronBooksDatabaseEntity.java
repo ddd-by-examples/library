@@ -3,9 +3,9 @@ package io.pillopl.library.lending.infrastructure.patron;
 
 import io.pillopl.library.lending.domain.patron.PatronInformation;
 import io.pillopl.library.lending.domain.patron.PatronInformation.PatronType;
-import io.pillopl.library.lending.domain.patron.PatronResourcesEvent;
-import io.pillopl.library.lending.domain.patron.PatronResourcesEvent.ResourceCollected;
-import io.pillopl.library.lending.domain.patron.PatronResourcesEvent.ResourcePlacedOnHold;
+import io.pillopl.library.lending.domain.patron.PatronBooksEvent;
+import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookCollected;
+import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold;
 import io.vavr.API;
 import io.vavr.Predicates;
 import lombok.EqualsAndHashCode;
@@ -20,39 +20,39 @@ import static io.vavr.API.$;
 import static io.vavr.API.Case;
 
 @NoArgsConstructor
-class PatronResourcesDatabaseEntity {
+class PatronBooksDatabaseEntity {
 
     @Id
     Long id;
     UUID patronId;
     PatronType patronType;
-    Set<ResourceOnHoldDatabaseEntity> resourcesOnHold;
+    Set<BookOnHoldDatabaseEntity> booksOnHold;
 
-    PatronResourcesDatabaseEntity(PatronInformation patronInformation) {
+    PatronBooksDatabaseEntity(PatronInformation patronInformation) {
         this.patronId = patronInformation.getPatronId().getPatronId();
         this.patronType = patronInformation.getType();
-        this.resourcesOnHold = new HashSet<>();
+        this.booksOnHold = new HashSet<>();
     }
 
-    PatronResourcesDatabaseEntity reactTo(PatronResourcesEvent event) {
+    PatronBooksDatabaseEntity reactTo(PatronBooksEvent event) {
         return API.Match(event).of(
-                Case($(Predicates.instanceOf(ResourcePlacedOnHold.class)), this::handle),
-                Case($(Predicates.instanceOf(ResourceCollected.class)), this::handle)
+                Case($(Predicates.instanceOf(BookPlacedOnHold.class)), this::handle),
+                Case($(Predicates.instanceOf(BookCollected.class)), this::handle)
 
         );
     }
 
-    private PatronResourcesDatabaseEntity handle(ResourcePlacedOnHold event) {
-        resourcesOnHold.add(new ResourceOnHoldDatabaseEntity(event.getResourceId(), event.getPatronId(), event.getLibraryBranchId()));
+    private PatronBooksDatabaseEntity handle(BookPlacedOnHold event) {
+        booksOnHold.add(new BookOnHoldDatabaseEntity(event.getBookId(), event.getPatronId(), event.getLibraryBranchId()));
         return this;
     }
 
-    private PatronResourcesDatabaseEntity handle(ResourceCollected event) {
-        resourcesOnHold
+    private PatronBooksDatabaseEntity handle(BookCollected event) {
+        booksOnHold
                 .stream()
                 .filter(entity -> entity.hasSamePropertiesAs(event))
                 .findAny()
-                .ifPresent(entity -> resourcesOnHold.remove(entity));
+                .ifPresent(entity -> booksOnHold.remove(entity));
         return this;
     }
 
@@ -61,22 +61,22 @@ class PatronResourcesDatabaseEntity {
 
 @NoArgsConstructor
 @EqualsAndHashCode
-class ResourceOnHoldDatabaseEntity {
+class BookOnHoldDatabaseEntity {
     @Id
     Long id;
     UUID patronId;
-    UUID resourceId;
+    UUID bookId;
     UUID libraryBranchId;
 
-    ResourceOnHoldDatabaseEntity(UUID resourceId, UUID patronId, UUID libraryBranchId) {
-        this.resourceId = resourceId;
+    BookOnHoldDatabaseEntity(UUID bookId, UUID patronId, UUID libraryBranchId) {
+        this.bookId = bookId;
         this.patronId = patronId;
         this.libraryBranchId = libraryBranchId;
     }
 
-    boolean hasSamePropertiesAs(ResourceCollected event) {
+    boolean hasSamePropertiesAs(BookCollected event) {
         return  this.patronId.equals(event.getPatronId()) &&
-                this.resourceId.equals(event.getResourceId()) &&
+                this.bookId.equals(event.getBookId()) &&
                 this.libraryBranchId.equals(event.getLibraryBranchId());
     }
 

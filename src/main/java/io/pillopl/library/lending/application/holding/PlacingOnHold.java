@@ -1,12 +1,12 @@
 package io.pillopl.library.lending.application.holding;
 
 import io.pillopl.library.lending.domain.patron.PatronId;
-import io.pillopl.library.lending.domain.patron.PatronResources;
-import io.pillopl.library.lending.domain.patron.PatronResourcesEvent.ResourceHoldFailed;
-import io.pillopl.library.lending.domain.patron.PatronResourcesEvent.ResourcePlacedOnHold;
-import io.pillopl.library.lending.domain.patron.PatronResourcesRepository;
-import io.pillopl.library.lending.domain.resource.Resource;
-import io.pillopl.library.lending.domain.resource.ResourceId;
+import io.pillopl.library.lending.domain.patron.PatronBooks;
+import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldFailed;
+import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold;
+import io.pillopl.library.lending.domain.patron.PatronBooksRepository;
+import io.pillopl.library.lending.domain.book.Book;
+import io.pillopl.library.lending.domain.book.BookId;
 import io.vavr.control.Either;
 import lombok.AllArgsConstructor;
 
@@ -23,37 +23,38 @@ public class PlacingOnHold {
         SUCCESS, FAILURE
     }
 
-    private final FindResource findResource;
-    private final PatronResourcesRepository patronResourcesRepository;
+    private final FindBook findBook;
+    private final PatronBooksRepository patronBooksRepository;
 
-    public Result placeOnHold(ResourceId id, PatronId patronId) {
-        Resource resource = findResource(id);
-        PatronResources patronResources = findPatronCurrentResources(patronId);
-        Either<ResourceHoldFailed, ResourcePlacedOnHold> result = patronResources.placeOnHold(resource);
+    //TODO return TRY?
+    public Result placeOnHold(BookId id, PatronId patronId) {
+        Book book = findResource(id);
+        PatronBooks patronBooks = findPatronCurrentResources(patronId);
+        Either<BookHoldFailed, BookPlacedOnHold> result = patronBooks.placeOnHold(book);
         return Match(result).of(
                 Case($Left($()), this::publishEvents),
                 Case($Right($()), this::saveAndPublishEvents)
         );
     }
 
-    private Result publishEvents(ResourceHoldFailed resourceHoldFailed) {
+    private Result publishEvents(BookHoldFailed bookHoldFailed) {
         //TODO publish events
         return FAILURE;
     }
 
-    private Result saveAndPublishEvents(ResourcePlacedOnHold placedOnHold) {
+    private Result saveAndPublishEvents(BookPlacedOnHold placedOnHold) {
         //TODO publish events
-        patronResourcesRepository.reactTo(placedOnHold);
+        patronBooksRepository.reactTo(placedOnHold);
         return SUCCESS;
     }
 
-    private Resource findResource(ResourceId id) {
-        return findResource.with(id)
-                .getOrElseThrow(() -> new IllegalArgumentException("Resource with given Id does not exists: " + id.getResourceId()));
+    private Book findResource(BookId id) {
+        return findBook.with(id)
+                .getOrElseThrow(() -> new IllegalArgumentException("Book with given Id does not exists: " + id.getBookId()));
     }
 
-    private PatronResources findPatronCurrentResources(PatronId patronId) {
-        return patronResourcesRepository
+    private PatronBooks findPatronCurrentResources(PatronId patronId) {
+        return patronBooksRepository
                 .findBy(patronId)
                 .getOrElseThrow(() -> new IllegalArgumentException("Patron with given Id does not exists: " + patronId.getPatronId()));
     }

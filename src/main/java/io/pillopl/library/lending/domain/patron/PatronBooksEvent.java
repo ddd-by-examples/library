@@ -1,6 +1,6 @@
 package io.pillopl.library.lending.domain.patron;
 
-import io.pillopl.library.lending.domain.resource.ResourceId;
+import io.pillopl.library.lending.domain.book.BookId;
 import io.pillopl.library.lending.domain.library.LibraryBranchId;
 import lombok.Value;
 
@@ -9,7 +9,7 @@ import java.util.UUID;
 
 //TODO add notNull
 //TODO add id to events
-public interface PatronResourcesEvent {
+public interface PatronBooksEvent {
 
     default PatronId patronId() {
         return new PatronId(getPatronId());
@@ -18,77 +18,77 @@ public interface PatronResourcesEvent {
     UUID getPatronId();
 
     @Value
-    class ResourcePlacedOnHold implements PatronResourcesEvent {
+    class BookPlacedOnHold implements PatronBooksEvent {
         Instant when;
         UUID patronId;
-        UUID resourceId;
+        UUID bookId;
         UUID libraryBranchId;
 
-        static ResourcePlacedOnHold now(ResourceId resourceId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
-            return new ResourcePlacedOnHold(
+        static BookPlacedOnHold now(BookId bookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
+            return new BookPlacedOnHold(
                     Instant.now(),
                     patronInformation.getPatronId().getPatronId(),
-                    resourceId.getResourceId(),
+                    bookId.getBookId(),
                     libraryBranchId.getLibraryBranchId());
         }
     }
 
     @Value
-    class ResourceCollected implements PatronResourcesEvent {
+    class BookCollected implements PatronBooksEvent {
         Instant when;
         UUID patronId;
-        UUID resourceId;
+        UUID bookId;
         UUID libraryBranchId;
 
-        static ResourceCollected now(ResourceId resourceId, LibraryBranchId libraryBranchId, PatronId patronId) {
-            return new ResourceCollected(
+        static BookCollected now(BookId bookId, LibraryBranchId libraryBranchId, PatronId patronId) {
+            return new BookCollected(
                     Instant.now(),
                     patronId.getPatronId(),
-                    resourceId.getResourceId(),
+                    bookId.getBookId(),
                     libraryBranchId.getLibraryBranchId());
         }
     }
 
     @Value
-    class ResourceReturned implements PatronResourcesEvent {
+    class BookReturned implements PatronBooksEvent {
         Instant when;
         UUID patronId;
-        UUID resourceId;
+        UUID bookId;
         UUID libraryBranchId;
     }
 
     @Value
-    class ResourceHoldFailed implements PatronResourcesEvent {
+    class BookHoldFailed implements PatronBooksEvent {
         String reason;
         Instant when;
         UUID patronId;
-        UUID resourceId;
+        UUID bookId;
         UUID libraryBranchId;
 
-        static ResourceHoldFailed now(Reason reason, ResourceId resourceId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
-            return new ResourceHoldFailed(
+        static BookHoldFailed now(Reason reason, BookId bookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
+            return new BookHoldFailed(
                     reason.getReason(),
                     Instant.now(),
                     patronInformation.getPatronId().getPatronId(),
-                    resourceId.getResourceId(),
+                    bookId.getBookId(),
                     libraryBranchId.getLibraryBranchId());
         }
     }
 
     @Value
-    class ResourceCollectingFailed implements PatronResourcesEvent {
+    class BookCollectingFailed implements PatronBooksEvent {
         String reason;
         Instant when;
         UUID patronId;
-        UUID resourceId;
+        UUID bookId;
         UUID libraryBranchId;
 
-        static ResourceCollectingFailed now(Reason reason, ResourceId resourceId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
-            return new ResourceCollectingFailed(
+        static BookCollectingFailed now(Reason reason, BookId bookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
+            return new BookCollectingFailed(
                     reason.getReason(),
                     Instant.now(),
                     patronInformation.getPatronId().getPatronId(),
-                    resourceId.getResourceId(),
+                    bookId.getBookId(),
                     libraryBranchId.getLibraryBranchId());
         }
     }
