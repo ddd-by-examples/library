@@ -14,7 +14,7 @@ public class HexagonalArchitectureTest {
 
     @ArchTest
     public static final ArchRule domain_should_not_depend_on_application =
-            noClasses()
+                    noClasses()
                     .that()
                     .resideInAPackage("..domain..")
                     .should()
@@ -23,7 +23,7 @@ public class HexagonalArchitectureTest {
 
     @ArchTest
     public static final ArchRule domain_should_not_depend_on_infrastructure =
-            noClasses()
+                    noClasses()
                     .that()
                     .resideInAPackage("..domain..")
                     .should()
@@ -32,16 +32,16 @@ public class HexagonalArchitectureTest {
 
     @ArchTest
     public static final ArchRule domain_should_not_depend_on_ui =
-            noClasses()
+                    noClasses()
                     .that()
                     .resideInAPackage("..domain..")
                     .should()
                     .dependOnClassesThat()
-                    .resideInAPackage("..ut comm..");
+                    .resideInAPackage("..ut..");
 
     @ArchTest
     public static final ArchRule application_should_not_depend_on_infrastructure =
-            noClasses()
+                    noClasses()
                     .that()
                     .resideInAPackage("..application..")
                     .should()
@@ -50,7 +50,7 @@ public class HexagonalArchitectureTest {
 
     @ArchTest
     public static final ArchRule application_should_not_depend_on_ui =
-            noClasses()
+                    noClasses()
                     .that()
                     .resideInAPackage("..application..")
                     .should()
@@ -59,7 +59,7 @@ public class HexagonalArchitectureTest {
 
     @ArchTest
     public static final ArchRule ui_should_not_depend_on_infrastructure =
-            noClasses()
+                    noClasses()
                     .that()
                     .resideInAPackage("..ui..")
                     .should()
