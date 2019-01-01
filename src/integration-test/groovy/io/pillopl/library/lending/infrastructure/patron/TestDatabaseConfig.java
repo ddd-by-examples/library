@@ -16,7 +16,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import javax.sql.DataSource;
 
 @Configuration
-@EnableJdbcRepositories(basePackages = {"io.pillopl.library.lending.infrastructure.patron"})
+@EnableJdbcRepositories
 class TestDatabaseConfig extends JdbcConfiguration {
 
     @Bean

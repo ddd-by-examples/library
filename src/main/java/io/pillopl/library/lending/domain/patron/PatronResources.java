@@ -14,6 +14,7 @@ import io.vavr.control.Option;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,13 +33,11 @@ public class PatronResources {
 
     private final PatronInformation patron;
 
-
     private final List<PlacingOnHoldPolicy> placingOnHoldPolicies;
 
     private final OverdueCheckouts overdueCheckouts;
 
     private final ResourcesOnHold resourcesOnHold;
-
 
     public Either<ResourceHoldFailed, ResourcePlacedOnHold> placeOnHold(Resource resource) {
         if(!resource.isAvailable()) {

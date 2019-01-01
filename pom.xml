@@ -83,23 +83,6 @@
 
     </dependencies>
 
-
-    <profiles>
-        <profile>
-            <id>dev</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-        </profile>
-        <profile>
-            <id>integration-test</id>
-            <properties>
-                <skip.integration.tests>false</skip.integration.tests>
-                <skip.unit.tests>true</skip.unit.tests>
-            </properties>
-        </profile>
-    </profiles>
-
     <build>
         <plugins>
             <plugin>
@@ -108,16 +91,15 @@
                 <version>2.20</version>
                 <configuration>
                     <includes>
-                        <include>**/*Test.**</include>
-                        <include>**/*Spec.**</include>
+                        <include>**/*Test.java</include>
+                        <include>**/*Test.groovy</include>
                     </includes>
-                    <skipTests>${skip.unit.tests}</skipTests>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.20</version>
+                <version>2.22.1</version>
                 <executions>
                     <execution>
                         <id>integration-tests</id>
@@ -127,9 +109,9 @@
                         </goals>
                         <configuration>
                             <includes>
-                                <include>**/*IT.**</include>
+                                <include>**/*IT.java</include>
+                                <include>**/*IT.groovy</include>
                             </includes>
-                            <skipTests>${skip.integration.tests}</skipTests>
                         </configuration>
                     </execution>
                 </executions>
@@ -138,18 +120,29 @@
                 <groupId>org.codehaus.gmavenplus</groupId>
                 <artifactId>gmavenplus-plugin</artifactId>
                 <version>1.6.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compileTests</goal>
+                            <goal>addTestSources</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
                     <testSources>
                         <testSource>
                             <directory>src/test/groovy</directory>
                             <includes>
-                                <include>**/*.**</include>
+                                <include>**/*Test.groovy</include>
+                                <include>**/*Test.java</include>
+
                             </includes>
                         </testSource>
                         <testSource>
                             <directory>src/integration-test/groovy</directory>
                             <includes>
-                                <include>**/IT.**</include>
+                                <include>**/*IT.groovy</include>
+                                <include>**/*IT.java</include>
                             </includes>
                         </testSource>
                     </testSources>
