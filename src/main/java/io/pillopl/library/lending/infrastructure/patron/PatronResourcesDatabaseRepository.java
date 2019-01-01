@@ -15,7 +15,6 @@ import java.util.UUID;
 import static io.pillopl.library.lending.domain.patron.PatronInformation.PatronType.REGULAR;
 import static java.util.stream.Collectors.toSet;
 
-@Repository
 class PatronResourcesDatabaseRepository implements PatronResourcesRepository {
 
     private final PatronResourcesEntityRepository patronResourcesEntityRepository;

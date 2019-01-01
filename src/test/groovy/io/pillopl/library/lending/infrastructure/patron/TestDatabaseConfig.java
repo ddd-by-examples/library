@@ -16,7 +16,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import javax.sql.DataSource;
 
 @Configuration
-@EnableJdbcRepositories
+@EnableJdbcRepositories(basePackages = {"io.pillopl.library.lending.infrastructure.patron"})
 class TestDatabaseConfig extends JdbcConfiguration {
 
     @Bean
@@ -30,7 +30,7 @@ class TestDatabaseConfig extends JdbcConfiguration {
     }
 
     @Bean
-    DataSource dataSource(){
+    DataSource dataSource() {
         return new EmbeddedDatabaseBuilder()
                 .generateUniqueName(true)
                 .setType(EmbeddedDatabaseType.HSQL)
@@ -42,4 +42,6 @@ class TestDatabaseConfig extends JdbcConfiguration {
     PatronResourcesRepository patronResourcesRepository(PatronResourcesEntityRepository patronResourcesEntityRepository) {
         return new PatronResourcesDatabaseRepository(patronResourcesEntityRepository, new PatronResourcesFactory());
     }
+
+
 }
