@@ -39,6 +39,7 @@ public class PatronBooks {
 
     private final BooksOnHold booksOnHold;
 
+    //TODO should pass BookRequest here?
     public Either<BookHoldFailed, BookPlacedOnHold> placeOnHold(Book book) {
         if(!book.isAvailable()) {
             return left(BookHoldFailed.now(new Reason("book is not available"), book.getBookId(), book.getLibraryBranch(), patron));
