@@ -16,7 +16,7 @@ import static io.pillopl.library.lending.domain.resource.ResourceFixture.circula
 //TODO - move integration tests away of unit ones
 @ContextConfiguration(classes = TestDatabaseConfig.class)
 @SpringBootTest
-class PatronResourcesDatabaseRepositoryIntegrationTest extends Specification {
+class PatronResourcesDatabaseRepositoryIT extends Specification {
 
     PatronId patronId = PatronResourcesFixture.anyPatronId()
 
