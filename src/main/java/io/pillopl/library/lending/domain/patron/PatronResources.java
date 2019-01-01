@@ -60,7 +60,7 @@ public class PatronResources {
     private Option<Rejection> tryPlacingOnHold(Resource resource) {
         return placingOnHoldPolicies
                 .toStream()
-                .map(policy -> policy.canPlaceOnHold(resource, this))
+                .map(policy -> policy.apply(resource, this))
                 .find(Either::isLeft)
                 .map(Either::getLeft);
     }
