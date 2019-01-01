@@ -5,6 +5,7 @@ import io.pillopl.library.lending.domain.patron.PatronResources
 import io.pillopl.library.lending.domain.patron.PatronResourcesEvent
 import io.pillopl.library.lending.domain.patron.PatronResourcesFixture
 import io.pillopl.library.lending.domain.resource.Resource
+import io.pillopl.library.lending.infrastructure.patron.TestDatabaseConfig
 import io.vavr.control.Option
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
