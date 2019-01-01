@@ -19,7 +19,7 @@ import static io.pillopl.library.lending.domain.resource.ResourceFixture.circula
 @SpringBootTest
 class PatronResourcesDatabaseRepositoryIntegrationTest extends Specification {
 
-    final PatronId patronId = PatronResourcesFixture.anyPatronId()
+    PatronId patronId = PatronResourcesFixture.anyPatronId()
 
     @Autowired
     PatronResourcesDatabaseRepository patronResourcesRepository
