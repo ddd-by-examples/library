@@ -24,7 +24,6 @@ class RegularPatronRequestingCirculatingBooksTest extends Specification {
 
     }
 
-    //TODO: per month
     def 'a regular patron cannot place on hold more than 5 books'() {
         when:
             Either<BookHoldFailed, BookPlacedOnHold> hold = regularPatronWithHolds(holds).placeOnHold(circulatingBook())
@@ -37,7 +36,6 @@ class RegularPatronRequestingCirculatingBooksTest extends Specification {
 
     }
 
-    //TODO: per month
     def 'a regular patron can place on hold book when he did not place on hold more than 4 books'() {
         given:
             Book book = circulatingBook()
