@@ -27,7 +27,7 @@ class PatronResourcesDatabaseRepositoryIntegrationTest extends Specification {
     @Autowired
     PatronResourcesEntityRepository patronResourcesEntityRepository
 
-    def 'persistance in real database should work'() {
+    def 'persistence in real database should work'() {
         given:
             PatronResources regular = PatronResourcesFixture.regularPatron(patronId)
             Resource resource = circulatingResource()
