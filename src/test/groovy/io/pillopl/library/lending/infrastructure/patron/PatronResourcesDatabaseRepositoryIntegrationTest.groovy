@@ -14,7 +14,6 @@ import spock.lang.Specification
 import static io.pillopl.library.lending.domain.resource.ResourceFixture.circulatingResource
 
 //TODO - move integration tests away of unit ones
-//TODO - add archtests for domain/application/infra
 @ContextConfiguration(classes = TestDatabaseConfig.class)
 @SpringBootTest
 class PatronResourcesDatabaseRepositoryIntegrationTest extends Specification {
