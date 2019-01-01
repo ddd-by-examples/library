@@ -37,10 +37,10 @@ public class HexagonalArchitectureTest {
                     .resideInAPackage("..domain..")
                     .should()
                     .dependOnClassesThat()
-                    .resideInAPackage("..ui..");
+                    .resideInAPackage("..ut comm..");
 
     @ArchTest
-    public static final ArchRule appliaction_should_not_depend_on_infrastructure =
+    public static final ArchRule application_should_not_depend_on_infrastructure =
             noClasses()
                     .that()
                     .resideInAPackage("..application..")
