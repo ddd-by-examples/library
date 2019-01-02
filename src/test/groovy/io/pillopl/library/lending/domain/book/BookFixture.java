@@ -33,7 +33,7 @@ public class BookFixture {
     }
 
     public static CollectedBook collectedBook() {
-        return new CollectedBook(new BookInformation(anyBookId(), Circulating), anyBranch(), anyPatronId(), Instant.now());
+        return new CollectedBook(new BookInformation(anyBookId(), Circulating), anyBranch(), anyPatronId());
     }
 
     public static AvailableBook restrictedBook() {

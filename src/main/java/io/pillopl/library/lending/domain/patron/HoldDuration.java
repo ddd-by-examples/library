@@ -17,17 +17,28 @@ public class HoldDuration {
         this.to = to;
     }
 
-    Option<Instant> activeTill() {
+    boolean isOpenEnded() {
+        return getTo().isEmpty();
+    }
+
+    Option<Instant> getTo() {
         return Option.of(to);
     }
 
-    public static HoldDuration openEnded() {
-        return new HoldDuration(Instant.now(), null);
+    public static HoldDuration forOpenEnded() {
+        return forOpenEnded(Instant.now());
     }
 
-    public static HoldDuration closeEnded(int days) {
-        Instant now = Instant.now();
-        Instant till = now.plus(Duration.ofDays(days));
-        return new HoldDuration(Instant.now(), till);
+    public static HoldDuration forOpenEnded(Instant from) {
+        return new HoldDuration(from, null);
+    }
+
+    public static HoldDuration forCloseEnded(int days) {
+        return forCloseEnded(Instant.now(), days);
+    }
+
+    static HoldDuration forCloseEnded(Instant from, int days) {
+        Instant till = from.plus(Duration.ofDays(days));
+        return new HoldDuration(from, till);
     }
 }

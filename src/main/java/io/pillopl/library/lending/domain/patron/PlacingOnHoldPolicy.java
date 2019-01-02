@@ -1,26 +1,25 @@
 package io.pillopl.library.lending.domain.patron;
 
 import io.pillopl.library.lending.domain.book.AvailableBook;
+import io.vavr.Function3;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 import lombok.Value;
-
-import java.util.function.BiFunction;
 
 import static io.pillopl.library.lending.domain.patron.Reason.withReason;
 import static io.vavr.control.Either.left;
 import static io.vavr.control.Either.right;
 
-interface PlacingOnHoldPolicy extends BiFunction<AvailableBook, PatronBooks, Either<Rejection, Allowance>> {
+interface PlacingOnHoldPolicy extends Function3<AvailableBook, PatronBooks, HoldDuration, Either<Rejection, Allowance>> {
 
-    PlacingOnHoldPolicy onlyResearcherPatronsCanBookRestrictedBooksPolicy = (AvailableBook toHold, PatronBooks patron) -> {
+    PlacingOnHoldPolicy onlyResearcherPatronsCanHoldRestrictedBooksPolicy = (AvailableBook toHold, PatronBooks patron, HoldDuration holdDuration) -> {
         if (toHold.isRestricted() && patron.isRegular()) {
             return left(new Rejection(withReason("Regular patrons cannot hold restricted books")));
         }
         return right(new Allowance());
     };
 
-    PlacingOnHoldPolicy overdueCheckoutsRejectionPolicy = (AvailableBook toHold, PatronBooks patron) -> {
+    PlacingOnHoldPolicy overdueCheckoutsRejectionPolicy = (AvailableBook toHold, PatronBooks patron, HoldDuration holdDuration) -> {
         final int MAX_COUNT_OF_OVERDUE_RESOURCES = 2;
 
         if (patron.overdueCheckoutsAt(toHold.getLibraryBranch()) >= MAX_COUNT_OF_OVERDUE_RESOURCES) {
@@ -29,7 +28,7 @@ interface PlacingOnHoldPolicy extends BiFunction<AvailableBook, PatronBooks, Eit
         return right(new Allowance());
     };
 
-    PlacingOnHoldPolicy regularPatronMaximumNumberOfHoldsPolicy = (AvailableBook toHold, PatronBooks patron) -> {
+    PlacingOnHoldPolicy regularPatronMaximumNumberOfHoldsPolicy = (AvailableBook toHold, PatronBooks patron, HoldDuration holdDuration) -> {
         final int MAX_NUMBER_OF_HOLDS = 5;
 
         if (patron.isRegular() && patron.numberOfHolds() >= MAX_NUMBER_OF_HOLDS) {
@@ -38,11 +37,20 @@ interface PlacingOnHoldPolicy extends BiFunction<AvailableBook, PatronBooks, Eit
         return right(new Allowance());
     };
 
+    PlacingOnHoldPolicy onlyResearcherPatronsCanPlaceOpenEndedHolds = (AvailableBook toHold, PatronBooks patron, HoldDuration holdDuration) -> {
+
+        if (patron.isRegular() && holdDuration.isOpenEnded()) {
+            return left(new Rejection(withReason("regular patron cannot place open ended holds")));
+        }
+        return right(new Allowance());
+    };
+
     static List<PlacingOnHoldPolicy> allCurrentPolicies() {
         return List.of(
-                onlyResearcherPatronsCanBookRestrictedBooksPolicy,
+                onlyResearcherPatronsCanHoldRestrictedBooksPolicy,
                 overdueCheckoutsRejectionPolicy,
-                regularPatronMaximumNumberOfHoldsPolicy);
+                regularPatronMaximumNumberOfHoldsPolicy,
+                onlyResearcherPatronsCanPlaceOpenEndedHolds);
     }
 
 }

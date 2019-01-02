@@ -24,7 +24,6 @@ public class AvailableBook {
         return bookInformation.getBookId();
     }
 
-    //TODO add till
     public BookOnHold handle(BookPlacedOnHoldByPatron bookPlacedOnHold) {
         return new BookOnHold(
                 new BookInformation(
@@ -32,7 +31,7 @@ public class AvailableBook {
                         bookPlacedOnHold.getBookType()),
                 new LibraryBranchId(bookPlacedOnHold.getLibraryBranchId()),
                 new PatronId(bookPlacedOnHold.getPatronId()),
-                null);
+                bookPlacedOnHold.getHoldTill());
     }
 }
 

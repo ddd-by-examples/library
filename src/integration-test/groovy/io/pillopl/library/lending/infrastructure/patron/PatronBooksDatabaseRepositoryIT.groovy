@@ -1,60 +1,69 @@
 package io.pillopl.library.lending.infrastructure.patron
 
-
-import io.pillopl.library.lending.domain.book.AvailableBook
-import io.pillopl.library.lending.domain.book.BookOnHold
-import io.pillopl.library.lending.domain.patron.PatronBooks
-import io.pillopl.library.lending.domain.patron.PatronBooksEvent
-import io.pillopl.library.lending.domain.patron.PatronBooksFixture
-import io.pillopl.library.lending.domain.patron.PatronId
+import io.pillopl.library.lending.domain.book.BookInformation
+import io.pillopl.library.lending.domain.book.BookType
+import io.pillopl.library.lending.domain.library.LibraryBranchId
+import io.pillopl.library.lending.domain.patron.*
 import io.vavr.control.Option
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification
 
-import static io.pillopl.library.lending.domain.book.BookFixture.circulatingBook
+import static io.pillopl.library.lending.domain.book.BookFixture.anyBookId
+import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookCollectedByPatron
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldByPatron
+import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.anyPatronId
+import static io.pillopl.library.lending.domain.patron.PatronInformation.PatronType.Regular
 
 @ContextConfiguration(classes = TestDatabaseConfig.class)
 @SpringBootTest
 class PatronBooksDatabaseRepositoryIT extends Specification {
 
-    PatronId patronId = PatronBooksFixture.anyPatronId()
+    PatronId patronId = anyPatronId()
+    LibraryBranchId libraryBranchId = anyBranch()
+    BookInformation bookInformation = new BookInformation(anyBookId(), BookType.Restricted);
 
     @Autowired
     PatronBooksDatabaseRepository patronResourcesRepository
 
     def 'persistence in real database should work'() {
-        given:
-            PatronBooks regular = PatronBooksFixture.regularPatron(patronId)
-            AvailableBook availableBook = circulatingBook()
-        and:
-            PatronBooksEvent.BookPlacedOnHoldByPatron placedOnHold = regular.placeOnHold(availableBook).get()
+
         when:
-            patronResourcesRepository.reactTo(placedOnHold)
-        and:
-            BookOnHold bookOnHold = availableBook.handle(placedOnHold)
+            patronResourcesRepository.reactTo(placedOnHold())
         then:
-            PatronBooks patron = patronShouldBeFoundInDatabaseWithOneBookOnHold(patronId)
+            patronShouldBeFoundInDatabaseWithOneBookOnHold(patronId)
         when:
-            PatronBooksEvent.BookCollectedByPatron newEvent = patron.collect(bookOnHold).get()
-        and:
-            patronResourcesRepository.reactTo(newEvent)
+            patronResourcesRepository.reactTo(patronCollected())
         then:
             patronShouldBeFoundInDatabaseWithZeroBooksOnHold(patronId)
 
     }
 
-    PatronBooks patronShouldBeFoundInDatabaseWithOneBookOnHold(PatronId patronId) {
-        PatronBooks patronBooks = loadPersistedPatron(patronId)
-        assert patronBooks.numberOfHolds() == 1
-        return patronBooks
+    BookCollectedByPatron patronCollected() {
+        return BookCollectedByPatron.now(
+                bookInformation,
+                libraryBranchId,
+                patronId)
     }
 
-    PatronBooks patronShouldBeFoundInDatabaseWithZeroBooksOnHold(PatronId patronId) {
+    BookPlacedOnHoldByPatron placedOnHold() {
+        return BookPlacedOnHoldByPatron.now(
+                bookInformation,
+                libraryBranchId,
+                new PatronInformation(patronId, Regular),
+                HoldDuration.forCloseEnded(5))
+    }
+
+    void patronShouldBeFoundInDatabaseWithOneBookOnHold(PatronId patronId) {
+        PatronBooks patronBooks = loadPersistedPatron(patronId)
+        assert patronBooks.numberOfHolds() == 1
+    }
+
+    void patronShouldBeFoundInDatabaseWithZeroBooksOnHold(PatronId patronId) {
         PatronBooks patronBooks = loadPersistedPatron(patronId)
         assert patronBooks.numberOfHolds() == 0
-        return patronBooks
     }
 
     PatronBooks loadPersistedPatron(PatronId patronId) {

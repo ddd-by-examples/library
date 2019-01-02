@@ -7,6 +7,7 @@ import spock.lang.Specification
 
 import static io.pillopl.library.lending.domain.book.BookFixture.*
 import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
+import static io.pillopl.library.lending.domain.patron.HoldDuration.forCloseEnded
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldFailed
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldByPatron
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.*
@@ -31,7 +32,7 @@ class RegularPatronRequestingCirculatingBooksTest extends Specification {
         given:
             AvailableBook book = circulatingBook()
         when:
-            Either<BookHoldFailed, BookPlacedOnHoldByPatron> hold = regularPatronWithHolds(holds).placeOnHold(book)
+            Either<BookHoldFailed, BookPlacedOnHoldByPatron> hold = regularPatronWithHolds(holds).placeOnHold(book, forCloseEnded(3))
         then:
             hold.isRight()
         where:
@@ -44,7 +45,7 @@ class RegularPatronRequestingCirculatingBooksTest extends Specification {
             LibraryBranchId libraryBranchId = anyBranch()
         when:
             Either<BookHoldFailed, BookPlacedOnHoldByPatron> hold =
-                    regularPatronWithOverdueCheckouts(libraryBranchId, books).placeOnHold(circulatingAvailableBookAt(libraryBranchId))
+                    regularPatronWithOverdueCheckouts(libraryBranchId, books).placeOnHold(circulatingAvailableBookAt(libraryBranchId), forCloseEnded(3))
         then:
             hold.isLeft()
             BookHoldFailed e = hold.getLeft()
@@ -62,7 +63,7 @@ class RegularPatronRequestingCirculatingBooksTest extends Specification {
         given:
             AvailableBook book = circulatingBook()
         when:
-            Either<BookHoldFailed, BookPlacedOnHoldByPatron> hold = regularPatronWithOverdueCheckouts(anyBranch(), books).placeOnHold(book)
+            Either<BookHoldFailed, BookPlacedOnHoldByPatron> hold = regularPatronWithOverdueCheckouts(anyBranch(), books).placeOnHold(book, forCloseEnded(3))
         then:
             hold.isRight()
         where:

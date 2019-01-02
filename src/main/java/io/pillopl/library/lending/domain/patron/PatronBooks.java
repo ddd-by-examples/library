@@ -25,7 +25,6 @@ import static io.vavr.control.Either.left;
 import static io.vavr.control.Either.right;
 import static java.util.Collections.emptySet;
 
-//TODO - open/close
 //TODO - rename to patron?
 @AllArgsConstructor
 @EqualsAndHashCode(of = "patron")
@@ -40,28 +39,28 @@ public class PatronBooks {
     private final PatronHolds patronHolds;
 
     public Either<BookHoldFailed, BookPlacedOnHoldByPatron> placeOnHold(AvailableBook book) {
-       return placeOnHold(book, HoldDuration.openEnded());
+       return placeOnHold(book, HoldDuration.forOpenEnded());
     }
 
-    public Either<BookHoldFailed, BookPlacedOnHoldByPatron> placeOnHold(AvailableBook book, HoldDuration holdDuration) {
-        Option<Rejection> rejection = tryPlacingOnHold(book);
+    public Either<BookHoldFailed, BookPlacedOnHoldByPatron> placeOnHold(AvailableBook aBook, HoldDuration forDuration) {
+        Option<Rejection> rejection = tryPlacingOnHold(aBook, forDuration);
         if (!rejection.isEmpty()) {
-            return left(BookHoldFailed.now(rejection.get().getReason(), book.getBookId(), book.getLibraryBranch(), patron));
+            return left(BookHoldFailed.now(rejection.get().getReason(), aBook.getBookId(), aBook.getLibraryBranch(), patron));
         }
-        return right(BookPlacedOnHoldByPatron.now(book.getBookInformation(), book.getLibraryBranch(), patron));
+        return right(BookPlacedOnHoldByPatron.now(aBook.getBookInformation(), aBook.getLibraryBranch(), patron, forDuration));
     }
 
     public Either<BookCollectingFailed, BookCollectedByPatron> collect(BookOnHold book) {
         if (patronHolds.doesNotContain(book)) {
-            return left(BookCollectingFailed.now(withReason("book is not on hold by patron"), book.getBookId(), book.getLibraryBranchId(), patron));
+            return left(BookCollectingFailed.now(withReason("book is not on hold by patron"), book.getBookId(), book.getHoldPlacedAt(), patron));
         }
-        return right(BookCollectedByPatron.now(book.getBookInformation(), book.getLibraryBranchId(), patron.getPatronId()));
+        return right(BookCollectedByPatron.now(book.getBookInformation(), book.getHoldPlacedAt(), patron.getPatronId()));
     }
 
-    private Option<Rejection> tryPlacingOnHold(AvailableBook availableBook) {
+    private Option<Rejection> tryPlacingOnHold(AvailableBook aBook, HoldDuration forDuration) {
         return placingOnHoldPolicies
                 .toStream()
-                .map(policy -> policy.apply(availableBook, this))
+                .map(policy -> policy.apply(aBook, this, forDuration))
                 .find(Either::isLeft)
                 .map(Either::getLeft);
     }

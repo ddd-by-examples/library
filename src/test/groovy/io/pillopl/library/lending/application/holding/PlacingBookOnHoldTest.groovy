@@ -6,7 +6,6 @@ import io.vavr.control.Option
 import io.vavr.control.Try
 import spock.lang.Specification
 
-import static io.pillopl.library.lending.application.holding.PlaceOnHoldCommand.openEnded
 import static io.pillopl.library.lending.application.holding.PlacingOnHold.Result.Rejection
 import static io.pillopl.library.lending.application.holding.PlacingOnHold.Result.Success
 import static io.pillopl.library.lending.domain.book.BookFixture.anyBookId
@@ -26,12 +25,13 @@ class PlacingBookOnHoldTest extends Specification {
         and:
             PlacingOnHold holding = new PlacingOnHold(willFindBook, repository)
         when:
-            Try<PlacingOnHold.Result> result = holding.placeOnHold(openEnded(patron, anyBranch(), anyBookId()))
+            Try<PlacingOnHold.Result> result = holding.placeOnHold(for3days(patron))
         then:
             result.isSuccess()
             result.get() == Success
 
     }
+
 
     def 'should reject placing on hold book if one of the domain rules is broken (but should not fail!)'() {
         given:
@@ -39,7 +39,7 @@ class PlacingBookOnHoldTest extends Specification {
         and:
             PatronId patron = persistedRegularPatronWithManyHolds()
         when:
-            Try<PlacingOnHold.Result> result = holding.placeOnHold(openEnded(patron, anyBranch(), anyBookId()))
+            Try<PlacingOnHold.Result> result = holding.placeOnHold(for3days(patron))
         then:
             result.isSuccess()
             result.get() == Rejection
@@ -52,7 +52,7 @@ class PlacingBookOnHoldTest extends Specification {
         and:
             PatronId patron = unknownPatron()
         when:
-            Try<PlacingOnHold.Result> result = holding.placeOnHold(openEnded(patron, anyBranch(), anyBookId()))
+            Try<PlacingOnHold.Result> result = holding.placeOnHold(for3days(patron))
         then:
             result.isFailure()
 
@@ -65,9 +65,13 @@ class PlacingBookOnHoldTest extends Specification {
         and:
             PatronId patron = persistedRegularPatron()
         when:
-            Try<PlacingOnHold.Result> result = holding.placeOnHold(openEnded(patron, anyBranch(), anyBookId()))
+            Try<PlacingOnHold.Result> result = holding.placeOnHold(for3days(patron))
         then:
             result.isFailure()
+    }
+
+    PlaceOnHoldCommand for3days(PatronId patron) {
+        return PlaceOnHoldCommand.closeEnded(patron, anyBranch(), anyBookId(), 4)
     }
 
     PatronId persistedRegularPatron() {

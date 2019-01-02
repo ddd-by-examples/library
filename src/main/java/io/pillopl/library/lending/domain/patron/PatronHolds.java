@@ -12,7 +12,7 @@ public class PatronHolds {
     Set<PatronHold> resourcesOnHold;
 
     boolean doesNotContain(BookOnHold bookOnHold) {
-        PatronHold hold = new PatronHold(bookOnHold.getBookId(), bookOnHold.getLibraryBranchId());
+        PatronHold hold = new PatronHold(bookOnHold.getBookId(), bookOnHold.getHoldPlacedAt());
         return !resourcesOnHold.contains(hold);
     }
 

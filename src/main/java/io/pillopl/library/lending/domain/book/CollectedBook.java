@@ -6,8 +6,6 @@ import io.pillopl.library.lending.domain.patron.PatronId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.time.Instant;
-
 @AllArgsConstructor
 public class CollectedBook {
 
@@ -19,8 +17,6 @@ public class CollectedBook {
 
     @Getter
     private final PatronId byPatron;
-
-    private final Instant collectedTill;
 
     public BookId getBookId() {
         return bookInformation.getBookId();

@@ -26,14 +26,18 @@ public interface PatronBooksEvent {
         UUID bookId;
         BookType bookType;
         UUID libraryBranchId;
+        Instant holdFrom;
+        Instant holdTill;
 
-        static BookPlacedOnHoldByPatron now(BookInformation book, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
+        public static BookPlacedOnHoldByPatron now(BookInformation book, LibraryBranchId libraryBranchId, PatronInformation patronInformation, HoldDuration holdDuration) {
             return new BookPlacedOnHoldByPatron(
                     Instant.now(),
                     patronInformation.getPatronId().getPatronId(),
                     book.getBookId().getBookId(),
                     book.getBookType(),
-                    libraryBranchId.getLibraryBranchId());
+                    libraryBranchId.getLibraryBranchId(),
+                    holdDuration.getFrom(),
+                    holdDuration.getTo().getOrNull());
         }
     }
 
@@ -45,7 +49,7 @@ public interface PatronBooksEvent {
         BookType bookType;
         UUID libraryBranchId;
 
-        static BookCollectedByPatron now(BookInformation book, LibraryBranchId libraryBranchId, PatronId patronId) {
+        public static BookCollectedByPatron now(BookInformation book, LibraryBranchId libraryBranchId, PatronId patronId) {
             return new BookCollectedByPatron(
                     Instant.now(),
                     patronId.getPatronId(),

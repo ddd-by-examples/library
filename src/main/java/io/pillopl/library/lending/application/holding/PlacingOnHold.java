@@ -46,9 +46,9 @@ public class PlacingOnHold {
 
     private Either<BookHoldFailed, BookPlacedOnHoldByPatron> placeOnHold(AvailableBook availableBook, PatronBooks patronBooks, PlaceOnHoldCommand hold) {
         if (hold.isOpenEnded()) {
-            return patronBooks.placeOnHold(availableBook, HoldDuration.openEnded());
+            return patronBooks.placeOnHold(availableBook, HoldDuration.forOpenEnded());
         } else {
-            return patronBooks.placeOnHold(availableBook, HoldDuration.closeEnded(hold.getHoldForDays()));
+            return patronBooks.placeOnHold(availableBook, HoldDuration.forCloseEnded(hold.getHoldForDays()));
         }
     }
 
