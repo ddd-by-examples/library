@@ -11,8 +11,8 @@ import io.vavr.control.Either;
 import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
 
-import static io.pillopl.library.lending.application.holding.PlacingOnHold.Result.REJECTION;
-import static io.pillopl.library.lending.application.holding.PlacingOnHold.Result.SUCCESS;
+import static io.pillopl.library.lending.application.holding.PlacingOnHold.Result.Rejection;
+import static io.pillopl.library.lending.application.holding.PlacingOnHold.Result.Success;
 import static io.vavr.API.*;
 import static io.vavr.Patterns.$Left;
 import static io.vavr.Patterns.$Right;
@@ -21,7 +21,7 @@ import static io.vavr.Patterns.$Right;
 public class PlacingOnHold {
 
     enum Result {
-        SUCCESS, REJECTION
+        Success, Rejection
     }
 
     private final FindBook findBook;
@@ -41,13 +41,13 @@ public class PlacingOnHold {
 
     private Result publishEvents(BookHoldFailed bookHoldFailed) {
         //TODO publish events
-        return REJECTION;
+        return Rejection;
     }
 
     private Result saveAndPublishEvents(BookPlacedOnHold placedOnHold) {
         //TODO publish events
         patronBooksRepository.reactTo(placedOnHold);
-        return SUCCESS;
+        return Success;
     }
 
     private Book findResource(BookId id) {

@@ -9,8 +9,8 @@ import io.vavr.control.Try
 import lombok.Value
 import spock.lang.Specification
 
-import static io.pillopl.library.lending.application.holding.PlacingOnHold.Result.REJECTION
-import static io.pillopl.library.lending.application.holding.PlacingOnHold.Result.SUCCESS
+import static io.pillopl.library.lending.application.holding.PlacingOnHold.Result.Rejection
+import static io.pillopl.library.lending.application.holding.PlacingOnHold.Result.Success
 import static io.pillopl.library.lending.domain.book.BookFixture.*
 
 class PlacingBookOnHoldTest extends Specification {
@@ -29,7 +29,7 @@ class PlacingBookOnHoldTest extends Specification {
             Try<PlacingOnHold.Result> result = holding.placeOnHold(anyBookId(), patron)
         then:
             result.isSuccess()
-            result.get() == SUCCESS
+            result.get() == Success
 
     }
 
@@ -42,7 +42,7 @@ class PlacingBookOnHoldTest extends Specification {
             Try<PlacingOnHold.Result> result = holding.placeOnHold(anyBookId(), patron)
         then:
             result.isSuccess()
-            result.get() == REJECTION
+            result.get() == Rejection
 
     }
 

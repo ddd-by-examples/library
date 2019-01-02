@@ -5,15 +5,17 @@ import io.pillopl.library.lending.domain.patron.PatronBooksEvent;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import static io.pillopl.library.lending.domain.book.Book.BookState.COLLECTED;
-import static io.pillopl.library.lending.domain.book.Book.BookState.ON_HOLD;
+import static io.pillopl.library.lending.domain.book.Book.BookState.Available;
+import static io.pillopl.library.lending.domain.book.Book.BookState.Collected;
+import static io.pillopl.library.lending.domain.book.Book.BookState.OnHold;
+import static io.pillopl.library.lending.domain.book.Book.BookType.Restricted;
 
 @AllArgsConstructor
 public class Book {
 
-    enum BookState {AVAILABLE, ON_HOLD, COLLECTED}
+    enum BookState {Available, OnHold, Collected}
 
-    enum BookType {RESTRICTED, CIRCULATING}
+    enum BookType {Restricted, Circulating}
 
     @Getter
     private final BookId bookId;
@@ -26,24 +28,24 @@ public class Book {
     private BookState state;
 
     public boolean isRestricted() {
-        return type.equals(BookType.RESTRICTED);
+        return type.equals(Restricted);
     }
 
     public boolean isAvailable() {
-        return state.equals(BookState.AVAILABLE);
+        return state.equals(Available);
     }
 
     //TODO events upper
     public void handle(PatronBooksEvent.BookReturned event) {
-        this.state = BookState.AVAILABLE;
+        this.state = Available;
     }
 
     public void handle(PatronBooksEvent.BookPlacedOnHold event) {
-        state = ON_HOLD;
+        state = OnHold;
     }
 
     public void handle(PatronBooksEvent.BookCollected event) {
-        state = COLLECTED;
+        state = Collected;
     }
 }
 

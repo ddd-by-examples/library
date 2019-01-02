@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.UUID;
 
-import static io.pillopl.library.lending.domain.patron.PatronInformation.PatronType.REGULAR;
+import static io.pillopl.library.lending.domain.patron.PatronInformation.PatronType.Regular;
 import static java.util.stream.Collectors.toSet;
 
 class PatronBooksDatabaseRepository implements PatronBooksRepository {
@@ -57,7 +57,7 @@ class PatronBooksDatabaseRepository implements PatronBooksRepository {
     private PatronBooksDatabaseEntity findOrCreateNewFor(PatronId patronId) {
         //TODO change regular
         return patronBooksEntityRepository.findByPatronId(patronId.getPatronId())
-                .getOrElse(() -> new PatronBooksDatabaseEntity(new PatronInformation(patronId, REGULAR)));
+                .getOrElse(() -> new PatronBooksDatabaseEntity(new PatronInformation(patronId, Regular)));
     }
 
 }

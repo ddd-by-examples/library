@@ -19,7 +19,7 @@ public class PatronBooksFixture {
 
     public static PatronBooks regularPatron(PatronId patronId) {
         return new PatronBooks(
-                patronInformation(patronId, PatronInformation.PatronType.REGULAR),
+                patronInformation(patronId, PatronInformation.PatronType.Regular),
                 allCurrentPolicies(),
                 OverdueCheckouts.noOverdueCheckouts(),
                 noHolds());
@@ -32,7 +32,7 @@ public class PatronBooksFixture {
     static PatronBooks regularPatronWithHolds(int numberOfHolds) {
         PatronId patronId = anyPatronId();
         return new PatronBooks(
-                patronInformation(patronId, PatronInformation.PatronType.REGULAR),
+                patronInformation(patronId, PatronInformation.PatronType.Regular),
                 allCurrentPolicies(),
                 OverdueCheckouts.noOverdueCheckouts(),
                 booksOnHold(numberOfHolds));
@@ -42,7 +42,7 @@ public class PatronBooksFixture {
         PatronId patronId = anyPatronId();
         BooksOnHold booksOnHold = new BooksOnHold(Collections.singleton(bookOnHold));
         return new PatronBooks(
-                patronInformation(patronId, PatronInformation.PatronType.REGULAR),
+                patronInformation(patronId, PatronInformation.PatronType.Regular),
                 allCurrentPolicies(),
                 OverdueCheckouts.noOverdueCheckouts(),
                 booksOnHold);
@@ -57,7 +57,7 @@ public class PatronBooksFixture {
     static PatronBooks researcherPatronWithHolds(int numberOfHolds) {
         PatronId patronId = anyPatronId();
         return new PatronBooks(
-                patronInformation(patronId, PatronInformation.PatronType.RESEARCHER),
+                patronInformation(patronId, PatronInformation.PatronType.Researcher),
                 allCurrentPolicies(),
                 OverdueCheckouts.noOverdueCheckouts(),
                 booksOnHold(numberOfHolds));
@@ -67,7 +67,7 @@ public class PatronBooksFixture {
         Map<LibraryBranchId, Set<BookId>> overdueCheckouts = new HashMap<>();
         overdueCheckouts.put(libraryBranchId, overdueResources);
         return new PatronBooks(
-                patronInformation(anyPatronId(), PatronInformation.PatronType.REGULAR),
+                patronInformation(anyPatronId(), PatronInformation.PatronType.Regular),
                 allCurrentPolicies(),
                 new OverdueCheckouts(overdueCheckouts),
                 noHolds());
