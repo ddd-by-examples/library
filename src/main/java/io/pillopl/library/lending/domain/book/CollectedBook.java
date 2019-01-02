@@ -22,7 +22,7 @@ public class CollectedBook {
         return bookInformation.getBookId();
     }
 
-    AvailableBook handle(PatronBooksEvent.BookReturnedByPatron bookReturnedByPatron) {
+    AvailableBook handle(PatronBooksEvent.BookReturned bookReturnedByPatron) {
         return new AvailableBook(
                 new BookInformation(
                         new BookId(bookReturnedByPatron.getBookId()),

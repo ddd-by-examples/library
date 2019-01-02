@@ -8,7 +8,7 @@ import java.time.Instant
 
 import static io.pillopl.library.lending.domain.book.BookFixture.circulatingAvailableBook
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldFailed
-import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldByPatron
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.*
 import static io.pillopl.library.lending.domain.patron.PlacingOnHoldPolicy.onlyResearcherPatronsCanPlaceOpenEndedHolds
 
@@ -24,7 +24,7 @@ class PatronRequestingOpenEndedHoldTest extends Specification {
         and:
             PatronBooks researcherPatron = researcherPatronWithPolicy(patronId, onlyResearcherPatronsCanPlaceOpenEndedHolds)
         when:
-            Either<BookHoldFailed, BookPlacedOnHoldByPatron> hold = researcherPatron.placeOnHold(aBook, HoldDuration.forOpenEnded(from))
+            Either<BookHoldFailed, BookPlacedOnHold> hold = researcherPatron.placeOnHold(aBook, HoldDuration.forOpenEnded(from))
         then:
             hold.isRight()
             hold.get().with {
@@ -45,7 +45,7 @@ class PatronRequestingOpenEndedHoldTest extends Specification {
         and:
             PatronBooks regularPatron = regularPatronWithPolicy(patronId, onlyResearcherPatronsCanPlaceOpenEndedHolds)
         when:
-            Either<BookHoldFailed, BookPlacedOnHoldByPatron> hold = regularPatron.placeOnHold(aBook, HoldDuration.forOpenEnded(from))
+            Either<BookHoldFailed, BookPlacedOnHold> hold = regularPatron.placeOnHold(aBook, HoldDuration.forOpenEnded(from))
         then:
             hold.isLeft()
             hold.getLeft().with {

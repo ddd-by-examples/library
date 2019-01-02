@@ -6,7 +6,7 @@ import io.pillopl.library.lending.domain.library.LibraryBranchId;
 import io.pillopl.library.lending.domain.patron.HoldDuration;
 import io.pillopl.library.lending.domain.patron.PatronBooks;
 import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldFailed;
-import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldByPatron;
+import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold;
 import io.pillopl.library.lending.domain.patron.PatronBooksRepository;
 import io.pillopl.library.lending.domain.patron.PatronId;
 import io.vavr.control.Either;
@@ -36,7 +36,7 @@ public class PlacingOnHold {
         return Try.ofSupplier(() -> {
             AvailableBook availableBook = find(command.getBookId());
             PatronBooks patronBooks = find(command.getPatronId());
-            Either<BookHoldFailed, BookPlacedOnHoldByPatron> result = placeOnHold(availableBook, patronBooks, command);
+            Either<BookHoldFailed, BookPlacedOnHold> result = placeOnHold(availableBook, patronBooks, command);
             return Match(result).of(
                     Case($Left($()), this::publishEvents),
                     Case($Right($()), this::saveAndPublishEvents)
@@ -44,7 +44,7 @@ public class PlacingOnHold {
         });
     }
 
-    private Either<BookHoldFailed, BookPlacedOnHoldByPatron> placeOnHold(AvailableBook availableBook, PatronBooks patronBooks, PlaceOnHoldCommand hold) {
+    private Either<BookHoldFailed, BookPlacedOnHold> placeOnHold(AvailableBook availableBook, PatronBooks patronBooks, PlaceOnHoldCommand hold) {
         if (hold.isOpenEnded()) {
             return patronBooks.placeOnHold(availableBook, HoldDuration.forOpenEnded());
         } else {
@@ -58,7 +58,7 @@ public class PlacingOnHold {
         return Rejection;
     }
 
-    private Result saveAndPublishEvents(BookPlacedOnHoldByPatron placedOnHold) {
+    private Result saveAndPublishEvents(BookPlacedOnHold placedOnHold) {
         //TODO publish events
         patronBooksRepository.reactTo(placedOnHold);
         return Success;

@@ -1,8 +1,8 @@
 package io.pillopl.library.lending.domain.book;
 
 import io.pillopl.library.lending.domain.library.LibraryBranchId;
-import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookCollectedByPatron;
-import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookReturnedByPatron;
+import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookCollected;
+import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookReturned;
 import io.pillopl.library.lending.domain.patron.PatronId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,13 +21,13 @@ public class BookOnHold {
 
     private final Instant holdTill;
 
-    AvailableBook handle(BookReturnedByPatron bookReturned) {
+    AvailableBook handle(BookReturned bookReturned) {
         return new AvailableBook(
                 new BookInformation(new BookId(bookReturned.getBookId()), bookReturned.getBookType()),
                 new LibraryBranchId(bookReturned.getLibraryBranchId()));
     }
 
-    CollectedBook handle(BookCollectedByPatron bookCollected) {
+    CollectedBook handle(BookCollected bookCollected) {
         return new CollectedBook(
                 new BookInformation(new BookId(bookCollected.getBookId()), bookCollected.getBookType()),
                 new LibraryBranchId(bookCollected.getLibraryBranchId()),

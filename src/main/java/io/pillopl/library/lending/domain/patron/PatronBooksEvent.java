@@ -20,7 +20,7 @@ public interface PatronBooksEvent {
     UUID getPatronId();
 
     @Value
-    class BookPlacedOnHoldByPatron implements PatronBooksEvent {
+    class BookPlacedOnHold implements PatronBooksEvent {
         Instant when;
         UUID patronId;
         UUID bookId;
@@ -29,8 +29,8 @@ public interface PatronBooksEvent {
         Instant holdFrom;
         Instant holdTill;
 
-        public static BookPlacedOnHoldByPatron now(BookInformation book, LibraryBranchId libraryBranchId, PatronInformation patronInformation, HoldDuration holdDuration) {
-            return new BookPlacedOnHoldByPatron(
+        public static BookPlacedOnHold now(BookInformation book, LibraryBranchId libraryBranchId, PatronInformation patronInformation, HoldDuration holdDuration) {
+            return new BookPlacedOnHold(
                     Instant.now(),
                     patronInformation.getPatronId().getPatronId(),
                     book.getBookId().getBookId(),
@@ -42,15 +42,15 @@ public interface PatronBooksEvent {
     }
 
     @Value
-    class BookCollectedByPatron implements PatronBooksEvent {
+    class BookCollected implements PatronBooksEvent {
         Instant when;
         UUID patronId;
         UUID bookId;
         BookType bookType;
         UUID libraryBranchId;
 
-        public static BookCollectedByPatron now(BookInformation book, LibraryBranchId libraryBranchId, PatronId patronId) {
-            return new BookCollectedByPatron(
+        public static BookCollected now(BookInformation book, LibraryBranchId libraryBranchId, PatronId patronId) {
+            return new BookCollected(
                     Instant.now(),
                     patronId.getPatronId(),
                     book.getBookId().getBookId(),
@@ -60,7 +60,7 @@ public interface PatronBooksEvent {
     }
 
     @Value
-    class BookReturnedByPatron implements PatronBooksEvent {
+    class BookReturned implements PatronBooksEvent {
         Instant when;
         UUID patronId;
         UUID bookId;
@@ -76,9 +76,9 @@ public interface PatronBooksEvent {
         UUID bookId;
         UUID libraryBranchId;
 
-        static BookHoldFailed now(Reason reason, BookId bookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
+        static BookHoldFailed now(Rejection rejection, BookId bookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
             return new BookHoldFailed(
-                    reason.getReason(),
+                    rejection.getReason().getReason(),
                     Instant.now(),
                     patronInformation.getPatronId().getPatronId(),
                     bookId.getBookId(),
@@ -94,9 +94,9 @@ public interface PatronBooksEvent {
         UUID bookId;
         UUID libraryBranchId;
 
-        static BookCollectingFailed now(Reason reason, BookId bookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
+        static BookCollectingFailed now(Rejection rejection, BookId bookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
             return new BookCollectingFailed(
-                    reason.getReason(),
+                    rejection.getReason().getReason(),
                     Instant.now(),
                     patronInformation.getPatronId().getPatronId(),
                     bookId.getBookId(),

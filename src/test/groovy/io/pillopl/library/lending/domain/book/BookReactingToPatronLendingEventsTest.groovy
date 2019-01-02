@@ -9,8 +9,8 @@ import java.time.Instant
 
 import static io.pillopl.library.lending.domain.book.BookFixture.*
 import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookReturnedByPatron
-import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookCollectedByPatron
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookReturned
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookCollected
 
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.anyPatronId
 
@@ -76,32 +76,32 @@ class BookReactingToPatronLendingEventsTest extends Specification {
             collectedBook.collectedAt == collectedAt
     }
 
-    BookReturnedByPatron bookReturned(CollectedBook bookCollected, PatronId patronId, LibraryBranchId libraryBranchId) {
-        return new BookReturnedByPatron(Instant.now(),
+    BookReturned bookReturned(CollectedBook bookCollected, PatronId patronId, LibraryBranchId libraryBranchId) {
+        return new BookReturned(Instant.now(),
                 patronId.patronId,
                 bookCollected.getBookId().bookId,
                 bookCollected.bookInformation.bookType,
                 libraryBranchId.libraryBranchId)
     }
 
-    BookReturnedByPatron bookReturned(BookOnHold bookOnHold, PatronId patronId, LibraryBranchId libraryBranchId) {
-        return new BookReturnedByPatron(Instant.now(),
+    BookReturned bookReturned(BookOnHold bookOnHold, PatronId patronId, LibraryBranchId libraryBranchId) {
+        return new BookReturned(Instant.now(),
                 patronId.patronId,
                 bookOnHold.getBookId().bookId,
                 bookOnHold.bookInformation.bookType,
                 libraryBranchId.libraryBranchId)
     }
 
-    BookCollectedByPatron bookCollected(BookOnHold bookOnHold, PatronId patronId, LibraryBranchId libraryBranchId) {
-        return new BookCollectedByPatron(Instant.now(),
+    BookCollected bookCollected(BookOnHold bookOnHold, PatronId patronId, LibraryBranchId libraryBranchId) {
+        return new BookCollected(Instant.now(),
                 patronId.patronId,
                 bookOnHold.getBookId().bookId,
                 bookOnHold.bookInformation.bookType,
                 libraryBranchId.libraryBranchId)
     }
 
-    PatronBooksEvent.BookPlacedOnHoldByPatron bookPlacedOnHold(AvailableBook availableBook, PatronId byPatron, LibraryBranchId libraryBranchId, Instant from, Instant till) {
-        return new PatronBooksEvent.BookPlacedOnHoldByPatron(
+    PatronBooksEvent.BookPlacedOnHold bookPlacedOnHold(AvailableBook availableBook, PatronId byPatron, LibraryBranchId libraryBranchId, Instant from, Instant till) {
+        return new PatronBooksEvent.BookPlacedOnHold(
                 Instant.now(),
                 byPatron.patronId,
                 availableBook.getBookId().bookId,

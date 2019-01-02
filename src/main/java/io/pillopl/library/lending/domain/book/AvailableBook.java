@@ -1,7 +1,7 @@
 package io.pillopl.library.lending.domain.book;
 
 import io.pillopl.library.lending.domain.library.LibraryBranchId;
-import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldByPatron;
+import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold;
 import io.pillopl.library.lending.domain.patron.PatronId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,7 +24,7 @@ public class AvailableBook {
         return bookInformation.getBookId();
     }
 
-    public BookOnHold handle(BookPlacedOnHoldByPatron bookPlacedOnHold) {
+    public BookOnHold handle(BookPlacedOnHold bookPlacedOnHold) {
         return new BookOnHold(
                 new BookInformation(
                         new BookId(bookPlacedOnHold.getBookId()),

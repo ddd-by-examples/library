@@ -8,14 +8,14 @@ import static PatronBooksEvent.BookCollectingFailed
 import static PatronBooksFixture.regularPatron
 import static PatronBooksFixture.regularPatronWith
 import static io.pillopl.library.lending.domain.book.BookFixture.bookOnHold
-import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookCollectedByPatron
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookCollected
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.onHold
 
 class PatronCollectingBookTest extends Specification {
 
     def 'patron cannot collect book which is not placed on hold'() {
         when:
-            Either<BookCollectingFailed, BookCollectedByPatron> collect = regularPatron().collect(bookOnHold())
+            Either<BookCollectingFailed, BookCollected> collect = regularPatron().collect(bookOnHold())
         then:
             collect.isLeft()
             BookCollectingFailed e = collect.getLeft()
@@ -29,7 +29,7 @@ class PatronCollectingBookTest extends Specification {
         and:
             PatronBooks patron = regularPatronWith(onHold)
         when:
-            Either<BookCollectingFailed, BookCollectedByPatron> collect = patron.collect(bookOnHold(onHold.bookId, onHold.libraryBranchId))
+            Either<BookCollectingFailed, BookCollected> collect = patron.collect(bookOnHold(onHold.bookId, onHold.libraryBranchId))
         then:
             collect.isRight()
     }

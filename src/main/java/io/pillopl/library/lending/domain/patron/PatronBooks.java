@@ -2,13 +2,13 @@ package io.pillopl.library.lending.domain.patron;
 
 
 import io.pillopl.library.lending.domain.book.AvailableBook;
+import io.pillopl.library.lending.domain.book.BookId;
 import io.pillopl.library.lending.domain.book.BookOnHold;
 import io.pillopl.library.lending.domain.library.LibraryBranchId;
-import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookCollectedByPatron;
+import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookCollected;
 import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookCollectingFailed;
 import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldFailed;
-import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldByPatron;
-import io.pillopl.library.lending.domain.book.BookId;
+import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 import io.vavr.control.Option;
@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static io.pillopl.library.lending.domain.patron.Reason.withReason;
 import static io.vavr.control.Either.left;
 import static io.vavr.control.Either.right;
 import static java.util.Collections.emptySet;
@@ -38,23 +37,23 @@ public class PatronBooks {
 
     private final PatronHolds patronHolds;
 
-    public Either<BookHoldFailed, BookPlacedOnHoldByPatron> placeOnHold(AvailableBook book) {
-       return placeOnHold(book, HoldDuration.forOpenEnded());
+    public Either<BookHoldFailed, BookPlacedOnHold> placeOnHold(AvailableBook book) {
+        return placeOnHold(book, HoldDuration.forOpenEnded());
     }
 
-    public Either<BookHoldFailed, BookPlacedOnHoldByPatron> placeOnHold(AvailableBook aBook, HoldDuration forDuration) {
+    public Either<BookHoldFailed, BookPlacedOnHold> placeOnHold(AvailableBook aBook, HoldDuration forDuration) {
         Option<Rejection> rejection = tryPlacingOnHold(aBook, forDuration);
         if (!rejection.isEmpty()) {
-            return left(BookHoldFailed.now(rejection.get().getReason(), aBook.getBookId(), aBook.getLibraryBranch(), patron));
+            return left(BookHoldFailed.now(rejection.get(), aBook.getBookId(), aBook.getLibraryBranch(), patron));
         }
-        return right(BookPlacedOnHoldByPatron.now(aBook.getBookInformation(), aBook.getLibraryBranch(), patron, forDuration));
+        return right(BookPlacedOnHold.now(aBook.getBookInformation(), aBook.getLibraryBranch(), patron, forDuration));
     }
 
-    public Either<BookCollectingFailed, BookCollectedByPatron> collect(BookOnHold book) {
+    public Either<BookCollectingFailed, BookCollected> collect(BookOnHold book) {
         if (patronHolds.doesNotContain(book)) {
-            return left(BookCollectingFailed.now(withReason("book is not on hold by patron"), book.getBookId(), book.getHoldPlacedAt(), patron));
+            return left(BookCollectingFailed.now(Rejection.withReason("book is not on hold by patron"), book.getBookId(), book.getHoldPlacedAt(), patron));
         }
-        return right(BookCollectedByPatron.now(book.getBookInformation(), book.getHoldPlacedAt(), patron.getPatronId()));
+        return right(BookCollected.now(book.getBookInformation(), book.getHoldPlacedAt(), patron.getPatronId()));
     }
 
     private Option<Rejection> tryPlacingOnHold(AvailableBook aBook, HoldDuration forDuration) {

@@ -112,6 +112,17 @@ public class PatronBooksFixture {
                 noHolds());
     }
 
+    static PatronBooks regularPatronWith3_OverdueCheckouts(LibraryBranchId libraryBranchId) {
+        Map<LibraryBranchId, Set<BookId>> overdueCheckouts = new HashMap<>();
+        Set<BookId> overdueBooks = Set.of(anyBookId(), anyBookId(), anyBookId());
+        overdueCheckouts.put(libraryBranchId, overdueBooks);
+        return new PatronBooks(
+                patronInformation(anyPatronId(), Regular),
+                List.of(overdueCheckoutsRejectionPolicy),
+                new OverdueCheckouts(overdueCheckouts),
+                noHolds());
+    }
+
     public static PatronId anyPatronId() {
         return patronId(UUID.randomUUID());
     }

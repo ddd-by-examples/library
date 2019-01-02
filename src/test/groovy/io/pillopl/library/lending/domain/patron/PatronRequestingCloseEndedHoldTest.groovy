@@ -9,7 +9,7 @@ import java.time.Instant
 
 import static io.pillopl.library.lending.domain.book.BookFixture.circulatingAvailableBook
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldFailed
-import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldByPatron
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.regularPatronWithPolicy
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.researcherPatronWithPolicy
 import static io.pillopl.library.lending.domain.patron.PlacingOnHoldPolicy.onlyResearcherPatronsCanPlaceOpenEndedHolds
@@ -22,7 +22,7 @@ class PatronRequestingCloseEndedHoldTest extends Specification {
         given:
             AvailableBook aBook = circulatingAvailableBook()
         when:
-            Either<BookHoldFailed, BookPlacedOnHoldByPatron> hold = patron.placeOnHold(aBook, HoldDuration.forCloseEnded(from, 3))
+            Either<BookHoldFailed, BookPlacedOnHold> hold = patron.placeOnHold(aBook, HoldDuration.forCloseEnded(from, 3))
         then:
             hold.isRight()
             hold.get().with {

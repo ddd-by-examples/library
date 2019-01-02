@@ -7,13 +7,13 @@ import spock.lang.Specification
 import static PatronBooksFixture.researcherPatronWithHolds
 import static io.pillopl.library.lending.domain.book.BookFixture.circulatingBook
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldFailed
-import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldByPatron
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold
 
 class ResearcherPatronRequestingCirculatingBookTest extends Specification {
 
     def 'a researcher patron can hold any number of circulating books'() {
         when:
-            Either<BookHoldFailed, BookPlacedOnHoldByPatron> hold = researcherPatronWithHolds(holds).placeOnHold(circulatingBook())
+            Either<BookHoldFailed, BookPlacedOnHold> hold = researcherPatronWithHolds(holds).placeOnHold(circulatingBook())
         then:
             hold.isRight()
         where:
