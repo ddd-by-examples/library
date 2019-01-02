@@ -5,12 +5,13 @@ import io.pillopl.library.lending.domain.patron.PatronBooksEvent
 import io.pillopl.library.lending.domain.patron.PatronBooksFixture
 import io.pillopl.library.lending.domain.patron.PatronId
 import io.vavr.control.Option
+import io.vavr.control.Try
 import lombok.Value
 import spock.lang.Specification
 
-import static io.pillopl.library.lending.domain.book.BookFixture.anyBookId
-import static io.pillopl.library.lending.domain.book.BookFixture.circulatingBook
-import static io.pillopl.library.lending.domain.book.BookFixture.restrictedBook
+import static io.pillopl.library.lending.application.holding.PlacingOnHold.Result.REJECTION
+import static io.pillopl.library.lending.application.holding.PlacingOnHold.Result.SUCCESS
+import static io.pillopl.library.lending.domain.book.BookFixture.*
 
 class PlacingBookOnHoldTest extends Specification {
 
@@ -24,18 +25,24 @@ class PlacingBookOnHoldTest extends Specification {
             PatronId patron = persistedRegularPatron()
         and:
             PlacingOnHold holding = new PlacingOnHold(willFindBook, repository)
-        expect:
-            holding.placeOnHold(anyBookId(), patron) == PlacingOnHold.Result.SUCCESS
+        when:
+            Try<PlacingOnHold.Result> result = holding.placeOnHold(anyBookId(), patron)
+        then:
+            result.isSuccess()
+            result.get() == SUCCESS
 
     }
 
-    def 'should not successfully place on hold book if trying to hold book resource (one of the domain rules is broken)'() {
+    def 'should reject placing on hold book if trying to hold book resource (one of the domain rules is broken)'() {
         given:
             PatronId patron = persistedRegularPatron()
         and:
             PlacingOnHold holding = new PlacingOnHold(willFindRestrictedBook, repository)
-        expect:
-            holding.placeOnHold(anyBookId(), patron) == PlacingOnHold.Result.FAILURE
+        when:
+            Try<PlacingOnHold.Result> result = holding.placeOnHold(anyBookId(), patron)
+        then:
+            result.isSuccess()
+            result.get() == REJECTION
 
     }
 
@@ -43,9 +50,9 @@ class PlacingBookOnHoldTest extends Specification {
         given:
             PatronId patron = unknownPatron()
         when:
-            new PlacingOnHold(willFindBook, repository).placeOnHold(anyBookId(), patron)
+            Try<PlacingOnHold.Result> result = new PlacingOnHold(willFindBook, repository).placeOnHold(anyBookId(), patron)
         then:
-            thrown(IllegalArgumentException)
+            result.isFailure()
 
     }
 
@@ -54,9 +61,9 @@ class PlacingBookOnHoldTest extends Specification {
         given:
             PatronId patron = persistedRegularPatron()
         when:
-            new PlacingOnHold(willNotFindBook, repository).placeOnHold(anyBookId(), patron)
+            Try<PlacingOnHold.Result> result = new PlacingOnHold(willNotFindBook, repository).placeOnHold(anyBookId(), patron)
         then:
-            thrown(IllegalArgumentException)
+            result.isFailure()
     }
 
     PatronId persistedRegularPatron() {
