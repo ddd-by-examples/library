@@ -1,13 +1,13 @@
 package io.pillopl.library.lending.domain.patron;
 
-import io.pillopl.library.lending.domain.library.LibraryBranchFixture;
-import io.pillopl.library.lending.domain.library.LibraryBranchId;
-import io.pillopl.library.lending.domain.book.BookFixture;
 import io.pillopl.library.lending.domain.book.BookId;
+import io.pillopl.library.lending.domain.library.LibraryBranchId;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static io.pillopl.library.lending.domain.book.BookFixture.anyBookId;
+import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch;
 import static io.pillopl.library.lending.domain.patron.PlacingOnHoldPolicy.allCurrentPolicies;
 import static java.util.stream.IntStream.rangeClosed;
 
@@ -29,7 +29,7 @@ public class PatronBooksFixture {
         return new PatronInformation(id, type);
     }
 
-    static PatronBooks regularPatronWithHolds(int numberOfHolds) {
+    public static PatronBooks regularPatronWithHolds(int numberOfHolds) {
         PatronId patronId = anyPatronId();
         return new PatronBooks(
                 patronInformation(patronId, PatronInformation.PatronType.Regular),
@@ -38,19 +38,23 @@ public class PatronBooksFixture {
                 booksOnHold(numberOfHolds));
     }
 
-    static PatronBooks regularPatronWith(BookOnHold bookOnHold) {
+    static PatronBooks regularPatronWith(PatronHold patronHold) {
         PatronId patronId = anyPatronId();
-        BooksOnHold booksOnHold = new BooksOnHold(Collections.singleton(bookOnHold));
+        PatronHolds patronHolds = new PatronHolds(Collections.singleton(patronHold));
         return new PatronBooks(
                 patronInformation(patronId, PatronInformation.PatronType.Regular),
                 allCurrentPolicies(),
                 OverdueCheckouts.noOverdueCheckouts(),
-                booksOnHold);
+                patronHolds);
     }
 
-    static BooksOnHold booksOnHold(int numberOfHolds) {
-        return new BooksOnHold(rangeClosed(1, numberOfHolds)
-                .mapToObj(i -> new BookOnHold(BookFixture.anyBookId(), LibraryBranchFixture.anyBranch()))
+    public static PatronHold onHold() {
+        return new PatronHold(anyBookId(), anyBranch());
+    }
+
+    static PatronHolds booksOnHold(int numberOfHolds) {
+        return new PatronHolds(rangeClosed(1, numberOfHolds)
+                .mapToObj(i -> new PatronHold(anyBookId(), anyBranch()))
                 .collect(Collectors.toSet()));
     }
 
@@ -81,8 +85,8 @@ public class PatronBooksFixture {
         return new PatronId(patronId);
     }
 
-    static BooksOnHold noHolds() {
-        return new BooksOnHold(new HashSet<>());
+    static PatronHolds noHolds() {
+        return new PatronHolds(new HashSet<>());
     }
 
 

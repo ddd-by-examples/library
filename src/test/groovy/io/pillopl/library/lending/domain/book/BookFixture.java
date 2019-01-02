@@ -1,49 +1,51 @@
 package io.pillopl.library.lending.domain.book;
 
 import io.pillopl.library.lending.domain.library.LibraryBranchId;
-import io.pillopl.library.lending.domain.patron.BookOnHold;
+import io.pillopl.library.lending.domain.patron.PatronId;
 
+import java.time.Instant;
 import java.util.UUID;
 
+import static io.pillopl.library.lending.domain.book.BookType.Circulating;
+import static io.pillopl.library.lending.domain.book.BookType.Restricted;
 import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch;
-import static io.pillopl.library.lending.domain.book.Book.BookState.Available;
-import static io.pillopl.library.lending.domain.book.Book.BookState.Collected;
-import static io.pillopl.library.lending.domain.book.Book.BookState.OnHold;
-import static io.pillopl.library.lending.domain.book.Book.BookType.Circulating;
-import static io.pillopl.library.lending.domain.book.Book.BookType.Restricted;
 
 public class BookFixture {
 
-    public static Book bookOnHold(BookId bookId, LibraryBranchId libraryBranchId) {
-        return new Book(bookId, libraryBranchId, Circulating, OnHold);
+    public static BookOnHold bookOnHold(BookId bookId, LibraryBranchId libraryBranchId) {
+        return new BookOnHold(new BookInformation(bookId, Circulating), libraryBranchId, anyPatronId(), Instant.now());
     }
 
-    public static Book circulatingBook() {
-        return new Book(anyBookId(), anyBranch(), Circulating, Available);
+    public static AvailableBook circulatingBook() {
+        return new AvailableBook(new BookInformation(anyBookId(), Circulating), anyBranch());
     }
 
-    public static Book bookOnHold() {
-        return new Book(anyBookId(), anyBranch(), Circulating, OnHold);
+    public static BookOnHold bookOnHold() {
+        return new BookOnHold(new BookInformation(anyBookId(), Circulating), anyBranch(), anyPatronId(), Instant.now());
     }
 
-    public static BookOnHold onHold() {
-        return new BookOnHold(anyBookId(), anyBranch());
+    public static AvailableBook circulatingAvailableBookAt(LibraryBranchId libraryBranchId) {
+        return new AvailableBook(new BookInformation(anyBookId(), Circulating), libraryBranchId);
     }
 
-    public static Book circulatingResourceAt(LibraryBranchId libraryBranchId) {
-        return new Book(anyBookId(), libraryBranchId, Circulating, Available);
+    public static AvailableBook circulatingAvailableBook() {
+        return circulatingAvailableBookAt(anyBranch());
     }
 
-    static Book collectedBook() {
-        return new Book(anyBookId(), anyBranch(), Circulating, Collected);
+    public static CollectedBook collectedBook() {
+        return new CollectedBook(new BookInformation(anyBookId(), Circulating), anyBranch(), anyPatronId(), Instant.now());
     }
 
-    public static Book restrictedBook() {
-        return new Book(anyBookId(), anyBranch(), Restricted, Available);
+    public static AvailableBook restrictedBook() {
+        return new AvailableBook(new BookInformation(anyBookId(), Restricted), anyBranch());
     }
 
     public static BookId anyBookId() {
         return new BookId(UUID.randomUUID());
+    }
+
+    private static PatronId anyPatronId() {
+        return new PatronId(UUID.randomUUID());
     }
 
 

@@ -5,9 +5,9 @@ import static io.pillopl.library.lending.domain.patron.PlacingOnHoldPolicy.allCu
 
 public class PatronBooksFactory {
 
-    public PatronBooks recreateFrom(PatronInformation patronInformation, BooksOnHold booksOnHold) {
+    public PatronBooks recreateFrom(PatronInformation patronInformation, PatronHolds patronHolds) {
         //TODO overduecheckouts
-        return new PatronBooks(patronInformation, allCurrentPolicies(), noOverdueCheckouts(), booksOnHold);
+        return new PatronBooks(patronInformation, allCurrentPolicies(), noOverdueCheckouts(), patronHolds);
     }
 
 }

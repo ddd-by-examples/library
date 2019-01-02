@@ -1,6 +1,6 @@
 package io.pillopl.library.lending.domain.patron
 
-import io.pillopl.library.lending.domain.book.Book
+import io.pillopl.library.lending.domain.book.AvailableBook
 import io.pillopl.library.lending.domain.library.LibraryBranchId
 import io.vavr.control.Either
 import spock.lang.Specification
@@ -8,25 +8,16 @@ import spock.lang.Specification
 import static io.pillopl.library.lending.domain.book.BookFixture.*
 import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldFailed
-import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldByPatron
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.*
 import static java.util.Collections.emptySet
 
 class RegularPatronRequestingCirculatingBooksTest extends Specification {
 
-    def 'a regular patron cannot place on hold book which is on hold'() {
-        when:
-            Either<BookHoldFailed, BookPlacedOnHold> hold = regularPatron().placeOnHold(bookOnHold())
-        then:
-            hold.isLeft()
-            BookHoldFailed e = hold.getLeft()
-            e.reason.contains("book is not available")
-
-    }
 
     def 'a regular patron cannot place on hold more than 5 books'() {
         when:
-            Either<BookHoldFailed, BookPlacedOnHold> hold = regularPatronWithHolds(holds).placeOnHold(circulatingBook())
+            Either<BookHoldFailed, BookPlacedOnHoldByPatron> hold = regularPatronWithHolds(holds).placeOnHold(circulatingBook())
         then:
             hold.isLeft()
             BookHoldFailed e = hold.getLeft()
@@ -38,9 +29,9 @@ class RegularPatronRequestingCirculatingBooksTest extends Specification {
 
     def 'a regular patron can place on hold book when he did not place on hold more than 4 books'() {
         given:
-            Book book = circulatingBook()
+            AvailableBook book = circulatingBook()
         when:
-            Either<BookHoldFailed, BookPlacedOnHold> hold = regularPatronWithHolds(holds).placeOnHold(book)
+            Either<BookHoldFailed, BookPlacedOnHoldByPatron> hold = regularPatronWithHolds(holds).placeOnHold(book)
         then:
             hold.isRight()
         where:
@@ -52,8 +43,8 @@ class RegularPatronRequestingCirculatingBooksTest extends Specification {
         given:
             LibraryBranchId libraryBranchId = anyBranch()
         when:
-            Either<BookHoldFailed, BookPlacedOnHold> hold =
-                    regularPatronWithOverdueCheckouts(libraryBranchId, books).placeOnHold(circulatingResourceAt(libraryBranchId))
+            Either<BookHoldFailed, BookPlacedOnHoldByPatron> hold =
+                    regularPatronWithOverdueCheckouts(libraryBranchId, books).placeOnHold(circulatingAvailableBookAt(libraryBranchId))
         then:
             hold.isLeft()
             BookHoldFailed e = hold.getLeft()
@@ -69,9 +60,9 @@ class RegularPatronRequestingCirculatingBooksTest extends Specification {
 
     def 'a regular patron can place on hold books when he does not have 2 overdues'() {
         given:
-            Book book = circulatingBook()
+            AvailableBook book = circulatingBook()
         when:
-            Either<BookHoldFailed, BookPlacedOnHold> hold = regularPatronWithOverdueCheckouts(anyBranch(), books).placeOnHold(book)
+            Either<BookHoldFailed, BookPlacedOnHoldByPatron> hold = regularPatronWithOverdueCheckouts(anyBranch(), books).placeOnHold(book)
         then:
             hold.isRight()
         where:

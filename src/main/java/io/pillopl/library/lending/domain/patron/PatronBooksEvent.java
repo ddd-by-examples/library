@@ -1,6 +1,8 @@
 package io.pillopl.library.lending.domain.patron;
 
 import io.pillopl.library.lending.domain.book.BookId;
+import io.pillopl.library.lending.domain.book.BookInformation;
+import io.pillopl.library.lending.domain.book.BookType;
 import io.pillopl.library.lending.domain.library.LibraryBranchId;
 import lombok.Value;
 
@@ -18,42 +20,47 @@ public interface PatronBooksEvent {
     UUID getPatronId();
 
     @Value
-    class BookPlacedOnHold implements PatronBooksEvent {
+    class BookPlacedOnHoldByPatron implements PatronBooksEvent {
         Instant when;
         UUID patronId;
         UUID bookId;
+        BookType bookType;
         UUID libraryBranchId;
 
-        static BookPlacedOnHold now(BookId bookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
-            return new BookPlacedOnHold(
+        static BookPlacedOnHoldByPatron now(BookInformation book, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
+            return new BookPlacedOnHoldByPatron(
                     Instant.now(),
                     patronInformation.getPatronId().getPatronId(),
-                    bookId.getBookId(),
+                    book.getBookId().getBookId(),
+                    book.getBookType(),
                     libraryBranchId.getLibraryBranchId());
         }
     }
 
     @Value
-    class BookCollected implements PatronBooksEvent {
+    class BookCollectedByPatron implements PatronBooksEvent {
         Instant when;
         UUID patronId;
         UUID bookId;
+        BookType bookType;
         UUID libraryBranchId;
 
-        static BookCollected now(BookId bookId, LibraryBranchId libraryBranchId, PatronId patronId) {
-            return new BookCollected(
+        static BookCollectedByPatron now(BookInformation book, LibraryBranchId libraryBranchId, PatronId patronId) {
+            return new BookCollectedByPatron(
                     Instant.now(),
                     patronId.getPatronId(),
-                    bookId.getBookId(),
+                    book.getBookId().getBookId(),
+                    book.getBookType(),
                     libraryBranchId.getLibraryBranchId());
         }
     }
 
     @Value
-    class BookReturned implements PatronBooksEvent {
+    class BookReturnedByPatron implements PatronBooksEvent {
         Instant when;
         UUID patronId;
         UUID bookId;
+        BookType bookType;
         UUID libraryBranchId;
     }
 

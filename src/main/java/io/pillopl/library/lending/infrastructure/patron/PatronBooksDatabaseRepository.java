@@ -35,13 +35,13 @@ class PatronBooksDatabaseRepository implements PatronBooksRepository {
     private PatronBooks recreateDomainModelFromDataModel(PatronBooksDatabaseEntity patronBooksDatabaseEntity) {
         PatronInformation patronInformation =
                 new PatronInformation(new PatronId(patronBooksDatabaseEntity.patronId), patronBooksDatabaseEntity.patronType);
-        BooksOnHold booksOnHold =
-                new BooksOnHold(patronBooksDatabaseEntity
+        PatronHolds patronHolds =
+                new PatronHolds(patronBooksDatabaseEntity
                         .booksOnHold
                         .stream()
-                        .map(entity -> new BookOnHold(new BookId(entity.bookId), new LibraryBranchId(entity.libraryBranchId)))
+                        .map(entity -> new PatronHold(new BookId(entity.bookId), new LibraryBranchId(entity.libraryBranchId)))
                         .collect(toSet()));
-        return patronBooksFactory.recreateFrom(patronInformation, booksOnHold);
+        return patronBooksFactory.recreateFrom(patronInformation, patronHolds);
     }
 
     @Override

@@ -1,6 +1,8 @@
 package io.pillopl.library.lending.infrastructure.patron
 
-import io.pillopl.library.lending.domain.book.Book
+
+import io.pillopl.library.lending.domain.book.AvailableBook
+import io.pillopl.library.lending.domain.book.BookOnHold
 import io.pillopl.library.lending.domain.patron.PatronBooks
 import io.pillopl.library.lending.domain.patron.PatronBooksEvent
 import io.pillopl.library.lending.domain.patron.PatronBooksFixture
@@ -25,15 +27,17 @@ class PatronBooksDatabaseRepositoryIT extends Specification {
     def 'persistence in real database should work'() {
         given:
             PatronBooks regular = PatronBooksFixture.regularPatron(patronId)
-            Book book = circulatingBook()
+            AvailableBook availableBook = circulatingBook()
         and:
-            PatronBooksEvent.BookPlacedOnHold event = regular.placeOnHold(book).get()
+            PatronBooksEvent.BookPlacedOnHoldByPatron placedOnHold = regular.placeOnHold(availableBook).get()
         when:
-            patronResourcesRepository.reactTo(event)
+            patronResourcesRepository.reactTo(placedOnHold)
+        and:
+            BookOnHold bookOnHold = availableBook.handle(placedOnHold)
         then:
             PatronBooks patron = patronShouldBeFoundInDatabaseWithOneBookOnHold(patronId)
         when:
-            PatronBooksEvent.BookCollected newEvent = patron.collect(book).get()
+            PatronBooksEvent.BookCollectedByPatron newEvent = patron.collect(bookOnHold).get()
         and:
             patronResourcesRepository.reactTo(newEvent)
         then:
