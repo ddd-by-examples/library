@@ -60,11 +60,11 @@ class RegularPatronRequestingCirculatingBooksTest extends Specification {
 
     def 'a regular patron can place on hold books even though he has 2 overdue checkouts at different library'() {
         given:
-            LibraryBranchId branchWherePatronHasOverdue = anyBranch()
+            LibraryBranchId branch = anyBranch()
             LibraryBranchId differentBranch = anyBranch()
         when:
             Either<BookHoldFailed, BookPlacedOnHold> hold =
-                    regularPatronWith3_OverdueCheckouts(branchWherePatronHasOverdue)
+                    regularPatronWith3_OverdueCheckoutsAt(branch)
                             .placeOnHold(aBookAt(differentBranch), forCloseEnded(3))
         then:
             hold.isRight()

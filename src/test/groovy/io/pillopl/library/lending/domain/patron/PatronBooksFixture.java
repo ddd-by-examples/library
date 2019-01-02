@@ -112,7 +112,7 @@ public class PatronBooksFixture {
                 noHolds());
     }
 
-    static PatronBooks regularPatronWith3_OverdueCheckouts(LibraryBranchId libraryBranchId) {
+    static PatronBooks regularPatronWith3_OverdueCheckoutsAt(LibraryBranchId libraryBranchId) {
         Map<LibraryBranchId, Set<BookId>> overdueCheckouts = new HashMap<>();
         Set<BookId> overdueBooks = Set.of(anyBookId(), anyBookId(), anyBookId());
         overdueCheckouts.put(libraryBranchId, overdueBooks);

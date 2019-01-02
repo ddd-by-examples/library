@@ -16,7 +16,7 @@ public class AvailableBook {
     private final LibraryBranchId libraryBranch;
 
 
-    public boolean isRestricted () {
+    public boolean isRestricted() {
         return bookInformation.getBookType().equals(BookType.Restricted);
     }
 
