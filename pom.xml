@@ -104,15 +104,8 @@
                     <execution>
                         <id>integration-tests</id>
                         <goals>
-                            <goal>integration-test</goal>
                             <goal>verify</goal>
                         </goals>
-                        <configuration>
-                            <includes>
-                                <include>**/*IT.java</include>
-                                <include>**/*IT.groovy</include>
-                            </includes>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -135,7 +128,6 @@
                             <includes>
                                 <include>**/*Test.groovy</include>
                                 <include>**/*Test.java</include>
-
                             </includes>
                         </testSource>
                         <testSource>
