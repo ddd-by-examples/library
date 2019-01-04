@@ -32,7 +32,7 @@ public class PatronBooks {
     }
 
     public Either<BookHoldFailed, BookPlacedOnHold> placeOnHold(AvailableBook aBook, HoldDuration forDuration) {
-        Option<Rejection> rejection = tryPlacingOnHold(aBook, forDuration);
+        Option<Rejection> rejection = patronCanHold(aBook, forDuration);
         if (rejection.isEmpty()) {
             return right(BookPlacedOnHold.now(aBook.getBookInformation(), aBook.getLibraryBranch(), patron, forDuration));
         }
@@ -54,7 +54,7 @@ public class PatronBooks {
         return left(BookCollectingFailed.now(Rejection.withReason("book is not on hold by patron"), book.getBookId(), book.getHoldPlacedAt(), patron));
     }
 
-    private Option<Rejection> tryPlacingOnHold(AvailableBook aBook, HoldDuration forDuration) {
+    private Option<Rejection> patronCanHold(AvailableBook aBook, HoldDuration forDuration) {
         return placingOnHoldPolicies
                 .toStream()
                 .map(policy -> policy.apply(aBook, this, forDuration))
