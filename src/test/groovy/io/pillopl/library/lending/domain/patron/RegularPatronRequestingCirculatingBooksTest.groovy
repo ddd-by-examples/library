@@ -9,7 +9,7 @@ import static io.pillopl.library.lending.domain.book.BookFixture.*
 import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.domain.patron.HoldDuration.forCloseEnded
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldFailed
-import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldEvents
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.*
 import static java.util.Collections.emptySet
 
@@ -18,7 +18,7 @@ class RegularPatronRequestingCirculatingBooksTest extends Specification {
 
     def 'a regular patron cannot place on hold more than 5 books'() {
         when:
-            Either<BookHoldFailed, BookPlacedOnHold> hold = regularPatronWithHolds(holds).placeOnHold(circulatingBook())
+            Either<BookHoldFailed, BookPlacedOnHoldEvents> hold = regularPatronWithHolds(holds).placeOnHold(circulatingBook())
         then:
             hold.isLeft()
             BookHoldFailed e = hold.getLeft()
@@ -32,7 +32,7 @@ class RegularPatronRequestingCirculatingBooksTest extends Specification {
         given:
             AvailableBook book = circulatingBook()
         when:
-            Either<BookHoldFailed, BookPlacedOnHold> hold = regularPatronWithHolds(holds).placeOnHold(book, forCloseEnded(3))
+            Either<BookHoldFailed, BookPlacedOnHoldEvents> hold = regularPatronWithHolds(holds).placeOnHold(book, forCloseEnded(3))
         then:
             hold.isRight()
         where:
@@ -44,7 +44,7 @@ class RegularPatronRequestingCirculatingBooksTest extends Specification {
         given:
             LibraryBranchId libraryBranchId = anyBranch()
         when:
-            Either<BookHoldFailed, BookPlacedOnHold> hold =
+            Either<BookHoldFailed, BookPlacedOnHoldEvents> hold =
                     regularPatronWithOverdueCheckouts(libraryBranchId, books).placeOnHold(circulatingAvailableBookAt(libraryBranchId), forCloseEnded(3))
         then:
             hold.isLeft()
@@ -63,7 +63,7 @@ class RegularPatronRequestingCirculatingBooksTest extends Specification {
             LibraryBranchId branch = anyBranch()
             LibraryBranchId differentBranch = anyBranch()
         when:
-            Either<BookHoldFailed, BookPlacedOnHold> hold =
+            Either<BookHoldFailed, BookPlacedOnHoldEvents> hold =
                     regularPatronWith3_OverdueCheckoutsAt(branch)
                             .placeOnHold(aBookAt(differentBranch), forCloseEnded(3))
         then:
@@ -74,7 +74,7 @@ class RegularPatronRequestingCirculatingBooksTest extends Specification {
         given:
             AvailableBook book = circulatingBook()
         when:
-            Either<BookHoldFailed, BookPlacedOnHold> hold = regularPatronWithOverdueCheckouts(anyBranch(), books).placeOnHold(book, forCloseEnded(3))
+            Either<BookHoldFailed, BookPlacedOnHoldEvents> hold = regularPatronWithOverdueCheckouts(anyBranch(), books).placeOnHold(book, forCloseEnded(3))
         then:
             hold.isRight()
         where:

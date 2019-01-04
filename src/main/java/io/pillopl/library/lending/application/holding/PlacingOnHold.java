@@ -3,12 +3,9 @@ package io.pillopl.library.lending.application.holding;
 import io.pillopl.library.lending.domain.book.AvailableBook;
 import io.pillopl.library.lending.domain.book.BookId;
 import io.pillopl.library.lending.domain.library.LibraryBranchId;
-import io.pillopl.library.lending.domain.patron.HoldDuration;
-import io.pillopl.library.lending.domain.patron.PatronBooks;
+import io.pillopl.library.lending.domain.patron.*;
 import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldFailed;
-import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold;
-import io.pillopl.library.lending.domain.patron.PatronBooksRepository;
-import io.pillopl.library.lending.domain.patron.PatronId;
+import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldEvents;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
@@ -37,7 +34,7 @@ public class PlacingOnHold {
         return Try.ofSupplier(() -> {
             AvailableBook availableBook = find(command.getBookId());
             PatronBooks patronBooks = find(command.getPatronId());
-            Either<BookHoldFailed, BookPlacedOnHold> result = placeOnHold(availableBook, patronBooks, command);
+            Either<BookHoldFailed, BookPlacedOnHoldEvents> result = placeOnHold(availableBook, patronBooks, command);
             return Match(result).of(
                     Case($Left($()), this::publishEvents),
                     Case($Right($()), this::saveAndPublishEvents)
@@ -45,7 +42,7 @@ public class PlacingOnHold {
         });
     }
 
-    private Either<BookHoldFailed, BookPlacedOnHold> placeOnHold(AvailableBook availableBook, PatronBooks patronBooks, PlaceOnHoldCommand hold) {
+    private Either<BookHoldFailed, BookPlacedOnHoldEvents> placeOnHold(AvailableBook availableBook, PatronBooks patronBooks, PlaceOnHoldCommand hold) {
         if (hold.isOpenEnded()) {
             return patronBooks.placeOnHold(availableBook, HoldDuration.forOpenEnded());
         } else {
@@ -53,13 +50,12 @@ public class PlacingOnHold {
         }
     }
 
-
     private Result publishEvents(BookHoldFailed bookHoldFailed) {
         //TODO publish events
         return Rejection;
     }
 
-    private Result saveAndPublishEvents(BookPlacedOnHold placedOnHold) {
+    private Result saveAndPublishEvents(BookPlacedOnHoldEvents placedOnHold) {
         //TODO publish events
         patronBooksRepository.handle(placedOnHold);
         return Success;

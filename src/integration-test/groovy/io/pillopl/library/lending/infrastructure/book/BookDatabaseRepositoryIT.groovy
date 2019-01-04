@@ -18,6 +18,9 @@ import static io.pillopl.library.lending.domain.book.BookFixture.anyBookId
 import static io.pillopl.library.lending.domain.book.BookFixture.circulatingAvailableBookAt
 import static io.pillopl.library.lending.domain.book.BookType.Circulating
 import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold.now
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldEvents
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldEvents.events
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.anyPatronId
 import static io.pillopl.library.lending.domain.patron.PatronInformation.PatronType.Regular
 
@@ -80,12 +83,13 @@ class BookDatabaseRepositoryIT extends Specification {
         return book
     }
 
-    PatronBooksEvent.BookPlacedOnHold placedOnHold() {
-        return PatronBooksEvent.BookPlacedOnHold.now(
+    BookPlacedOnHoldEvents placedOnHold() {
+        return events(
+                new PatronInformation(patronId, Regular), now(
                 new BookInformation(bookId, Circulating),
                 libraryBranchId,
                 new PatronInformation(patronId, Regular),
-                HoldDuration.forCloseEnded(5))
+                HoldDuration.forCloseEnded(5)))
     }
 
     PatronBooksEvent.BookCollected bookCollected() {

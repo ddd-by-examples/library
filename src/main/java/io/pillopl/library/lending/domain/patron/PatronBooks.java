@@ -11,6 +11,8 @@ import io.vavr.control.Option;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldEvents.events;
+import static io.pillopl.library.lending.domain.patron.PatronHolds.MAX_NUMBER_OF_HOLDS;
 import static io.vavr.control.Either.left;
 import static io.vavr.control.Either.right;
 
@@ -27,14 +29,18 @@ public class PatronBooks {
 
     private final PatronHolds patronHolds;
 
-    public Either<BookHoldFailed, BookPlacedOnHold> placeOnHold(AvailableBook book) {
+    public Either<BookHoldFailed, BookPlacedOnHoldEvents> placeOnHold(AvailableBook book) {
         return placeOnHold(book, HoldDuration.forOpenEnded());
     }
 
-    public Either<BookHoldFailed, BookPlacedOnHold> placeOnHold(AvailableBook aBook, HoldDuration forDuration) {
+    public Either<BookHoldFailed, BookPlacedOnHoldEvents> placeOnHold(AvailableBook aBook, HoldDuration forDuration) {
         Option<Rejection> rejection = patronCanHold(aBook, forDuration);
         if (rejection.isEmpty()) {
-            return right(BookPlacedOnHold.now(aBook.getBookInformation(), aBook.getLibraryBranch(), patron, forDuration));
+            BookPlacedOnHold bookPlacedOnHold = BookPlacedOnHold.now(aBook.getBookInformation(), aBook.getLibraryBranch(), patron, forDuration);
+            if (patronHolds.maximumNumberOfHoldsReached()) {
+                return right(events(patron, bookPlacedOnHold, MaximumNumberOhHoldsReached.now(patron, MAX_NUMBER_OF_HOLDS)));
+            }
+            return right(events(patron, bookPlacedOnHold));
         }
         return left(BookHoldFailed.now(rejection.get(), aBook.getBookId(), aBook.getLibraryBranch(), patron));
     }
@@ -44,7 +50,6 @@ public class PatronBooks {
             return right(BookHoldCanceled.now(book.getBookId(), book.getHoldPlacedAt(), patron));
         }
         return left(BookHoldCancelingFailed.now(book.getBookId(), book.getHoldPlacedAt(), patron));
-
     }
 
     public Either<BookCollectingFailed, BookCollected> collect(BookOnHold book) {

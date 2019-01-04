@@ -8,6 +8,8 @@ import java.util.Set;
 @Value
 public class PatronHolds {
 
+    static int MAX_NUMBER_OF_HOLDS = 5;
+
     Set<PatronHold> resourcesOnHold;
 
     boolean a(BookOnHold bookOnHold) {
@@ -19,4 +21,8 @@ public class PatronHolds {
         return resourcesOnHold.size();
     }
 
+
+    boolean maximumNumberOfHoldsReached() {
+        return count() + 1 == MAX_NUMBER_OF_HOLDS;
+    }
 }

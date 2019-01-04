@@ -1,7 +1,7 @@
 package io.pillopl.library.lending.domain.book;
 
 import io.pillopl.library.lending.domain.library.LibraryBranchId;
-import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold;
+import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldEvents;
 import io.pillopl.library.lending.domain.patron.PatronId;
 import lombok.NonNull;
 import lombok.Value;
@@ -23,14 +23,12 @@ public class AvailableBook implements Book {
         return bookInformation.getBookId();
     }
 
-    public BookOnHold handle(BookPlacedOnHold bookPlacedOnHold) {
+    public BookOnHold handle(BookPlacedOnHoldEvents bookPlacedOnHold) {
         return new BookOnHold(
-                new BookInformation(
-                        new BookId(bookPlacedOnHold.getBookId()),
-                        bookPlacedOnHold.getBookType()),
-                new LibraryBranchId(bookPlacedOnHold.getLibraryBranchId()),
-                new PatronId(bookPlacedOnHold.getPatronId()),
-                bookPlacedOnHold.getHoldTill());
+                new BookInformation(new BookId(bookPlacedOnHold.getBookPlacedOnHold().getBookId()), bookPlacedOnHold.getBookPlacedOnHold().getBookType()),
+                new LibraryBranchId(bookPlacedOnHold.getBookPlacedOnHold().getLibraryBranchId()),
+                new PatronId(bookPlacedOnHold.getBookPlacedOnHold().getPatronId()),
+                bookPlacedOnHold.getBookPlacedOnHold().getHoldTill());
     }
 }
 

@@ -5,6 +5,7 @@ import io.pillopl.library.lending.domain.book.BookInformation;
 import io.pillopl.library.lending.domain.book.BookType;
 import io.pillopl.library.lending.domain.library.LibraryBranchId;
 import io.pillopl.library.lending.domain.patron.PatronInformation.PatronType;
+import io.vavr.control.Option;
 import lombok.NonNull;
 import lombok.Value;
 
@@ -54,6 +55,39 @@ public interface PatronBooksEvent {
                     libraryBranchId.getLibraryBranchId(),
                     holdDuration.getFrom(),
                     holdDuration.getTo().getOrNull());
+        }
+    }
+
+    @Value
+    class BookPlacedOnHoldEvents implements PatronBooksEvent {
+        @NonNull UUID patronId;
+        @NonNull BookPlacedOnHold bookPlacedOnHold;
+        @NonNull Option<MaximumNumberOhHoldsReached> maximumNumberOhHoldsReached;
+
+        public static BookPlacedOnHoldEvents events(PatronInformation patron, BookPlacedOnHold bookPlacedOnHold) {
+            return new BookPlacedOnHoldEvents(patron.getPatronId().getPatronId(), bookPlacedOnHold, Option.none());
+        }
+
+        public static BookPlacedOnHoldEvents events(PatronInformation patron, BookPlacedOnHold bookPlacedOnHold, MaximumNumberOhHoldsReached maximumNumberOhHoldsReached) {
+            return new BookPlacedOnHoldEvents(patron.getPatronId().getPatronId(), bookPlacedOnHold, Option.of(maximumNumberOhHoldsReached));
+        }
+
+    }
+
+
+
+    @Value
+    class MaximumNumberOhHoldsReached implements PatronBooksEvent {
+        @NonNull UUID eventId = UUID.randomUUID();
+        @NonNull Instant when;
+        @NonNull UUID patronId;
+        int numberOfHolds;
+
+        public static MaximumNumberOhHoldsReached now(PatronInformation patronInformation, int numberOfHolds) {
+            return new MaximumNumberOhHoldsReached(
+                    Instant.now(),
+                    patronInformation.getPatronId().getPatronId(),
+                    numberOfHolds);
         }
     }
 
@@ -157,6 +191,7 @@ public interface PatronBooksEvent {
                     libraryBranchId.getLibraryBranchId());
         }
     }
+
 }
 
 

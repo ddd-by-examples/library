@@ -43,5 +43,4 @@ class BookDatabaseConfiguration extends JdbcConfiguration {
         return new BookDatabaseRepository(bookEntityRepository);
     }
 
-
 }

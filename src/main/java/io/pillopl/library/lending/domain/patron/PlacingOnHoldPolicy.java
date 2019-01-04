@@ -19,25 +19,20 @@ interface PlacingOnHoldPolicy extends Function3<AvailableBook, PatronBooks, Hold
     };
 
     PlacingOnHoldPolicy overdueCheckoutsRejectionPolicy = (AvailableBook toHold, PatronBooks patron, HoldDuration holdDuration) -> {
-        final int MAX_COUNT_OF_OVERDUE_RESOURCES = 2;
-
-        if (patron.overdueCheckoutsAt(toHold.getLibraryBranch()) >= MAX_COUNT_OF_OVERDUE_RESOURCES) {
+        if (patron.overdueCheckoutsAt(toHold.getLibraryBranch()) >= OverdueCheckouts.MAX_COUNT_OF_OVERDUE_RESOURCES) {
             return left(Rejection.withReason("cannot place on hold when there are overdue checkouts"));
         }
         return right(new Allowance());
     };
 
     PlacingOnHoldPolicy regularPatronMaximumNumberOfHoldsPolicy = (AvailableBook toHold, PatronBooks patron, HoldDuration holdDuration) -> {
-        final int MAX_NUMBER_OF_HOLDS = 5;
-
-        if (patron.isRegular() && patron.numberOfHolds() >= MAX_NUMBER_OF_HOLDS) {
+        if (patron.isRegular() && patron.numberOfHolds() >= PatronHolds.MAX_NUMBER_OF_HOLDS) {
             return left(Rejection.withReason("patron cannot hold more books"));
         }
         return right(new Allowance());
     };
 
     PlacingOnHoldPolicy onlyResearcherPatronsCanPlaceOpenEndedHolds = (AvailableBook toHold, PatronBooks patron, HoldDuration holdDuration) -> {
-
         if (patron.isRegular() && holdDuration.isOpenEnded()) {
             return left(Rejection.withReason("regular patron cannot place open ended holds"));
         }

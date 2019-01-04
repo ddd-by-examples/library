@@ -9,6 +9,7 @@ import java.time.Instant
 import static io.pillopl.library.lending.domain.book.BookFixture.circulatingAvailableBook
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldFailed
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldEvents
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.*
 import static io.pillopl.library.lending.domain.patron.PlacingOnHoldPolicy.onlyResearcherPatronsCanPlaceOpenEndedHolds
 
@@ -24,15 +25,16 @@ class PatronRequestingOpenEndedHoldTest extends Specification {
         and:
             PatronBooks researcherPatron = researcherPatronWithPolicy(patronId, onlyResearcherPatronsCanPlaceOpenEndedHolds)
         when:
-            Either<BookHoldFailed, BookPlacedOnHold> hold = researcherPatron.placeOnHold(aBook, HoldDuration.forOpenEnded(from))
+            Either<BookHoldFailed, BookPlacedOnHoldEvents> hold = researcherPatron.placeOnHold(aBook, HoldDuration.forOpenEnded(from))
         then:
             hold.isRight()
             hold.get().with {
-                assert it.libraryBranchId == aBook.libraryBranch.libraryBranchId
-                assert it.patronId == patronId.patronId
-                assert it.bookId == aBook.bookInformation.bookId.bookId
-                assert it.holdFrom == from
-                assert it.holdTill == null
+                BookPlacedOnHold bookPlacedOnHold = it.bookPlacedOnHold
+                assert bookPlacedOnHold.libraryBranchId == aBook.libraryBranch.libraryBranchId
+                assert bookPlacedOnHold.patronId == patronId.patronId
+                assert bookPlacedOnHold.bookId == aBook.bookInformation.bookId.bookId
+                assert bookPlacedOnHold.holdFrom == from
+                assert bookPlacedOnHold.holdTill == null
             }
 
     }
@@ -45,7 +47,7 @@ class PatronRequestingOpenEndedHoldTest extends Specification {
         and:
             PatronBooks regularPatron = regularPatronWithPolicy(patronId, onlyResearcherPatronsCanPlaceOpenEndedHolds)
         when:
-            Either<BookHoldFailed, BookPlacedOnHold> hold = regularPatron.placeOnHold(aBook, HoldDuration.forOpenEnded(from))
+            Either<BookHoldFailed, BookPlacedOnHoldEvents> hold = regularPatron.placeOnHold(aBook, HoldDuration.forOpenEnded(from))
         then:
             hold.isLeft()
             hold.getLeft().with {

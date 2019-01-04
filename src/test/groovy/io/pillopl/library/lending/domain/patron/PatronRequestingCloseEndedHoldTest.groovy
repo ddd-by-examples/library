@@ -10,8 +10,10 @@ import java.time.Instant
 import static io.pillopl.library.lending.domain.book.BookFixture.circulatingAvailableBook
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldFailed
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldEvents
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.regularPatronWithPolicy
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.researcherPatronWithPolicy
+
 import static io.pillopl.library.lending.domain.patron.PlacingOnHoldPolicy.onlyResearcherPatronsCanPlaceOpenEndedHolds
 
 class PatronRequestingCloseEndedHoldTest extends Specification {
@@ -22,16 +24,16 @@ class PatronRequestingCloseEndedHoldTest extends Specification {
         given:
             AvailableBook aBook = circulatingAvailableBook()
         when:
-            Either<BookHoldFailed, BookPlacedOnHold> hold =
-                    patron
-                    .placeOnHold(aBook, HoldDuration.forCloseEnded(from, 3))
+            Either<BookHoldFailed, BookPlacedOnHoldEvents> hold = patron.placeOnHold(aBook, HoldDuration.forCloseEnded(from, 3))
         then:
             hold.isRight()
             hold.get().with {
-                assert it.libraryBranchId == aBook.libraryBranch.libraryBranchId
-                assert it.bookId == aBook.bookInformation.bookId.bookId
-                assert it.holdFrom == from
-                assert it.holdTill == from.plus(Duration.ofDays(3))
+                BookPlacedOnHold bookPlacedOnHold = it.bookPlacedOnHold
+                assert bookPlacedOnHold.libraryBranchId == aBook.libraryBranch.libraryBranchId
+                assert bookPlacedOnHold.bookId == aBook.bookInformation.bookId.bookId
+                assert bookPlacedOnHold.holdFrom == from
+                assert bookPlacedOnHold.holdTill == from.plus(Duration.ofDays(3))
+                assert it.maximumNumberOhHoldsReached.isEmpty()
             }
         where:
             patron << [regularPatronWithPolicy(onlyResearcherPatronsCanPlaceOpenEndedHolds),

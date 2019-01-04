@@ -12,6 +12,8 @@ import static java.util.Collections.emptySet;
 @Value
 public class OverdueCheckouts {
 
+    static int MAX_COUNT_OF_OVERDUE_RESOURCES = 2;
+
     @NonNull Map<LibraryBranchId, Set<OverdueCheckout>> overdueCheckouts;
 
     int countAt(LibraryBranchId libraryBranchId) {
@@ -19,3 +21,6 @@ public class OverdueCheckouts {
     }
 
 }
+
+
+

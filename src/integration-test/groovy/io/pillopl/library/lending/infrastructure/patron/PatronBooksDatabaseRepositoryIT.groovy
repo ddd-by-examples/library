@@ -3,11 +3,7 @@ package io.pillopl.library.lending.infrastructure.patron
 import io.pillopl.library.lending.domain.book.BookInformation
 import io.pillopl.library.lending.domain.book.BookType
 import io.pillopl.library.lending.domain.library.LibraryBranchId
-import io.pillopl.library.lending.domain.patron.HoldDuration
-import io.pillopl.library.lending.domain.patron.PatronBooks
-import io.pillopl.library.lending.domain.patron.PatronBooksRepository
-import io.pillopl.library.lending.domain.patron.PatronId
-import io.pillopl.library.lending.domain.patron.PatronInformation
+import io.pillopl.library.lending.domain.patron.*
 import io.vavr.control.Option
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -17,6 +13,8 @@ import spock.lang.Specification
 import static io.pillopl.library.lending.domain.book.BookFixture.anyBookId
 import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.*
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold.now
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldEvents.events
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.anyPatronId
 import static io.pillopl.library.lending.domain.patron.PatronInformation.PatronType.Regular
 
@@ -71,12 +69,13 @@ class PatronBooksDatabaseRepositoryIT extends Specification {
         )
     }
 
-    BookPlacedOnHold placedOnHold() {
-        return BookPlacedOnHold.now(
+    BookPlacedOnHoldEvents placedOnHold() {
+        return events(
+                new PatronInformation(patronId, Regular), now(
                 bookInformation,
                 libraryBranchId,
                 new PatronInformation(patronId, Regular),
-                HoldDuration.forCloseEnded(5))
+                HoldDuration.forCloseEnded(5)))
     }
 
     PatronCreated patronCreated() {

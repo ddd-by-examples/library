@@ -3,15 +3,15 @@ package io.pillopl.library.lending.domain.book
 import io.pillopl.library.lending.domain.library.LibraryBranchId
 import io.pillopl.library.lending.domain.patron.PatronBooksEvent
 import io.pillopl.library.lending.domain.patron.PatronId
+import io.pillopl.library.lending.domain.patron.PatronInformation
 import spock.lang.Specification
 
 import java.time.Instant
 
 import static io.pillopl.library.lending.domain.book.BookFixture.*
 import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookReturned
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookCollected
-
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookReturned
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.anyPatronId
 
 class BookReactingToPatronLendingEventsTest extends Specification {
@@ -100,15 +100,17 @@ class BookReactingToPatronLendingEventsTest extends Specification {
                 libraryBranchId.libraryBranchId)
     }
 
-    PatronBooksEvent.BookPlacedOnHold bookPlacedOnHold(AvailableBook availableBook, PatronId byPatron, LibraryBranchId libraryBranchId, Instant from, Instant till) {
-        return new PatronBooksEvent.BookPlacedOnHold(
-                Instant.now(),
-                byPatron.patronId,
-                availableBook.getBookId().bookId,
-                availableBook.bookInformation.bookType,
-                libraryBranchId.libraryBranchId,
-                from,
-                till)
+    PatronBooksEvent.BookPlacedOnHoldEvents bookPlacedOnHold(AvailableBook availableBook, PatronId byPatron, LibraryBranchId libraryBranchId, Instant from, Instant till) {
+        return PatronBooksEvent.BookPlacedOnHoldEvents.events(
+                new PatronInformation(byPatron, PatronInformation.PatronType.Regular),
+                new PatronBooksEvent.BookPlacedOnHold(Instant.now(),
+                        byPatron.patronId,
+                        availableBook.getBookId().bookId,
+                        availableBook.bookInformation.bookType,
+                        libraryBranchId.libraryBranchId,
+                        from,
+                        till),
+        )
     }
 
 }

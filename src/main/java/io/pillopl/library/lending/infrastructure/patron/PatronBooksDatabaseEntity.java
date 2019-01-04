@@ -5,6 +5,7 @@ import io.pillopl.library.lending.domain.patron.PatronBooksEvent;
 import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookCollected;
 import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldCanceled;
 import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold;
+import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldEvents;
 import io.pillopl.library.lending.domain.patron.PatronInformation;
 import io.pillopl.library.lending.domain.patron.PatronInformation.PatronType;
 import io.vavr.API;
@@ -41,13 +42,14 @@ class PatronBooksDatabaseEntity {
 
     PatronBooksDatabaseEntity handle(PatronBooksEvent event) {
         return API.Match(event).of(
-                Case($(Predicates.instanceOf(BookPlacedOnHold.class)), this::handle),
+                Case($(Predicates.instanceOf(BookPlacedOnHoldEvents.class)), this::handle),
                 Case($(Predicates.instanceOf(BookCollected.class)), this::handle),
                 Case($(Predicates.instanceOf(BookHoldCanceled.class)), this::handle)
         );
     }
 
-    private PatronBooksDatabaseEntity handle(BookPlacedOnHold event) {
+    private PatronBooksDatabaseEntity handle(BookPlacedOnHoldEvents placedOnHoldEvents) {
+        BookPlacedOnHold event = placedOnHoldEvents.getBookPlacedOnHold();
         booksOnHold.add(new BookOnHoldDatabaseEntity(event.getBookId(), event.getPatronId(), event.getLibraryBranchId()));
         return this;
     }
