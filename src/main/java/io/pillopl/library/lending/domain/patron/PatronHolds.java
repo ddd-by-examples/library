@@ -10,7 +10,7 @@ public class PatronHolds {
 
     Set<PatronHold> resourcesOnHold;
 
-    boolean has(BookOnHold bookOnHold) {
+    boolean a(BookOnHold bookOnHold) {
         PatronHold hold = new PatronHold(bookOnHold.getBookId(), bookOnHold.getHoldPlacedAt());
         return resourcesOnHold.contains(hold);
     }

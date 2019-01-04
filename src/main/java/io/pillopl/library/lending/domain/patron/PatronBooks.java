@@ -39,19 +39,19 @@ public class PatronBooks {
         return left(BookHoldFailed.now(rejection.get(), aBook.getBookId(), aBook.getLibraryBranch(), patron));
     }
 
-    public Either<BookHoldCancelingFailed, BookHoldCanceled> cancelHold(BookOnHold aBook) {
-        if (patronHolds.has(aBook)) {
-            return right(BookHoldCanceled.now(aBook.getBookId(), aBook.getHoldPlacedAt(), patron));
+    public Either<BookHoldCancelingFailed, BookHoldCanceled> cancelHold(BookOnHold book) {
+        if (patronHolds.a(book)) {
+            return right(BookHoldCanceled.now(book.getBookId(), book.getHoldPlacedAt(), patron));
         }
-        return left(BookHoldCancelingFailed.now(aBook.getBookId(), aBook.getHoldPlacedAt(), patron));
+        return left(BookHoldCancelingFailed.now(book.getBookId(), book.getHoldPlacedAt(), patron));
 
     }
 
-    public Either<BookCollectingFailed, BookCollected> collect(BookOnHold aBook) {
-        if (patronHolds.has(aBook)) {
-            return right(BookCollected.now(aBook.getBookInformation(), aBook.getHoldPlacedAt(), patron.getPatronId()));
+    public Either<BookCollectingFailed, BookCollected> collect(BookOnHold book) {
+        if (patronHolds.a(book)) {
+            return right(BookCollected.now(book.getBookInformation(), book.getHoldPlacedAt(), patron.getPatronId()));
         }
-        return left(BookCollectingFailed.now(Rejection.withReason("book is not on hold by patron"), aBook.getBookId(), aBook.getHoldPlacedAt(), patron));
+        return left(BookCollectingFailed.now(Rejection.withReason("book is not on hold by patron"), book.getBookId(), book.getHoldPlacedAt(), patron));
     }
 
     private Option<Rejection> tryPlacingOnHold(AvailableBook aBook, HoldDuration forDuration) {
