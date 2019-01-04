@@ -46,6 +46,8 @@ class PatronBooksDatabaseRepositoryIT extends Specification {
             patronShouldBeFoundInDatabaseWithZeroBooksOnHold(patronId)
         when:
             patronResourcesRepository.reactTo(placedOnHold())
+        then:
+            patronShouldBeFoundInDatabaseWithOneBookOnHold(patronId)
         and:
             patronResourcesRepository.reactTo(holdCanceled())
         then:
