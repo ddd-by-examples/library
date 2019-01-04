@@ -4,6 +4,7 @@ import io.pillopl.library.lending.domain.book.BookId;
 import io.pillopl.library.lending.domain.book.BookInformation;
 import io.pillopl.library.lending.domain.book.BookType;
 import io.pillopl.library.lending.domain.library.LibraryBranchId;
+import io.pillopl.library.lending.domain.patron.PatronInformation.PatronType;
 import lombok.NonNull;
 import lombok.Value;
 
@@ -17,6 +18,21 @@ public interface PatronBooksEvent {
     }
 
     UUID getPatronId();
+
+    @Value
+    class PatronCreated implements PatronBooksEvent {
+        @NonNull UUID eventId = UUID.randomUUID();
+        @NonNull Instant when;
+        @NonNull UUID patronId;
+        @NonNull PatronType patronType;
+
+        public static PatronCreated now(PatronInformation patronInformation) {
+            return new PatronCreated(
+                    Instant.now(),
+                    patronInformation.getPatronId().getPatronId(),
+                    patronInformation.getType());
+        }
+    }
 
     @Value
     class BookPlacedOnHold implements PatronBooksEvent {
@@ -116,7 +132,7 @@ public interface PatronBooksEvent {
         @NonNull UUID bookId;
         @NonNull UUID libraryBranchId;
 
-        static BookHoldCanceled now(BookId bookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
+        public static BookHoldCanceled now(BookId bookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
             return new BookHoldCanceled(
                     Instant.now(),
                     patronInformation.getPatronId().getPatronId(),

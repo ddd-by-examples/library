@@ -45,8 +45,8 @@ class DomainModelMapperTest extends Specification {
             PatronHolds patronHolds = domainModelMapper.mapPatronHolds(entity)
         then:
             patronHolds.count() == 2
-            patronHolds.has(bookOnHold(bookId, libraryBranchId))
-            patronHolds.has(bookOnHold(anotherBookId, anotherBranchId))
+            patronHolds.a(bookOnHold(bookId, libraryBranchId))
+            patronHolds.a(bookOnHold(anotherBookId, anotherBranchId))
 
     }
 

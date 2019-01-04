@@ -1,8 +1,8 @@
 package io.pillopl.library.lending.application;
 
-import io.pillopl.library.lending.application.holding.FakePatronCreatedEvent;
 import io.pillopl.library.lending.application.holding.FakeTooManyHoldsEvent;
 import io.pillopl.library.lending.domain.patron.*;
+import io.pillopl.library.lending.domain.patron.PatronBooksEvent.PatronCreated;
 import io.vavr.Predicates;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
@@ -10,9 +10,7 @@ import io.vavr.control.Try;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static io.vavr.API.$;
-import static io.vavr.API.Case;
-import static io.vavr.API.Match;
+import static io.vavr.API.*;
 
 public class PatronBooksFakeDatabase implements PatronBooksRepository {
 
@@ -27,14 +25,14 @@ public class PatronBooksFakeDatabase implements PatronBooksRepository {
     public Try<Void> reactTo(PatronBooksEvent event) {
         return Try.run(() -> {
             Match(event).of(
-                    Case($(Predicates.instanceOf(FakePatronCreatedEvent.class)), this::createRegular),
+                    Case($(Predicates.instanceOf(PatronCreated.class)), this::createRegular),
                     Case($(Predicates.instanceOf(FakeTooManyHoldsEvent.class)), this::createWithManyHolds)
             );
         });
     }
 
 
-    private FakePatronCreatedEvent createRegular(FakePatronCreatedEvent event) {
+    private PatronCreated createRegular(PatronCreated event) {
         database.put(event.patronId(), PatronBooksFixture.regularPatron(event.patronId()));
         return event;
     }

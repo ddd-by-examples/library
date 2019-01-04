@@ -2,6 +2,7 @@ package io.pillopl.library.lending.application.holding
 
 import io.pillopl.library.lending.application.PatronBooksFakeDatabase
 import io.pillopl.library.lending.domain.patron.PatronId
+import io.pillopl.library.lending.domain.patron.PatronInformation
 import io.vavr.control.Option
 import io.vavr.control.Try
 import spock.lang.Specification
@@ -11,7 +12,9 @@ import static io.pillopl.library.lending.application.holding.PlacingOnHold.Resul
 import static io.pillopl.library.lending.domain.book.BookFixture.anyBookId
 import static io.pillopl.library.lending.domain.book.BookFixture.circulatingBook
 import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.PatronCreated.now
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.anyPatronId
+import static io.pillopl.library.lending.domain.patron.PatronInformation.PatronType.Regular
 
 class PlacingBookOnHoldTest extends Specification {
 
@@ -76,7 +79,7 @@ class PlacingBookOnHoldTest extends Specification {
 
     PatronId persistedRegularPatron() {
         PatronId patronId = anyPatronId();
-        repository.reactTo(new FakePatronCreatedEvent(patronId))
+        repository.reactTo(now(new PatronInformation(patronId, Regular)))
         return patronId
     }
 
