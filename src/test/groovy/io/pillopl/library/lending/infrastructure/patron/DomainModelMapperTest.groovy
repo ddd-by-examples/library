@@ -9,7 +9,6 @@ import io.pillopl.library.lending.domain.patron.PatronInformation
 import spock.lang.Specification
 
 import static io.pillopl.library.lending.domain.book.BookFixture.anyBookId
-import static io.pillopl.library.lending.domain.book.BookFixture.bookOnHold
 import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.anyPatronId
 import static io.pillopl.library.lending.domain.patron.PatronInformation.PatronType.Regular
@@ -44,9 +43,8 @@ class DomainModelMapperTest extends Specification {
         when:
             PatronHolds patronHolds = domainModelMapper.mapPatronHolds(entity)
         then:
-            patronHolds.count() == 2
-            patronHolds.a(bookOnHold(bookId, libraryBranchId))
-            patronHolds.a(bookOnHold(anotherBookId, anotherBranchId))
+            patronHolds.resourcesOnHold.size() == 2
+
 
     }
 
@@ -58,12 +56,12 @@ class DomainModelMapperTest extends Specification {
         when:
             OverdueCheckouts overdueCheckouts = domainModelMapper.mapPatronOverdueCheckouts(entity)
         then:
-            overdueCheckouts.countAt(libraryBranchId) == 1
-            overdueCheckouts.countAt(anotherBranchId) == 1
+            overdueCheckouts.getOverdueCheckouts().get(libraryBranchId).size() == 1
+            overdueCheckouts.getOverdueCheckouts().get(anotherBranchId).size() == 1
     }
 
 
-    private PatronBooksDatabaseEntity patronEntity(PatronId patronId,
+    PatronBooksDatabaseEntity patronEntity(PatronId patronId,
                                                    PatronInformation.PatronType type,
                                                    List<BookOnHoldDatabaseEntity> holds = emptyList(),
                                                    List<OverdueCheckoutDatabaseEntity> overdueCheckouts = emptyList()) {

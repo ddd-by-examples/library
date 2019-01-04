@@ -1,5 +1,6 @@
 package io.pillopl.library.lending.domain.patron;
 
+import io.pillopl.library.lending.domain.book.AvailableBook;
 import io.pillopl.library.lending.domain.book.BookOnHold;
 import lombok.Value;
 
@@ -21,8 +22,7 @@ public class PatronHolds {
         return resourcesOnHold.size();
     }
 
-
-    boolean maximumNumberOfHoldsReached() {
+    boolean maximumHoldsAfterHolding(AvailableBook book) {
         return count() + 1 == MAX_NUMBER_OF_HOLDS;
     }
 }

@@ -16,6 +16,7 @@ import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.*
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold.now
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldEvents.events
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.anyPatronId
+import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.regularPatron
 import static io.pillopl.library.lending.domain.patron.PatronInformation.PatronType.Regular
 
 @ContextConfiguration(classes = PatronDatabaseConfiguration.class)
@@ -95,9 +96,8 @@ class PatronBooksDatabaseRepositoryIT extends Specification {
 
     }
 
-    private void assertPatronInformation(PatronBooks patronBooks, PatronId patronId) {
-        assert patronBooks.patron.patronId == patronId
-        assert patronBooks.patron.type == Regular
+    void assertPatronInformation(PatronBooks patronBooks, PatronId patronId) {
+        assert patronBooks.equals(regularPatron(patronId))
     }
 
     PatronBooks loadPersistedPatron(PatronId patronId) {

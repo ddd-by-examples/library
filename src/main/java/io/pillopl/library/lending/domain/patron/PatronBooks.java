@@ -37,7 +37,7 @@ public class PatronBooks {
         Option<Rejection> rejection = patronCanHold(aBook, forDuration);
         if (rejection.isEmpty()) {
             BookPlacedOnHold bookPlacedOnHold = BookPlacedOnHold.now(aBook.getBookInformation(), aBook.getLibraryBranch(), patron, forDuration);
-            if (patronHolds.maximumNumberOfHoldsReached()) {
+            if (patronHolds.maximumHoldsAfterHolding(aBook)) {
                 return right(events(patron, bookPlacedOnHold, MaximumNumberOhHoldsReached.now(patron, MAX_NUMBER_OF_HOLDS)));
             }
             return right(events(patron, bookPlacedOnHold));
@@ -75,7 +75,7 @@ public class PatronBooks {
         return overdueCheckouts.countAt(libraryBranch);
     }
 
-    int numberOfHolds() {
+    public int numberOfHolds() {
         return patronHolds.count();
     }
 

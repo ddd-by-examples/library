@@ -123,7 +123,8 @@ class BookDatabaseEntityTest extends Specification {
     }
 
     BookDatabaseEntity bookEntity(BookState state) {
-        new BookDatabaseEntity(id: 1L,
+        new BookDatabaseEntity(
+                id: 1L,
                 bookId: bookId.bookId,
                 bookType: Circulating,
                 bookState: state,
