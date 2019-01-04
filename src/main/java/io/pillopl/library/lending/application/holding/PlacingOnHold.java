@@ -12,6 +12,7 @@ import io.pillopl.library.lending.domain.patron.PatronId;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.Value;
 
 import java.time.Instant;
@@ -77,13 +78,13 @@ public class PlacingOnHold {
     }
 }
 
-//TODO not null and validation
+
 @Value
 class PlaceOnHoldCommand {
-    Instant timestamp;
-    PatronId patronId;
-    LibraryBranchId libraryId;
-    BookId bookId;
+    @NonNull Instant timestamp;
+    @NonNull PatronId patronId;
+    @NonNull LibraryBranchId libraryId;
+    @NonNull BookId bookId;
     Integer holdForDays;
 
     boolean isOpenEnded() {

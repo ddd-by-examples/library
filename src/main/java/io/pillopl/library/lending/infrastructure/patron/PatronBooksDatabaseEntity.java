@@ -1,14 +1,16 @@
 package io.pillopl.library.lending.infrastructure.patron;
 
 
-import io.pillopl.library.lending.domain.patron.PatronInformation;
-import io.pillopl.library.lending.domain.patron.PatronInformation.PatronType;
 import io.pillopl.library.lending.domain.patron.PatronBooksEvent;
 import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookCollected;
+import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldCanceled;
 import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold;
+import io.pillopl.library.lending.domain.patron.PatronInformation;
+import io.pillopl.library.lending.domain.patron.PatronInformation.PatronType;
 import io.vavr.API;
 import io.vavr.Predicates;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
@@ -27,17 +29,22 @@ class PatronBooksDatabaseEntity {
     UUID patronId;
     PatronType patronType;
     Set<BookOnHoldDatabaseEntity> booksOnHold;
+    Set<OverdueCheckoutDatabaseEntity> overdueCheckouts;
+
 
     PatronBooksDatabaseEntity(PatronInformation patronInformation) {
         this.patronId = patronInformation.getPatronId().getPatronId();
         this.patronType = patronInformation.getType();
         this.booksOnHold = new HashSet<>();
+        this.overdueCheckouts = new HashSet<>();
     }
 
     PatronBooksDatabaseEntity reactTo(PatronBooksEvent event) {
         return API.Match(event).of(
                 Case($(Predicates.instanceOf(BookPlacedOnHold.class)), this::handle),
-                Case($(Predicates.instanceOf(BookCollected.class)), this::handle)
+                Case($(Predicates.instanceOf(BookCollected.class)), this::handle),
+                Case($(Predicates.instanceOf(BookHoldCanceled.class)), this::handle)
+
 
         );
     }
@@ -47,10 +54,19 @@ class PatronBooksDatabaseEntity {
         return this;
     }
 
+    private PatronBooksDatabaseEntity handle(BookHoldCanceled event) {
+        return removeHoldIfPresent(event.getPatronId(), event.getBookId(), event.getLibraryBranchId());
+    }
+
+
     private PatronBooksDatabaseEntity handle(BookCollected event) {
+        return removeHoldIfPresent(event.getPatronId(), event.getBookId(), event.getLibraryBranchId());
+    }
+
+    private PatronBooksDatabaseEntity removeHoldIfPresent(UUID patronId, UUID bookId, UUID libraryBranchId) {
         booksOnHold
                 .stream()
-                .filter(entity -> entity.hasSamePropertiesAs(event))
+                .filter(entity -> entity.hasSamePropertiesAs(patronId, bookId, libraryBranchId))
                 .findAny()
                 .ifPresent(entity -> booksOnHold.remove(entity));
         return this;
@@ -62,6 +78,7 @@ class PatronBooksDatabaseEntity {
 @NoArgsConstructor
 @EqualsAndHashCode
 class BookOnHoldDatabaseEntity {
+
     @Id
     Long id;
     UUID patronId;
@@ -74,18 +91,35 @@ class BookOnHoldDatabaseEntity {
         this.libraryBranchId = libraryBranchId;
     }
 
-    boolean hasSamePropertiesAs(BookCollected event) {
-        return  this.patronId.equals(event.getPatronId()) &&
-                this.bookId.equals(event.getBookId()) &&
-                this.libraryBranchId.equals(event.getLibraryBranchId());
+    boolean hasSamePropertiesAs(UUID patronId, UUID bookId, UUID libraryBranchId) {
+        return  this.patronId.equals(patronId) &&
+                this.bookId.equals(bookId) &&
+                this.libraryBranchId.equals(libraryBranchId);
     }
 
 }
 
+@NoArgsConstructor
+@EqualsAndHashCode
+@Getter
 class OverdueCheckoutDatabaseEntity {
+
     @Id
     Long id;
-    UUID resourceId;
+    UUID patronId;
+    UUID bookId;
     UUID libraryBranchId;
+
+    OverdueCheckoutDatabaseEntity(UUID bookId, UUID patronId, UUID libraryBranchId) {
+        this.bookId = bookId;
+        this.patronId = patronId;
+        this.libraryBranchId = libraryBranchId;
+    }
+
+    boolean hasSamePropertiesAs(UUID patronId, UUID bookId, UUID libraryBranchId) {
+        return  this.patronId.equals(patronId) &&
+                this.bookId.equals(bookId) &&
+                this.libraryBranchId.equals(libraryBranchId);
+    }
 
 }

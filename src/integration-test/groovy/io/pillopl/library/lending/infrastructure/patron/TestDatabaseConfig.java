@@ -40,7 +40,7 @@ class TestDatabaseConfig extends JdbcConfiguration {
 
     @Bean
     PatronBooksRepository patronBooksRepository(PatronBooksEntityRepository patronBooksEntityRepository) {
-        return new PatronBooksDatabaseRepository(patronBooksEntityRepository, new PatronBooksFactory());
+        return new PatronBooksDatabaseRepository(patronBooksEntityRepository, new PatronBooksFactory(), new DomainModelMapper());
     }
 
 

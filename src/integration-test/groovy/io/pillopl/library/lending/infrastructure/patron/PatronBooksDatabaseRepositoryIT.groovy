@@ -14,6 +14,7 @@ import static io.pillopl.library.lending.domain.book.BookFixture.anyBookId
 import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookCollected
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldCanceled
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.anyPatronId
 import static io.pillopl.library.lending.domain.patron.PatronInformation.PatronType.Regular
 
@@ -29,7 +30,6 @@ class PatronBooksDatabaseRepositoryIT extends Specification {
     PatronBooksDatabaseRepository patronResourcesRepository
 
     def 'persistence in real database should work'() {
-
         when:
             patronResourcesRepository.reactTo(placedOnHold())
         then:
@@ -38,6 +38,13 @@ class PatronBooksDatabaseRepositoryIT extends Specification {
             patronResourcesRepository.reactTo(patronCollected())
         then:
             patronShouldBeFoundInDatabaseWithZeroBooksOnHold(patronId)
+        when:
+            patronResourcesRepository.reactTo(placedOnHold())
+        and:
+            patronResourcesRepository.reactTo(holdCanceled())
+        then:
+            patronShouldBeFoundInDatabaseWithZeroBooksOnHold(patronId)
+
 
     }
 
@@ -46,6 +53,14 @@ class PatronBooksDatabaseRepositoryIT extends Specification {
                 bookInformation,
                 libraryBranchId,
                 patronId)
+    }
+
+    BookHoldCanceled holdCanceled() {
+        return BookHoldCanceled.now(
+                bookInformation.bookId,
+                libraryBranchId,
+                new PatronInformation(patronId, Regular),
+        )
     }
 
     BookPlacedOnHold placedOnHold() {

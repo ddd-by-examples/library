@@ -4,13 +4,12 @@ import io.pillopl.library.lending.domain.book.BookId;
 import io.pillopl.library.lending.domain.book.BookInformation;
 import io.pillopl.library.lending.domain.book.BookType;
 import io.pillopl.library.lending.domain.library.LibraryBranchId;
+import lombok.NonNull;
 import lombok.Value;
 
 import java.time.Instant;
 import java.util.UUID;
 
-//TODO add notNull
-//TODO add id to events
 public interface PatronBooksEvent {
 
     default PatronId patronId() {
@@ -21,12 +20,13 @@ public interface PatronBooksEvent {
 
     @Value
     class BookPlacedOnHold implements PatronBooksEvent {
-        Instant when;
-        UUID patronId;
-        UUID bookId;
-        BookType bookType;
-        UUID libraryBranchId;
-        Instant holdFrom;
+        @NonNull UUID eventId = UUID.randomUUID();
+        @NonNull Instant when;
+        @NonNull UUID patronId;
+        @NonNull UUID bookId;
+        @NonNull BookType bookType;
+        @NonNull UUID libraryBranchId;
+        @NonNull Instant holdFrom;
         Instant holdTill;
 
         public static BookPlacedOnHold now(BookInformation book, LibraryBranchId libraryBranchId, PatronInformation patronInformation, HoldDuration holdDuration) {
@@ -43,11 +43,12 @@ public interface PatronBooksEvent {
 
     @Value
     class BookCollected implements PatronBooksEvent {
-        Instant when;
-        UUID patronId;
-        UUID bookId;
-        BookType bookType;
-        UUID libraryBranchId;
+        @NonNull UUID eventId = UUID.randomUUID();
+        @NonNull Instant when;
+        @NonNull UUID patronId;
+        @NonNull UUID bookId;
+        @NonNull BookType bookType;
+        @NonNull UUID libraryBranchId;
 
         public static BookCollected now(BookInformation book, LibraryBranchId libraryBranchId, PatronId patronId) {
             return new BookCollected(
@@ -61,20 +62,22 @@ public interface PatronBooksEvent {
 
     @Value
     class BookReturned implements PatronBooksEvent {
-        Instant when;
-        UUID patronId;
-        UUID bookId;
-        BookType bookType;
-        UUID libraryBranchId;
+        @NonNull UUID eventId = UUID.randomUUID();
+        @NonNull Instant when;
+        @NonNull UUID patronId;
+        @NonNull UUID bookId;
+        @NonNull BookType bookType;
+        @NonNull UUID libraryBranchId;
     }
 
     @Value
     class BookHoldFailed implements PatronBooksEvent {
-        String reason;
-        Instant when;
-        UUID patronId;
-        UUID bookId;
-        UUID libraryBranchId;
+        @NonNull UUID eventId = UUID.randomUUID();
+        @NonNull String reason;
+        @NonNull Instant when;
+        @NonNull UUID patronId;
+        @NonNull UUID bookId;
+        @NonNull UUID libraryBranchId;
 
         static BookHoldFailed now(Rejection rejection, BookId bookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
             return new BookHoldFailed(
@@ -88,15 +91,50 @@ public interface PatronBooksEvent {
 
     @Value
     class BookCollectingFailed implements PatronBooksEvent {
-        String reason;
-        Instant when;
-        UUID patronId;
-        UUID bookId;
-        UUID libraryBranchId;
+        @NonNull UUID eventId = UUID.randomUUID();
+        @NonNull String reason;
+        @NonNull Instant when;
+        @NonNull UUID patronId;
+        @NonNull UUID bookId;
+        @NonNull UUID libraryBranchId;
 
         static BookCollectingFailed now(Rejection rejection, BookId bookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
             return new BookCollectingFailed(
                     rejection.getReason().getReason(),
+                    Instant.now(),
+                    patronInformation.getPatronId().getPatronId(),
+                    bookId.getBookId(),
+                    libraryBranchId.getLibraryBranchId());
+        }
+    }
+
+    @Value
+    class BookHoldCanceled implements PatronBooksEvent {
+        @NonNull UUID eventId = UUID.randomUUID();
+        @NonNull Instant when;
+        @NonNull UUID patronId;
+        @NonNull UUID bookId;
+        @NonNull UUID libraryBranchId;
+
+        static BookHoldCanceled now(BookId bookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
+            return new BookHoldCanceled(
+                    Instant.now(),
+                    patronInformation.getPatronId().getPatronId(),
+                    bookId.getBookId(),
+                    libraryBranchId.getLibraryBranchId());
+        }
+    }
+
+    @Value
+    class BookHoldCancelingFailed implements PatronBooksEvent {
+        @NonNull UUID eventId = UUID.randomUUID();
+        @NonNull Instant when;
+        @NonNull UUID patronId;
+        @NonNull UUID bookId;
+        @NonNull UUID libraryBranchId;
+
+        static BookHoldCancelingFailed now(BookId bookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
+            return new BookHoldCancelingFailed(
                     Instant.now(),
                     patronInformation.getPatronId().getPatronId(),
                     bookId.getBookId(),
