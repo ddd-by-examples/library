@@ -17,7 +17,7 @@ import javax.sql.DataSource;
 
 @Configuration
 @EnableJdbcRepositories
-class TestDatabaseConfig extends JdbcConfiguration {
+class PatronDatabaseConfiguration extends JdbcConfiguration {
 
     @Bean
     NamedParameterJdbcOperations operations() {
@@ -34,7 +34,7 @@ class TestDatabaseConfig extends JdbcConfiguration {
         return new EmbeddedDatabaseBuilder()
                 .generateUniqueName(true)
                 .setType(EmbeddedDatabaseType.HSQL)
-                .addScript("createdb.sql")
+                .addScript("create_patron_db.sql")
                 .build();
     }
 

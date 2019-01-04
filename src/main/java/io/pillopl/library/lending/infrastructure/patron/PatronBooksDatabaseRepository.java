@@ -4,7 +4,6 @@ import io.pillopl.library.lending.domain.book.BookId;
 import io.pillopl.library.lending.domain.library.LibraryBranchId;
 import io.pillopl.library.lending.domain.patron.*;
 import io.pillopl.library.lending.domain.patron.PatronBooksEvent.PatronCreated;
-import io.vavr.Predicates;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 import org.springframework.data.jdbc.repository.query.Query;
@@ -16,6 +15,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static io.vavr.API.*;
+import static io.vavr.Predicates.instanceOf;
 import static java.util.stream.Collectors.*;
 
 class PatronBooksDatabaseRepository implements PatronBooksRepository {
@@ -46,24 +46,23 @@ class PatronBooksDatabaseRepository implements PatronBooksRepository {
     }
 
     @Override
-    public Try<Void> reactTo(PatronBooksEvent domainEvent) {
+    public Try<Void> handle(PatronBooksEvent domainEvent) {
         return Try.run(() -> {
             Match(domainEvent).of(
-                    Case($(Predicates.instanceOf(PatronCreated.class)), this::createNewPatron),
+                    Case($(instanceOf(PatronCreated.class)), this::createNewPatron),
                     Case($(), this::handleNextEvent)
             );
         });
     }
 
-    private Option<PatronBooksDatabaseEntity> createNewPatron(PatronCreated domainEvent) {
-        return Option.of(
-                patronBooksEntityRepository
-                .save(new PatronBooksDatabaseEntity(new PatronInformation(domainEvent.patronId(), domainEvent.getPatronType()))));
+    private PatronBooksDatabaseEntity createNewPatron(PatronCreated domainEvent) {
+        return patronBooksEntityRepository
+                .save(new PatronBooksDatabaseEntity(new PatronInformation(domainEvent.patronId(), domainEvent.getPatronType())));
     }
 
     private Option<PatronBooksDatabaseEntity> handleNextEvent(PatronBooksEvent domainEvent) {
         return findDataModelFor(domainEvent.patronId())
-                .map(entity -> entity.reactTo(domainEvent))
+                .map(entity -> entity.handle(domainEvent))
                 .map(patronBooksEntityRepository::save);
     }
 

@@ -22,7 +22,7 @@ public class PatronBooksFakeDatabase implements PatronBooksRepository {
     }
 
     @Override
-    public Try<Void> reactTo(PatronBooksEvent event) {
+    public Try<Void> handle(PatronBooksEvent event) {
         return Try.run(() -> {
             Match(event).of(
                     Case($(Predicates.instanceOf(PatronCreated.class)), this::createRegular),

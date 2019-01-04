@@ -3,6 +3,3 @@ CREATE TABLE IF NOT EXISTS patron_books_database_entity (id INTEGER IDENTITY PRI
 CREATE TABLE IF NOT EXISTS book_on_hold_database_entity (id INTEGER IDENTITY PRIMARY KEY, book_id UUID, patron_id UUID, library_branch_id UUID, patron_books_database_entity INTEGER);
 
 CREATE TABLE IF NOT EXISTS overdue_checkout_database_entity (id INTEGER IDENTITY PRIMARY KEY, book_id UUID, patron_id UUID, library_branch_id UUID, patron_books_database_entity INTEGER);
-
-
-

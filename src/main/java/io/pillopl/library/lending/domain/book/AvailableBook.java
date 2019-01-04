@@ -3,18 +3,17 @@ package io.pillopl.library.lending.domain.book;
 import io.pillopl.library.lending.domain.library.LibraryBranchId;
 import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold;
 import io.pillopl.library.lending.domain.patron.PatronId;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.NonNull;
+import lombok.Value;
 
-@AllArgsConstructor
-public class AvailableBook {
+@Value
+public class AvailableBook implements Book {
 
-    @Getter
+    @NonNull
     private final BookInformation bookInformation;
 
-    @Getter
+    @NonNull
     private final LibraryBranchId libraryBranch;
-
 
     public boolean isRestricted() {
         return bookInformation.getBookType().equals(BookType.Restricted);

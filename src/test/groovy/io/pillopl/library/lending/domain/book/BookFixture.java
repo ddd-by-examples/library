@@ -28,6 +28,10 @@ public class BookFixture {
         return new AvailableBook(new BookInformation(anyBookId(), Circulating), libraryBranchId);
     }
 
+    public static AvailableBook circulatingAvailableBookAt(BookId bookId, LibraryBranchId libraryBranchId) {
+        return new AvailableBook(new BookInformation(bookId, Circulating), libraryBranchId);
+    }
+
     public static AvailableBook aBookAt(LibraryBranchId libraryBranchId) {
         return new AvailableBook(new BookInformation(anyBookId(), Circulating), libraryBranchId);
     }

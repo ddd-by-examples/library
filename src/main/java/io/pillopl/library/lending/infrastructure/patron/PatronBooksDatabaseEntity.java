@@ -39,13 +39,11 @@ class PatronBooksDatabaseEntity {
         this.overdueCheckouts = new HashSet<>();
     }
 
-    PatronBooksDatabaseEntity reactTo(PatronBooksEvent event) {
+    PatronBooksDatabaseEntity handle(PatronBooksEvent event) {
         return API.Match(event).of(
                 Case($(Predicates.instanceOf(BookPlacedOnHold.class)), this::handle),
                 Case($(Predicates.instanceOf(BookCollected.class)), this::handle),
                 Case($(Predicates.instanceOf(BookHoldCanceled.class)), this::handle)
-
-
         );
     }
 

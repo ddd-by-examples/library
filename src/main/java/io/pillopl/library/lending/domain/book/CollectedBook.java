@@ -3,19 +3,19 @@ package io.pillopl.library.lending.domain.book;
 import io.pillopl.library.lending.domain.library.LibraryBranchId;
 import io.pillopl.library.lending.domain.patron.PatronBooksEvent;
 import io.pillopl.library.lending.domain.patron.PatronId;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.NonNull;
+import lombok.Value;
 
-@AllArgsConstructor
-public class CollectedBook {
+@Value
+public class CollectedBook implements Book {
 
-    @Getter
+    @NonNull
     private final BookInformation bookInformation;
 
-    @Getter
+    @NonNull
     private final LibraryBranchId collectedAt;
 
-    @Getter
+    @NonNull
     private final PatronId byPatron;
 
     public BookId getBookId() {

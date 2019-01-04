@@ -79,13 +79,13 @@ class PlacingBookOnHoldTest extends Specification {
 
     PatronId persistedRegularPatron() {
         PatronId patronId = anyPatronId();
-        repository.reactTo(now(new PatronInformation(patronId, Regular)))
+        repository.handle(now(new PatronInformation(patronId, Regular)))
         return patronId
     }
 
     PatronId persistedRegularPatronWithManyHolds() {
         PatronId patronId = anyPatronId()
-        repository.reactTo(new FakeTooManyHoldsEvent(patronId))
+        repository.handle(new FakeTooManyHoldsEvent(patronId))
         return patronId
     }
 

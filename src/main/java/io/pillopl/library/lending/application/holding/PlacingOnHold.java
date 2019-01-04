@@ -61,7 +61,7 @@ public class PlacingOnHold {
 
     private Result saveAndPublishEvents(BookPlacedOnHold placedOnHold) {
         //TODO publish events
-        patronBooksRepository.reactTo(placedOnHold);
+        patronBooksRepository.handle(placedOnHold);
         return Success;
     }
 
