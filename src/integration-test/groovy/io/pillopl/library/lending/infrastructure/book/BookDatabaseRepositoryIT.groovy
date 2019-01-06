@@ -33,7 +33,7 @@ class BookDatabaseRepositoryIT extends Specification {
     PatronId patronId = anyPatronId()
 
     @Autowired
-    BookRepository bookEntityRepository
+    BookDatabaseRepository bookEntityRepository
 
     def 'persistence in real database should work'() {
         given:
@@ -56,6 +56,22 @@ class BookDatabaseRepositoryIT extends Specification {
             bookIsPersistedAs(CollectedBook.class)
 
     }
+
+    def 'should find available book'() {
+        given:
+            AvailableBook availableBook = circulatingAvailableBookAt(bookId, libraryBranchId)
+        when:
+            bookEntityRepository.save(availableBook)
+        then:
+            bookEntityRepository.findAvailableBookBy(bookId).isDefined()
+        when:
+            BookOnHold bookOnHold = availableBook.handle(placedOnHold())
+        and:
+            bookEntityRepository.save(bookOnHold)
+        then:
+            bookEntityRepository.findAvailableBookBy(bookId).isEmpty()
+    }
+
 
     void bookIsPersistedAs(Class<?> clz) {
         Book book = loadPersistedBook(bookId)

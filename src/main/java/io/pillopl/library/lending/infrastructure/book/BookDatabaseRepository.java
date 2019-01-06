@@ -1,8 +1,11 @@
 package io.pillopl.library.lending.infrastructure.book;
 
+import io.pillopl.library.lending.application.holding.FindAvailableBook;
+import io.pillopl.library.lending.domain.book.AvailableBook;
 import io.pillopl.library.lending.domain.book.Book;
 import io.pillopl.library.lending.domain.book.BookId;
 import io.pillopl.library.lending.domain.book.BookRepository;
+import io.vavr.Predicates;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 import org.springframework.data.jdbc.repository.query.Query;
@@ -11,7 +14,10 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.UUID;
 
-class BookDatabaseRepository implements BookRepository {
+import static io.vavr.API.*;
+import static io.vavr.Patterns.$Some;
+
+class BookDatabaseRepository implements BookRepository, FindAvailableBook {
 
     private final BookEntityRepository bookEntityRepository;
 
@@ -40,6 +46,14 @@ class BookDatabaseRepository implements BookRepository {
         return BookDatabaseEntity.from(book);
     }
 
+    @Override
+    public Option<AvailableBook> findAvailableBookBy(BookId bookId) {
+        return Match(findBy(bookId)).of(
+                Case($Some($(Predicates.instanceOf(AvailableBook.class))), Option::of),
+                Case($(), Option::none)
+
+        );
+    }
 }
 
 interface BookEntityRepository extends CrudRepository<BookDatabaseEntity, Long> {

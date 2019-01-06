@@ -63,7 +63,7 @@ public class PlacingOnHold {
 
     private AvailableBook find(BookId id) {
         return findAvailableBook
-                .with(id)
+                .findAvailableBookBy(id)
                 .getOrElseThrow(() -> new IllegalArgumentException("Cannot find available book with Id: " + id.getBookId()));
     }
 

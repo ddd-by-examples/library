@@ -6,7 +6,7 @@ import io.pillopl.library.lending.domain.book.BookId;
 import io.vavr.control.Option;
 
 @FunctionalInterface
-interface FindAvailableBook {
+public interface FindAvailableBook {
 
-    Option<AvailableBook> with(BookId bookId);
+    Option<AvailableBook> findAvailableBookBy(BookId bookId);
 }
