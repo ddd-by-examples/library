@@ -42,18 +42,6 @@ class BookDatabaseRepositoryIT extends Specification {
             bookEntityRepository.save(availableBook)
         then:
             bookIsPersistedAs(AvailableBook.class)
-        when:
-            BookOnHold bookOnHold = availableBook.handle(placedOnHold())
-        and:
-            bookEntityRepository.save(bookOnHold)
-        then:
-            bookIsPersistedAs(BookOnHold.class)
-        when:
-            CollectedBook collectedBook = bookOnHold.handle(bookCollected())
-        and:
-            bookEntityRepository.save(collectedBook)
-        then:
-            bookIsPersistedAs(CollectedBook.class)
 
     }
 
