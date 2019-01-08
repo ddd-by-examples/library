@@ -2,10 +2,7 @@ package io.pillopl.library.lending.infrastructure.patron;
 
 
 import io.pillopl.library.lending.domain.patron.PatronBooksEvent;
-import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookCollected;
-import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldCanceled;
-import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold;
-import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldEvents;
+import io.pillopl.library.lending.domain.patron.PatronBooksEvent.*;
 import io.pillopl.library.lending.domain.patron.PatronInformation;
 import io.pillopl.library.lending.domain.patron.PatronInformation.PatronType;
 import io.vavr.API;
@@ -15,6 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -43,14 +41,21 @@ class PatronBooksDatabaseEntity {
     PatronBooksDatabaseEntity handle(PatronBooksEvent event) {
         return API.Match(event).of(
                 Case($(Predicates.instanceOf(BookPlacedOnHoldEvents.class)), this::handle),
+                Case($(Predicates.instanceOf(BookPlacedOnHold.class)), this::handle),
                 Case($(Predicates.instanceOf(BookCollected.class)), this::handle),
-                Case($(Predicates.instanceOf(BookHoldCanceled.class)), this::handle)
+                Case($(Predicates.instanceOf(BookHoldCanceled.class)), this::handle),
+                Case($(Predicates.instanceOf(BookHoldExpired.class)), this::handle)
+
         );
     }
 
     private PatronBooksDatabaseEntity handle(BookPlacedOnHoldEvents placedOnHoldEvents) {
         BookPlacedOnHold event = placedOnHoldEvents.getBookPlacedOnHold();
-        booksOnHold.add(new BookOnHoldDatabaseEntity(event.getBookId(), event.getPatronId(), event.getLibraryBranchId()));
+        return handle(event);
+    }
+
+    private PatronBooksDatabaseEntity handle(BookPlacedOnHold event) {
+        booksOnHold.add(new BookOnHoldDatabaseEntity(event.getBookId(), event.getPatronId(), event.getLibraryBranchId(), event.getHoldTill()));
         return this;
     }
 
@@ -60,6 +65,10 @@ class PatronBooksDatabaseEntity {
 
 
     private PatronBooksDatabaseEntity handle(BookCollected event) {
+        return removeHoldIfPresent(event.getPatronId(), event.getBookId(), event.getLibraryBranchId());
+    }
+
+    private PatronBooksDatabaseEntity handle(BookHoldExpired event) {
         return removeHoldIfPresent(event.getPatronId(), event.getBookId(), event.getLibraryBranchId());
     }
 
@@ -84,11 +93,13 @@ class BookOnHoldDatabaseEntity {
     UUID patronId;
     UUID bookId;
     UUID libraryBranchId;
+    Instant till;
 
-    BookOnHoldDatabaseEntity(UUID bookId, UUID patronId, UUID libraryBranchId) {
+    BookOnHoldDatabaseEntity(UUID bookId, UUID patronId, UUID libraryBranchId, Instant till) {
         this.bookId = bookId;
         this.patronId = patronId;
         this.libraryBranchId = libraryBranchId;
+        this.till = till;
     }
 
     boolean hasSamePropertiesAs(UUID patronId, UUID bookId, UUID libraryBranchId) {

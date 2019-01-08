@@ -33,7 +33,7 @@ class BookDatabaseConfiguration extends JdbcConfiguration {
     DataSource dataSource() {
         return new EmbeddedDatabaseBuilder()
                 .generateUniqueName(true)
-                .setType(EmbeddedDatabaseType.HSQL)
+                .setType(EmbeddedDatabaseType.H2)
                 .addScript("create_book_db.sql")
                 .build();
     }

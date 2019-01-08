@@ -166,11 +166,11 @@ public interface PatronBooksEvent {
         @NonNull UUID bookId;
         @NonNull UUID libraryBranchId;
 
-        public static BookHoldCanceled now(BookId bookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
+        public static BookHoldCanceled now(BookInformation bookInformation, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
             return new BookHoldCanceled(
                     Instant.now(),
                     patronInformation.getPatronId().getPatronId(),
-                    bookId.getBookId(),
+                    bookInformation.getBookId().getBookId(),
                     libraryBranchId.getLibraryBranchId());
         }
     }
@@ -187,6 +187,23 @@ public interface PatronBooksEvent {
             return new BookHoldCancelingFailed(
                     Instant.now(),
                     patronInformation.getPatronId().getPatronId(),
+                    bookId.getBookId(),
+                    libraryBranchId.getLibraryBranchId());
+        }
+    }
+
+    @Value
+    class BookHoldExpired implements PatronBooksEvent {
+        @NonNull UUID eventId = UUID.randomUUID();
+        @NonNull Instant when;
+        @NonNull UUID patronId;
+        @NonNull UUID bookId;
+        @NonNull UUID libraryBranchId;
+
+        public static BookHoldExpired now(BookId bookId, PatronId patronId, LibraryBranchId libraryBranchId) {
+            return new BookHoldExpired(
+                    Instant.now(),
+                    patronId.getPatronId(),
                     bookId.getBookId(),
                     libraryBranchId.getLibraryBranchId());
         }

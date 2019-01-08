@@ -24,9 +24,7 @@ public class CollectedBook implements Book {
 
     AvailableBook handle(PatronBooksEvent.BookReturned bookReturnedByPatron) {
         return new AvailableBook(
-                new BookInformation(
-                        new BookId(bookReturnedByPatron.getBookId()),
-                        bookReturnedByPatron.getBookType()),
+                bookInformation,
                 new LibraryBranchId(bookReturnedByPatron.getLibraryBranchId()));
     }
 

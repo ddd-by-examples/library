@@ -49,20 +49,18 @@ class FindExpiredHoldsDatabaseIT extends Specification {
         given:
             patronBooksRepo.handle(patronCreated())
         when:
-            patronBooksRepo.handle(placedOnHold(andHoldExpired()))
+            patronBooksRepo.handle(placedOnHold(anExpiredHold()))
         and:
-            patronBooksRepo.handle(placedOnHold(andHoldWillExpireInFuture()))
+            patronBooksRepo.handle(placedOnHold(nonExpiredHold()))
         then:
             patronBooksRepo.allExpiredHolds().expiredHolds.size() == 1
-
-
     }
 
-    Instant andHoldWillExpireInFuture() {
+    Instant nonExpiredHold() {
         TIME_OF_EXPIRE_CHECK.plusSeconds(60)
     }
 
-    Instant andHoldExpired() {
+    Instant anExpiredHold() {
         TIME_OF_EXPIRE_CHECK.minusSeconds(60)
     }
 

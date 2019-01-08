@@ -15,7 +15,7 @@ import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.any
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.anyPatronId
 import static io.pillopl.library.lending.infrastructure.book.BookDatabaseEntity.BookState.*
 
-class BookDatabaseEntityTest extends Specification {
+class BookEntityToDomainModelMappingTest extends Specification {
 
     LibraryBranchId libraryBranchId = anyBranch()
     LibraryBranchId anotherBranchId = anyBranch()
@@ -25,7 +25,7 @@ class BookDatabaseEntityTest extends Specification {
     BookId bookId = anyBookId()
     Instant holdTill = Instant.now()
 
-    def 'should create a new instance with id and book type from domain model'() {
+    def 'should create a new instance with id, isbn and book type from domain model'() {
         given:
             AvailableBook availableBook = circulatingAvailableBookAt(bookId, libraryBranchId)
         when:
@@ -34,6 +34,8 @@ class BookDatabaseEntityTest extends Specification {
             entity.bookId == bookId.bookId
             entity.bookType == Circulating
             entity.bookState == Available
+
+
     }
 
     def 'should update data model to on hold book'() {

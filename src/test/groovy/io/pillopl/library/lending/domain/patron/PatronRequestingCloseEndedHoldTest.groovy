@@ -24,7 +24,7 @@ class PatronRequestingCloseEndedHoldTest extends Specification {
         given:
             AvailableBook aBook = circulatingAvailableBook()
         when:
-            Either<BookHoldFailed, BookPlacedOnHoldEvents> hold = patron.placeOnHold(aBook, HoldDuration.forCloseEnded(from, 3))
+            Either<BookHoldFailed, BookPlacedOnHoldEvents> hold = patron.placeOnHold(aBook, HoldDuration.forCloseEnded(from, NumberOfDays.of(3)))
         then:
             hold.isRight()
             hold.get().with {

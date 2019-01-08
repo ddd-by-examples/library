@@ -1,32 +1,28 @@
 package io.pillopl.library.lending.application.holding
 
-import io.pillopl.library.lending.application.PatronBooksFakeDatabase
-import io.pillopl.library.lending.domain.patron.PatronId
-import io.pillopl.library.lending.domain.patron.PatronInformation
+import io.pillopl.library.lending.domain.patron.*
 import io.vavr.control.Option
 import io.vavr.control.Try
 import spock.lang.Specification
 
-import static io.pillopl.library.lending.application.holding.PlacingOnHold.Result.Rejection
+
 import static io.pillopl.library.lending.application.holding.PlacingOnHold.Result.Success
 import static io.pillopl.library.lending.domain.book.BookFixture.anyBookId
 import static io.pillopl.library.lending.domain.book.BookFixture.circulatingBook
 import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.PatronCreated.now
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.anyPatronId
-import static io.pillopl.library.lending.domain.patron.PatronInformation.PatronType.Regular
 
 class PlacingBookOnHoldTest extends Specification {
 
-    PatronBooksFakeDatabase repository = new PatronBooksFakeDatabase()
     FindAvailableBook willFindBook = { id -> Option.of(circulatingBook()) }
     FindAvailableBook willNotFindBook = { id -> Option.none() }
+    PatronBooksRepository repository = Stub()
 
     def 'should successfully place on hold book if patron and book exist'() {
         given:
-            PatronId patron = persistedRegularPatron()
-        and:
             PlacingOnHold holding = new PlacingOnHold(willFindBook, repository)
+        and:
+            PatronId patron = persistedRegularPatron()
         when:
             Try<PlacingOnHold.Result> result = holding.placeOnHold(for3days(patron))
         then:
@@ -45,7 +41,7 @@ class PlacingBookOnHoldTest extends Specification {
             Try<PlacingOnHold.Result> result = holding.placeOnHold(for3days(patron))
         then:
             result.isSuccess()
-            result.get() == Rejection
+            result.get() == PlacingOnHold.Result.Rejection
 
     }
 
@@ -73,19 +69,43 @@ class PlacingBookOnHoldTest extends Specification {
             result.isFailure()
     }
 
+    def 'should reject (but not fail) if saving patron fails'() {
+        given:
+            PlacingOnHold holding = new PlacingOnHold(willFindBook, repository)
+        and:
+            PatronId patron = persistedRegularPatronThatFailsOnSaving()
+        when:
+            Try<PlacingOnHold.Result> result = holding.placeOnHold(for3days(patron))
+        then:
+            result.isSuccess()
+            result.get() == PlacingOnHold.Result.Rejection
+
+    }
+
     PlaceOnHoldCommand for3days(PatronId patron) {
         return PlaceOnHoldCommand.closeEnded(patron, anyBranch(), anyBookId(), 4)
     }
 
     PatronId persistedRegularPatron() {
-        PatronId patronId = anyPatronId();
-        repository.handle(now(new PatronInformation(patronId, Regular)))
+        PatronId patronId = anyPatronId()
+        PatronBooks patron = PatronBooksFixture.regularPatron(patronId)
+        repository.findBy(patronId) >> Option.of(patron)
+        repository.handle(_) >> Try.success(patron)
         return patronId
     }
 
     PatronId persistedRegularPatronWithManyHolds() {
         PatronId patronId = anyPatronId()
-        repository.handle(new FakeTooManyHoldsEvent(patronId))
+        PatronBooks patron = PatronBooksFixture.regularPatronWithHolds(10)
+        repository.findBy(patronId) >> Option.of(patron)
+        return patronId
+    }
+
+    PatronId persistedRegularPatronThatFailsOnSaving() {
+        PatronId patronId = anyPatronId()
+        PatronBooks patron = PatronBooksFixture.regularPatron(patronId)
+        repository.findBy(patronId) >> Option.of(patron)
+        repository.handle(_) >> Try.failure(new IllegalStateException())
         return patronId
     }
 

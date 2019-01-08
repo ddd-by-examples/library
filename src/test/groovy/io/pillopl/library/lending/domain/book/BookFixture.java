@@ -52,6 +52,7 @@ public class BookFixture {
         return new BookId(UUID.randomUUID());
     }
 
+
     private static PatronId anyPatronId() {
         return new PatronId(UUID.randomUUID());
     }

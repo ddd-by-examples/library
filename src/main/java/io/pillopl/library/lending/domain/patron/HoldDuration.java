@@ -13,6 +13,9 @@ public class HoldDuration {
     Instant to;
 
     private HoldDuration(Instant from, Instant to) {
+        if (to != null && to.isBefore(from)) {
+            throw new IllegalStateException("Close-ended duration must be valid");
+        }
         this.from = from;
         this.to = to;
     }
@@ -33,12 +36,19 @@ public class HoldDuration {
         return new HoldDuration(from, null);
     }
 
-    public static HoldDuration forCloseEnded(int days) {
+    public static HoldDuration forCloseEnded(NumberOfDays days) {
         return forCloseEnded(Instant.now(), days);
     }
 
-    static HoldDuration forCloseEnded(Instant from, int days) {
-        Instant till = from.plus(Duration.ofDays(days));
+    public static HoldDuration forCloseEnded(int days) {
+        return forCloseEnded(Instant.now(), NumberOfDays.of(days));
+    }
+
+    static HoldDuration forCloseEnded(Instant from, NumberOfDays days) {
+        Instant till = from.plus(Duration.ofDays(days.getDays()));
         return new HoldDuration(from, till);
     }
+
 }
+
+

@@ -7,6 +7,7 @@ import io.pillopl.library.lending.domain.patron.*;
 import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldFailed;
 import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldEvents;
 import io.vavr.control.Either;
+import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -16,6 +17,7 @@ import java.time.Instant;
 
 import static io.pillopl.library.lending.application.holding.PlacingOnHold.Result.Rejection;
 import static io.pillopl.library.lending.application.holding.PlacingOnHold.Result.Success;
+import static io.pillopl.library.lending.domain.patron.HoldDuration.forOpenEnded;
 import static io.vavr.API.*;
 import static io.vavr.Patterns.$Left;
 import static io.vavr.Patterns.$Right;
@@ -31,23 +33,15 @@ public class PlacingOnHold {
     private final PatronBooksRepository patronBooksRepository;
 
     Try<Result> placeOnHold(PlaceOnHoldCommand command) {
-        return Try.ofSupplier(() -> {
+        return Try.of(() -> {
             AvailableBook availableBook = find(command.getBookId());
             PatronBooks patronBooks = find(command.getPatronId());
-            Either<BookHoldFailed, BookPlacedOnHoldEvents> result = placeOnHold(availableBook, patronBooks, command);
+            Either<BookHoldFailed, BookPlacedOnHoldEvents> result = patronBooks.placeOnHold(availableBook, command.getHoldDuration());
             return Match(result).of(
                     Case($Left($()), this::publishEvents),
                     Case($Right($()), this::saveAndPublishEvents)
             );
         });
-    }
-
-    private Either<BookHoldFailed, BookPlacedOnHoldEvents> placeOnHold(AvailableBook availableBook, PatronBooks patronBooks, PlaceOnHoldCommand hold) {
-        if (hold.isOpenEnded()) {
-            return patronBooks.placeOnHold(availableBook, HoldDuration.forOpenEnded());
-        } else {
-            return patronBooks.placeOnHold(availableBook, HoldDuration.forCloseEnded(hold.getHoldForDays()));
-        }
     }
 
     private Result publishEvents(BookHoldFailed bookHoldFailed) {
@@ -57,8 +51,10 @@ public class PlacingOnHold {
 
     private Result saveAndPublishEvents(BookPlacedOnHoldEvents placedOnHold) {
         //TODO publish events
-        patronBooksRepository.handle(placedOnHold);
-        return Success;
+        return patronBooksRepository
+                .handle(placedOnHold)
+                .map((PatronBooks success) -> Success)
+                .getOrElse(Rejection);
     }
 
     private AvailableBook find(BookId id) {
@@ -81,17 +77,21 @@ class PlaceOnHoldCommand {
     @NonNull PatronId patronId;
     @NonNull LibraryBranchId libraryId;
     @NonNull BookId bookId;
-    Integer holdForDays;
-
-    boolean isOpenEnded() {
-        return holdForDays == null;
-    }
+    //TODO positiveInteger
+    Option<Integer> holdForDays;
 
     static PlaceOnHoldCommand closeEnded(PatronId patronId, LibraryBranchId libraryBranchId, BookId bookId, int forDays) {
-        return new PlaceOnHoldCommand(Instant.now(), patronId, libraryBranchId, bookId, forDays);
+        return new PlaceOnHoldCommand(Instant.now(), patronId, libraryBranchId, bookId, Option.of(forDays));
     }
 
     static PlaceOnHoldCommand openEnded(PatronId patronId, LibraryBranchId libraryBranchId, BookId bookId) {
-        return new PlaceOnHoldCommand(Instant.now(), patronId, libraryBranchId, bookId, null);
+        return new PlaceOnHoldCommand(Instant.now(), patronId, libraryBranchId, bookId, Option.none());
+    }
+
+    HoldDuration getHoldDuration() {
+        return holdForDays
+                .map(NumberOfDays::of)
+                .map(HoldDuration::forCloseEnded)
+                .getOrElse(forOpenEnded());
     }
 }

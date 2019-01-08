@@ -47,7 +47,7 @@ public class PatronBooks {
 
     public Either<BookHoldCancelingFailed, BookHoldCanceled> cancelHold(BookOnHold book) {
         if (patronHolds.a(book)) {
-            return right(BookHoldCanceled.now(book.getBookId(), book.getHoldPlacedAt(), patron));
+            return right(BookHoldCanceled.now(book.getBookInformation(), book.getHoldPlacedAt(), patron));
         }
         return left(BookHoldCancelingFailed.now(book.getBookId(), book.getHoldPlacedAt(), patron));
     }
@@ -57,6 +57,10 @@ public class PatronBooks {
             return right(BookCollected.now(book.getBookInformation(), book.getHoldPlacedAt(), patron.getPatronId()));
         }
         return left(BookCollectingFailed.now(Rejection.withReason("book is not on hold by patron"), book.getBookId(), book.getHoldPlacedAt(), patron));
+    }
+
+    public List<BookHoldExpired> expireHold() {
+        return List.of();
     }
 
     private Option<Rejection> patronCanHold(AvailableBook aBook, HoldDuration forDuration) {

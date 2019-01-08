@@ -12,6 +12,8 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 @AnalyzeClasses(packages = "io.pillopl.library.lending")
 public class HexagonalArchitectureTest {
 
+    //TODO no spring nor stubs, mockito in domain
+
     @ArchTest
     public static final ArchRule domain_should_not_depend_on_application =
                     noClasses()

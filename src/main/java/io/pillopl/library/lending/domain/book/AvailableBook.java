@@ -25,7 +25,7 @@ public class AvailableBook implements Book {
 
     public BookOnHold handle(BookPlacedOnHoldEvents bookPlacedOnHold) {
         return new BookOnHold(
-                new BookInformation(new BookId(bookPlacedOnHold.getBookPlacedOnHold().getBookId()), bookPlacedOnHold.getBookPlacedOnHold().getBookType()),
+                bookInformation,
                 new LibraryBranchId(bookPlacedOnHold.getBookPlacedOnHold().getLibraryBranchId()),
                 new PatronId(bookPlacedOnHold.getBookPlacedOnHold().getPatronId()),
                 bookPlacedOnHold.getBookPlacedOnHold().getHoldTill());

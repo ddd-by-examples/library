@@ -14,6 +14,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
+import java.time.Clock;
 
 @Configuration
 @EnableJdbcRepositories
@@ -33,14 +34,14 @@ class PatronDatabaseConfiguration extends JdbcConfiguration {
     DataSource dataSource() {
         return new EmbeddedDatabaseBuilder()
                 .generateUniqueName(true)
-                .setType(EmbeddedDatabaseType.HSQL)
+                .setType(EmbeddedDatabaseType.H2)
                 .addScript("create_patron_db.sql")
                 .build();
     }
 
     @Bean
     PatronBooksRepository patronBooksRepository(PatronBooksEntityRepository patronBooksEntityRepository) {
-        return new PatronBooksDatabaseRepository(patronBooksEntityRepository, new PatronBooksFactory(), new DomainModelMapper());
+        return new PatronBooksDatabaseRepository(patronBooksEntityRepository, new PatronBooksFactory(), new DomainModelMapper(), Clock.systemDefaultZone());
     }
 
 

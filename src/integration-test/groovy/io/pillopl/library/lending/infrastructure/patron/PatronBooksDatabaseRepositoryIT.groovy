@@ -26,48 +26,20 @@ class PatronBooksDatabaseRepositoryIT extends Specification {
     PatronId patronId = anyPatronId()
     PatronInformation.PatronType regular = Regular
     LibraryBranchId libraryBranchId = anyBranch()
-    BookInformation bookInformation = new BookInformation(anyBookId(), BookType.Restricted);
+    BookInformation bookInformation = new BookInformation(anyBookId(), BookType.Restricted)
 
     @Autowired
-    PatronBooksRepository patronResourcesRepository
+    PatronBooksRepository patronBooksRepo
 
     def 'persistence in real database should work'() {
         when:
-            patronResourcesRepository.handle(patronCreated())
+            patronBooksRepo.handle(patronCreated())
         then:
             patronShouldBeFoundInDatabaseWithZeroBooksOnHold(patronId)
         when:
-            patronResourcesRepository.handle(placedOnHold())
+            patronBooksRepo.handle(placedOnHold())
         then:
             patronShouldBeFoundInDatabaseWithOneBookOnHold(patronId)
-        when:
-            patronResourcesRepository.handle(patronCollected())
-        then:
-            patronShouldBeFoundInDatabaseWithZeroBooksOnHold(patronId)
-        when:
-            patronResourcesRepository.handle(placedOnHold())
-        then:
-            patronShouldBeFoundInDatabaseWithOneBookOnHold(patronId)
-        and:
-            patronResourcesRepository.handle(holdCanceled())
-        then:
-            patronShouldBeFoundInDatabaseWithZeroBooksOnHold(patronId)
-
-    }
-
-    BookCollected patronCollected() {
-        return BookCollected.now(
-                bookInformation,
-                libraryBranchId,
-                patronId)
-    }
-
-    BookHoldCanceled holdCanceled() {
-        return BookHoldCanceled.now(
-                bookInformation.bookId,
-                libraryBranchId,
-                new PatronInformation(patronId, Regular),
-        )
     }
 
     BookPlacedOnHoldEvents placedOnHold() {
@@ -78,6 +50,7 @@ class PatronBooksDatabaseRepositoryIT extends Specification {
                 new PatronInformation(patronId, Regular),
                 HoldDuration.forCloseEnded(5)))
     }
+
 
     PatronCreated patronCreated() {
         return PatronCreated.now(new PatronInformation(patronId, Regular))
@@ -101,7 +74,7 @@ class PatronBooksDatabaseRepositoryIT extends Specification {
     }
 
     PatronBooks loadPersistedPatron(PatronId patronId) {
-        Option<PatronBooks> loaded = patronResourcesRepository.findBy(patronId)
+        Option<PatronBooks> loaded = patronBooksRepo.findBy(patronId)
         PatronBooks patronBooks = loaded.getOrElseThrow({
             new IllegalStateException("should have been persisted")
         })

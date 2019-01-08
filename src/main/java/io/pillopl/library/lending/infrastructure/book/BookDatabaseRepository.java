@@ -5,7 +5,6 @@ import io.pillopl.library.lending.domain.book.AvailableBook;
 import io.pillopl.library.lending.domain.book.Book;
 import io.pillopl.library.lending.domain.book.BookId;
 import io.pillopl.library.lending.domain.book.BookRepository;
-import io.vavr.Predicates;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 import org.springframework.data.jdbc.repository.query.Query;
@@ -16,6 +15,7 @@ import java.util.UUID;
 
 import static io.vavr.API.*;
 import static io.vavr.Patterns.$Some;
+import static io.vavr.Predicates.instanceOf;
 
 class BookDatabaseRepository implements BookRepository, FindAvailableBook {
 
@@ -49,7 +49,7 @@ class BookDatabaseRepository implements BookRepository, FindAvailableBook {
     @Override
     public Option<AvailableBook> findAvailableBookBy(BookId bookId) {
         return Match(findBy(bookId)).of(
-                Case($Some($(Predicates.instanceOf(AvailableBook.class))), Option::of),
+                Case($Some($(instanceOf(AvailableBook.class))), Option::of),
                 Case($(), Option::none)
 
         );

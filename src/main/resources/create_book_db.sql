@@ -8,5 +8,5 @@ id INTEGER IDENTITY PRIMARY KEY,
   on_hold_by_patron UUID,
   collected_at_branch UUID,
   collected_by_patron UUID,
-  on_hold_till timestamp);
+  on_hold_till TIMESTAMP);
 

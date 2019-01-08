@@ -8,13 +8,15 @@ import io.pillopl.library.lending.domain.patron.PatronId
 import io.pillopl.library.lending.domain.patron.PatronInformation
 import spock.lang.Specification
 
+import java.time.Instant
+
 import static io.pillopl.library.lending.domain.book.BookFixture.anyBookId
 import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.anyPatronId
 import static io.pillopl.library.lending.domain.patron.PatronInformation.PatronType.Regular
 import static java.util.Collections.emptyList
 
-class DomainModelMapperTest extends Specification {
+class PatronEntityToDomainModelMappingTest extends Specification {
 
     DomainModelMapper domainModelMapper = new DomainModelMapper()
 
@@ -23,6 +25,7 @@ class DomainModelMapperTest extends Specification {
     PatronId patronId = anyPatronId()
     BookId bookId = anyBookId()
     BookId anotherBookId = anyBookId()
+    Instant anyDate = Instant.now()
 
     def 'should map patron information'() {
         given:
@@ -38,8 +41,8 @@ class DomainModelMapperTest extends Specification {
     def 'should map patron holds'() {
         given:
             PatronBooksDatabaseEntity entity = patronEntity(patronId, Regular, [
-                    new BookOnHoldDatabaseEntity(bookId.bookId, patronId.patronId, libraryBranchId.libraryBranchId),
-                    new BookOnHoldDatabaseEntity(anotherBookId.bookId, patronId.patronId, anotherBranchId.libraryBranchId)])
+                    new BookOnHoldDatabaseEntity(bookId.bookId, patronId.patronId, libraryBranchId.libraryBranchId, anyDate),
+                    new BookOnHoldDatabaseEntity(anotherBookId.bookId, patronId.patronId, anotherBranchId.libraryBranchId, anyDate)])
         when:
             PatronHolds patronHolds = domainModelMapper.mapPatronHolds(entity)
         then:

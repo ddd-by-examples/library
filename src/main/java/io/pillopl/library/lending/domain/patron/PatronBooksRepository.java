@@ -7,5 +7,5 @@ public interface PatronBooksRepository {
 
     Option<PatronBooks> findBy(PatronId patronId);
 
-    Try<Void> handle(PatronBooksEvent event);
+    Try<PatronBooks> handle(PatronBooksEvent event);
 }

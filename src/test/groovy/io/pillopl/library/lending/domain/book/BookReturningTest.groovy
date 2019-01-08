@@ -14,7 +14,7 @@ import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookColl
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookReturned
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.anyPatronId
 
-class BookReactingToPatronLendingEventsTest extends Specification {
+class BookReturningTest extends Specification {
 
     def 'should return book which is marked as placed on hold in the system'() {
         given:
@@ -60,6 +60,7 @@ class BookReactingToPatronLendingEventsTest extends Specification {
             AvailableBook available = collected.handle(bookReturned(collected, returnedBy, returnedAt))
         then:
             available.bookId == collected.bookId
+
     }
 
     def 'should collect book which is marked as placed on hold in the system'() {
