@@ -28,7 +28,7 @@ class PatronBooksDatabaseEntity {
     UUID patronId;
     PatronType patronType;
     Set<BookOnHoldDatabaseEntity> booksOnHold;
-    Set<OverdueCheckoutDatabaseEntity> overdueCheckouts;
+    Set<CheckoutDatabaseEntity> overdueCheckouts;
 
 
     PatronBooksDatabaseEntity(PatronInformation patronInformation) {
@@ -113,15 +113,16 @@ class BookOnHoldDatabaseEntity {
 @NoArgsConstructor
 @EqualsAndHashCode
 @Getter
-class OverdueCheckoutDatabaseEntity {
+class CheckoutDatabaseEntity {
 
     @Id
     Long id;
     UUID patronId;
     UUID bookId;
     UUID libraryBranchId;
+    Instant till;
 
-    OverdueCheckoutDatabaseEntity(UUID bookId, UUID patronId, UUID libraryBranchId) {
+    CheckoutDatabaseEntity(UUID bookId, UUID patronId, UUID libraryBranchId) {
         this.bookId = bookId;
         this.patronId = patronId;
         this.libraryBranchId = libraryBranchId;

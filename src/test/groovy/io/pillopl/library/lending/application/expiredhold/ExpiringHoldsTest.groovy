@@ -18,8 +18,6 @@ class ExpiringHoldsTest extends Specification {
 
     //TODO test events emitted
     PatronBooksRepository repository = Stub()
-    FindExpiredHolds findExpireHolds
-    ExpiringHolds expiring = new ExpiringHolds( { -> existsFrom(patron, anotherPatron) }, repository)
 
 
     def 'should return success if all holds were marked as expired'() {

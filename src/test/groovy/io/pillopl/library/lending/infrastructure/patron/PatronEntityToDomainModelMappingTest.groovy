@@ -54,8 +54,8 @@ class PatronEntityToDomainModelMappingTest extends Specification {
     def 'should map patron overdue checkouts'() {
         given:
             PatronBooksDatabaseEntity entity = patronEntity(patronId, Regular, [], [
-                    new OverdueCheckoutDatabaseEntity(bookId.bookId, patronId.patronId, libraryBranchId.libraryBranchId),
-                    new OverdueCheckoutDatabaseEntity(anotherBookId.bookId, patronId.patronId, anotherBranchId.libraryBranchId)])
+                    new CheckoutDatabaseEntity(bookId.bookId, patronId.patronId, libraryBranchId.libraryBranchId),
+                    new CheckoutDatabaseEntity(anotherBookId.bookId, patronId.patronId, anotherBranchId.libraryBranchId)])
         when:
             OverdueCheckouts overdueCheckouts = domainModelMapper.mapPatronOverdueCheckouts(entity)
         then:
@@ -67,7 +67,7 @@ class PatronEntityToDomainModelMappingTest extends Specification {
     PatronBooksDatabaseEntity patronEntity(PatronId patronId,
                                                    PatronInformation.PatronType type,
                                                    List<BookOnHoldDatabaseEntity> holds = emptyList(),
-                                                   List<OverdueCheckoutDatabaseEntity> overdueCheckouts = emptyList()) {
+                                                   List<CheckoutDatabaseEntity> overdueCheckouts = emptyList()) {
         PatronBooksDatabaseEntity entity = new PatronBooksDatabaseEntity(new PatronInformation(patronId, type))
         entity.booksOnHold = holds as Set
         entity.overdueCheckouts = overdueCheckouts as Set
