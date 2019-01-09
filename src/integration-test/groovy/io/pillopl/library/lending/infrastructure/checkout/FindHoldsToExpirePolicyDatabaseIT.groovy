@@ -1,29 +1,34 @@
-package io.pillopl.library.lending.infrastructure.patron
+package io.pillopl.library.lending.infrastructure.checkout
 
+import io.pillopl.library.lending.application.hold.FindHoldsToExpirePolicy
 import io.pillopl.library.lending.domain.book.BookInformation
 import io.pillopl.library.lending.domain.book.BookType
 import io.pillopl.library.lending.domain.library.LibraryBranchId
-import io.pillopl.library.lending.domain.patron.PatronBooksFactory
+import io.pillopl.library.lending.domain.patron.PatronBooksRepository
 import io.pillopl.library.lending.domain.patron.PatronId
 import io.pillopl.library.lending.domain.patron.PatronInformation
+import io.pillopl.library.lending.infrastructure.patron.PatronBooksEntityRepository
+import io.pillopl.library.lending.infrastructure.patron.PatronDatabaseConfiguration
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification
 
 import java.time.Clock
+import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
 
 import static io.pillopl.library.lending.domain.book.BookFixture.anyBookId
 import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.*
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.PatronCreated
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.anyPatronId
 import static io.pillopl.library.lending.domain.patron.PatronInformation.PatronType.Regular
 
 @ContextConfiguration(classes = PatronDatabaseConfiguration.class)
 @SpringBootTest
-class FindExpiredHoldsDatabaseIT extends Specification {
+class FindHoldsToExpirePolicyDatabaseIT extends Specification {
 
     static final Instant TIME_OF_EXPIRE_CHECK = Instant.now()
 
@@ -34,34 +39,51 @@ class FindExpiredHoldsDatabaseIT extends Specification {
     @Autowired
     PatronBooksEntityRepository patronEntityRepository
 
-    PatronBooksDatabaseRepository patronBooksRepo
+    @Autowired
+    PatronBooksRepository patronBooksRepository
+
+    FindHoldsToExpirePolicy findHoldsToExpirePolicy
 
     def setup() {
-         patronBooksRepo = new PatronBooksDatabaseRepository(
+        findHoldsToExpirePolicy = new FindExpiredHoldsInDatabaseByHoldDuration(
                 patronEntityRepository,
-                new PatronBooksFactory(),
-                new DomainModelMapper(),
                 Clock.fixed(TIME_OF_EXPIRE_CHECK, ZoneId.systemDefault()))
     }
 
-
     def 'should find expired holds'() {
         given:
-            patronBooksRepo.handle(patronCreated())
-        when:
-            patronBooksRepo.handle(placedOnHold(anExpiredHold()))
+            int currentNoOfExpiredHolds = findHoldsToExpirePolicy.allHoldsToExpire().count()
         and:
-            patronBooksRepo.handle(placedOnHold(nonExpiredHold()))
+            patronBooksRepository.handle(patronCreated())
+        when:
+            patronBooksRepository.handle(placedOnHold(aCloseEndedHoldTillYesterday()))
+        and:
+            patronBooksRepository.handle(placedOnHold(aCloseEndedHoldTillTomorrow()))
         then:
-            patronBooksRepo.allExpiredHolds().expiredHolds.size() == 1
+            findHoldsToExpirePolicy.allHoldsToExpire().count() == currentNoOfExpiredHolds + 1
     }
 
-    Instant nonExpiredHold() {
-        TIME_OF_EXPIRE_CHECK.plusSeconds(60)
+    def 'should never find open-ended holds'() {
+        given:
+            int currentNoOfExpiredHolds = findHoldsToExpirePolicy.allHoldsToExpire().count()
+        and:
+            patronBooksRepository.handle(patronCreated())
+        when:
+            patronBooksRepository.handle(placedOnHold(anOpenEndedHold()))
+        then:
+            findHoldsToExpirePolicy.allHoldsToExpire().count() == currentNoOfExpiredHolds
     }
 
-    Instant anExpiredHold() {
-        TIME_OF_EXPIRE_CHECK.minusSeconds(60)
+    Instant aCloseEndedHoldTillTomorrow() {
+        return TIME_OF_EXPIRE_CHECK.plus(Duration.ofDays(1))
+    }
+
+    Instant aCloseEndedHoldTillYesterday() {
+        return TIME_OF_EXPIRE_CHECK.minus(Duration.ofDays(1))
+    }
+
+    Instant anOpenEndedHold() {
+        return null
     }
 
     BookPlacedOnHold placedOnHold(Instant till) {
@@ -72,7 +94,7 @@ class FindExpiredHoldsDatabaseIT extends Specification {
                         bookInformation.getBookId().getBookId(),
                         bookInformation.bookType,
                         libraryBranchId.getLibraryBranchId(),
-                        till.minusSeconds(60),
+                        TIME_OF_EXPIRE_CHECK.minusSeconds(60000),
                         till)
         return placedOnHold
 

@@ -18,7 +18,7 @@ import java.time.Clock;
 
 @Configuration
 @EnableJdbcRepositories
-class PatronDatabaseConfiguration extends JdbcConfiguration {
+public class PatronDatabaseConfiguration extends JdbcConfiguration {
 
     @Bean
     NamedParameterJdbcOperations operations() {
@@ -41,7 +41,7 @@ class PatronDatabaseConfiguration extends JdbcConfiguration {
 
     @Bean
     PatronBooksRepository patronBooksRepository(PatronBooksEntityRepository patronBooksEntityRepository) {
-        return new PatronBooksDatabaseRepository(patronBooksEntityRepository, new PatronBooksFactory(), new DomainModelMapper(), Clock.systemDefaultZone());
+        return new PatronBooksDatabaseRepository(patronBooksEntityRepository, new DomainModelMapper(new PatronBooksFactory()));
     }
 
 

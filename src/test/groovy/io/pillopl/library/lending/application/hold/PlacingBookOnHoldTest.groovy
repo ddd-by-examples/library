@@ -1,4 +1,4 @@
-package io.pillopl.library.lending.application.holding
+package io.pillopl.library.lending.application.hold
 
 import io.pillopl.library.lending.domain.patron.*
 import io.vavr.control.Option
@@ -6,7 +6,7 @@ import io.vavr.control.Try
 import spock.lang.Specification
 
 
-import static io.pillopl.library.lending.application.holding.PlacingOnHold.Result.Success
+import static io.pillopl.library.lending.application.hold.PlacingOnHold.Result.Success
 import static io.pillopl.library.lending.domain.book.BookFixture.anyBookId
 import static io.pillopl.library.lending.domain.book.BookFixture.circulatingBook
 import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch

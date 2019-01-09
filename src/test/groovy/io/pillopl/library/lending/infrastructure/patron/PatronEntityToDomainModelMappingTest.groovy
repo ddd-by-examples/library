@@ -2,10 +2,7 @@ package io.pillopl.library.lending.infrastructure.patron
 
 import io.pillopl.library.lending.domain.book.BookId
 import io.pillopl.library.lending.domain.library.LibraryBranchId
-import io.pillopl.library.lending.domain.patron.OverdueCheckouts
-import io.pillopl.library.lending.domain.patron.PatronHolds
-import io.pillopl.library.lending.domain.patron.PatronId
-import io.pillopl.library.lending.domain.patron.PatronInformation
+import io.pillopl.library.lending.domain.patron.*
 import spock.lang.Specification
 
 import java.time.Instant
@@ -18,7 +15,7 @@ import static java.util.Collections.emptyList
 
 class PatronEntityToDomainModelMappingTest extends Specification {
 
-    DomainModelMapper domainModelMapper = new DomainModelMapper()
+    DomainModelMapper domainModelMapper = new DomainModelMapper(new PatronBooksFactory())
 
     LibraryBranchId libraryBranchId = anyBranch()
     LibraryBranchId anotherBranchId = anyBranch()

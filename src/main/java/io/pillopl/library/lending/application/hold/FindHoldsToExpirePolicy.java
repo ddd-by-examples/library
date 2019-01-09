@@ -1,4 +1,4 @@
-package io.pillopl.library.lending.application.expiredhold;
+package io.pillopl.library.lending.application.hold;
 
 
 import io.pillopl.library.lending.domain.book.BookId;
@@ -11,22 +11,26 @@ import io.vavr.collection.Stream;
 import lombok.Value;
 
 @FunctionalInterface
-public interface FindExpiredHolds{
+public interface FindHoldsToExpirePolicy {
 
-    ExpiredHolds allExpiredHolds();
+    HoldsToExpire allHoldsToExpire();
 
     @Value
-    class ExpiredHolds {
+    class HoldsToExpire {
 
         List<Tuple3<BookId, PatronId, LibraryBranchId>> expiredHolds;
 
         Stream<BookHoldExpired> toStreamOfEvents() {
             return expiredHolds
                     .toStream()
-                    .map(this::toEvent);
+                    .map(this::recordToEvent);
         }
 
-        private BookHoldExpired toEvent(Tuple3<BookId, PatronId, LibraryBranchId> expiredHold) {
+        public int count() {
+            return expiredHolds.size();
+        }
+
+        private BookHoldExpired recordToEvent(Tuple3<BookId, PatronId, LibraryBranchId> expiredHold) {
             return BookHoldExpired.now(expiredHold._1, expiredHold._2, expiredHold._3);
         }
 

@@ -7,12 +7,9 @@ import io.pillopl.library.lending.domain.patron.PatronInformation;
 import io.pillopl.library.lending.domain.patron.PatronInformation.PatronType;
 import io.vavr.API;
 import io.vavr.Predicates;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
-import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -21,7 +18,7 @@ import static io.vavr.API.$;
 import static io.vavr.API.Case;
 
 @NoArgsConstructor
-class PatronBooksDatabaseEntity {
+public class PatronBooksDatabaseEntity {
 
     @Id
     Long id;
@@ -84,54 +81,3 @@ class PatronBooksDatabaseEntity {
 }
 
 
-@NoArgsConstructor
-@EqualsAndHashCode
-class BookOnHoldDatabaseEntity {
-
-    @Id
-    Long id;
-    UUID patronId;
-    UUID bookId;
-    UUID libraryBranchId;
-    Instant till;
-
-    BookOnHoldDatabaseEntity(UUID bookId, UUID patronId, UUID libraryBranchId, Instant till) {
-        this.bookId = bookId;
-        this.patronId = patronId;
-        this.libraryBranchId = libraryBranchId;
-        this.till = till;
-    }
-
-    boolean hasSamePropertiesAs(UUID patronId, UUID bookId, UUID libraryBranchId) {
-        return  this.patronId.equals(patronId) &&
-                this.bookId.equals(bookId) &&
-                this.libraryBranchId.equals(libraryBranchId);
-    }
-
-}
-
-@NoArgsConstructor
-@EqualsAndHashCode
-@Getter
-class CheckoutDatabaseEntity {
-
-    @Id
-    Long id;
-    UUID patronId;
-    UUID bookId;
-    UUID libraryBranchId;
-    Instant till;
-
-    CheckoutDatabaseEntity(UUID bookId, UUID patronId, UUID libraryBranchId) {
-        this.bookId = bookId;
-        this.patronId = patronId;
-        this.libraryBranchId = libraryBranchId;
-    }
-
-    boolean hasSamePropertiesAs(UUID patronId, UUID bookId, UUID libraryBranchId) {
-        return  this.patronId.equals(patronId) &&
-                this.bookId.equals(bookId) &&
-                this.libraryBranchId.equals(libraryBranchId);
-    }
-
-}

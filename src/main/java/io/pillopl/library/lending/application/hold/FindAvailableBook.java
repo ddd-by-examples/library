@@ -1,4 +1,4 @@
-package io.pillopl.library.lending.application.holding;
+package io.pillopl.library.lending.application.hold;
 
 
 import io.pillopl.library.lending.domain.book.AvailableBook;

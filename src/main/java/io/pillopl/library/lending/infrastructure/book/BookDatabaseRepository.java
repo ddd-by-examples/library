@@ -1,12 +1,13 @@
 package io.pillopl.library.lending.infrastructure.book;
 
-import io.pillopl.library.lending.application.holding.FindAvailableBook;
+import io.pillopl.library.lending.application.hold.FindAvailableBook;
 import io.pillopl.library.lending.domain.book.AvailableBook;
 import io.pillopl.library.lending.domain.book.Book;
 import io.pillopl.library.lending.domain.book.BookId;
 import io.pillopl.library.lending.domain.book.BookRepository;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
+import lombok.AllArgsConstructor;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -17,13 +18,10 @@ import static io.vavr.API.*;
 import static io.vavr.Patterns.$Some;
 import static io.vavr.Predicates.instanceOf;
 
+@AllArgsConstructor
 class BookDatabaseRepository implements BookRepository, FindAvailableBook {
 
     private final BookEntityRepository bookEntityRepository;
-
-    BookDatabaseRepository(BookEntityRepository bookEntityRepository) {
-        this.bookEntityRepository = bookEntityRepository;
-    }
 
     @Override
     public Option<Book> findBy(BookId bookId) {

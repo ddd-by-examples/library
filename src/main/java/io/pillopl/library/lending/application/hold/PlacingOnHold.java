@@ -1,4 +1,4 @@
-package io.pillopl.library.lending.application.holding;
+package io.pillopl.library.lending.application.hold;
 
 import io.pillopl.library.lending.domain.book.AvailableBook;
 import io.pillopl.library.lending.domain.book.BookId;
@@ -15,8 +15,8 @@ import lombok.Value;
 
 import java.time.Instant;
 
-import static io.pillopl.library.lending.application.holding.PlacingOnHold.Result.Rejection;
-import static io.pillopl.library.lending.application.holding.PlacingOnHold.Result.Success;
+import static io.pillopl.library.lending.application.hold.PlacingOnHold.Result.Rejection;
+import static io.pillopl.library.lending.application.hold.PlacingOnHold.Result.Success;
 import static io.pillopl.library.lending.domain.patron.HoldDuration.forOpenEnded;
 import static io.vavr.API.*;
 import static io.vavr.Patterns.$Left;
@@ -77,7 +77,6 @@ class PlaceOnHoldCommand {
     @NonNull PatronId patronId;
     @NonNull LibraryBranchId libraryId;
     @NonNull BookId bookId;
-    //TODO positiveInteger
     Option<Integer> holdForDays;
 
     static PlaceOnHoldCommand closeEnded(PatronId patronId, LibraryBranchId libraryBranchId, BookId bookId, int forDays) {

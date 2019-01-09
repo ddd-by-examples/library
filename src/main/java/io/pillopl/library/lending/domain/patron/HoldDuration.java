@@ -44,7 +44,7 @@ public class HoldDuration {
         return forCloseEnded(Instant.now(), NumberOfDays.of(days));
     }
 
-    static HoldDuration forCloseEnded(Instant from, NumberOfDays days) {
+    public static HoldDuration forCloseEnded(Instant from, NumberOfDays days) {
         Instant till = from.plus(Duration.ofDays(days.getDays()));
         return new HoldDuration(from, till);
     }

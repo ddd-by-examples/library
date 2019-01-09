@@ -209,6 +209,21 @@ public interface PatronBooksEvent {
         }
     }
 
+    @Value
+    class OverdueCheckoutRegistered implements PatronBooksEvent {
+        @NonNull UUID eventId = UUID.randomUUID();
+        @NonNull Instant when;
+        @NonNull UUID patronId;
+        @NonNull UUID bookId;
+
+        public static OverdueCheckoutRegistered now(PatronId patronId, BookId bookId) {
+            return new OverdueCheckoutRegistered(
+                    Instant.now(),
+                    patronId.getPatronId(),
+                    bookId.getBookId());
+        }
+    }
+
 }
 
 

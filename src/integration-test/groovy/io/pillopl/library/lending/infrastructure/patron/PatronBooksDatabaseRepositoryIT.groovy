@@ -12,9 +12,10 @@ import spock.lang.Specification
 
 import static io.pillopl.library.lending.domain.book.BookFixture.anyBookId
 import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.*
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold.now
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldEvents
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldEvents.events
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.PatronCreated
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.anyPatronId
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.regularPatron
 import static io.pillopl.library.lending.domain.patron.PatronInformation.PatronType.Regular
