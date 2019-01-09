@@ -93,7 +93,6 @@
                 <configuration>
                     <includes>
                         <include>**/*Test.java</include>
-                        <include>**/*Test.groovy</include>
                     </includes>
                 </configuration>
             </plugin>
@@ -127,15 +126,13 @@
                         <testSource>
                             <directory>src/test/groovy</directory>
                             <includes>
-                                <include>**/*Test.groovy</include>
-                                <include>**/*Test.java</include>
+                                <include>**/*.groovy</include>
                             </includes>
                         </testSource>
                         <testSource>
                             <directory>src/integration-test/groovy</directory>
                             <includes>
-                                <include>**/*IT.groovy</include>
-                                <include>**/*IT.java</include>
+                                <include>**/*.groovy</include>
                             </includes>
                         </testSource>
                     </testSources>
