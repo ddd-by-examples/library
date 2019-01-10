@@ -3,12 +3,7 @@ package io.pillopl.library.lending.infrastructure.patron
 import io.pillopl.library.lending.domain.book.BookInformation
 import io.pillopl.library.lending.domain.book.BookType
 import io.pillopl.library.lending.domain.library.LibraryBranchId
-import io.pillopl.library.lending.domain.patron.CheckoutDuration
-import io.pillopl.library.lending.domain.patron.HoldDuration
-import io.pillopl.library.lending.domain.patron.NumberOfDays
-import io.pillopl.library.lending.domain.patron.PatronBooksEvent
-import io.pillopl.library.lending.domain.patron.PatronId
-import io.pillopl.library.lending.domain.patron.PatronInformation
+import io.pillopl.library.lending.domain.patron.*
 import spock.lang.Specification
 
 import java.time.Duration
@@ -94,17 +89,25 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
 
     }
 
-    def 'should add checkout on bookCollected event'() {
+    def 'should add overdue checkout on overdueCheckoutRegistered'() {
         given:
             PatronBooksDatabaseEntity entity = createPatron()
         when:
-            entity.handle(placedOnHold())
+            entity.handle(overdueCheckoutRegistered())
         then:
-            entity.booksOnHold.size() == 1
+            entity.checkouts.size() == 1
+    }
+
+    def 'should remove overdue checkout on bookReturned event'() {
+        given:
+            PatronBooksDatabaseEntity entity = createPatron()
         when:
-            entity.handle(bookCollected())
+            entity.handle(overdueCheckoutRegistered())
         then:
-            entity.booksOnHold.size() == 0
+            entity.checkouts.size() == 1
+        when:
+            entity.handle(bookReturned())
+        then:
             entity.checkouts.size() == 0
 
 
@@ -120,6 +123,15 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
                 libraryBranchId,
                 patronId,
                     CheckoutDuration.forNoOfDays(1))
+    }
+
+    PatronBooksEvent.BookReturned bookReturned() {
+        return new PatronBooksEvent.BookReturned(
+                Instant.now(),
+                patronId.patronId,
+                bookInformation.bookId.bookId,
+                bookInformation.bookType,
+                libraryBranchId.libraryBranchId)
     }
 
     PatronBooksEvent.BookHoldCanceled holdCanceled() {
@@ -145,6 +157,10 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
                 patronId,
                 libraryBranchId
         )
+    }
+
+    PatronBooksEvent.OverdueCheckoutRegistered overdueCheckoutRegistered() {
+        return PatronBooksEvent.OverdueCheckoutRegistered.now(patronId, bookInformation.bookId, libraryBranchId)
     }
 
 }

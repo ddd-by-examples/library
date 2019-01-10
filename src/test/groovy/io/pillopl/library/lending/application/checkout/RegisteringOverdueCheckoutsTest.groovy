@@ -8,6 +8,7 @@ import io.vavr.control.Try
 import spock.lang.Specification
 
 import static io.pillopl.library.lending.domain.book.BookFixture.anyBookId
+import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.anyPatronId
 import static io.vavr.collection.List.of
 
@@ -60,8 +61,8 @@ class RegisteringOverdueCheckoutsTest extends Specification {
     CheckoutsToOverdueSheet overdueCheckoutsBy(PatronId patronId, PatronId anotherPatronId) {
         return new CheckoutsToOverdueSheet(
                 of(
-                        io.vavr.Tuple.of(anyBookId(), patronId),
-                        io.vavr.Tuple.of(anyBookId(), anotherPatronId)
+                        io.vavr.Tuple.of(anyBookId(), patronId, anyBranch()),
+                        io.vavr.Tuple.of(anyBookId(), anotherPatronId, anyBranch()),
 
                 ))
     }

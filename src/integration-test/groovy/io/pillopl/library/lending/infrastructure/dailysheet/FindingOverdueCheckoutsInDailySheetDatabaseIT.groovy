@@ -26,7 +26,7 @@ import static java.time.ZoneId.systemDefault
 
 @ContextConfiguration(classes = SheetReadModelDatabaseConfiguration.class)
 @SpringBootTest
-class FindingHoldsInDailySheetDatabaseIT extends Specification {
+class FindingOverdueCheckoutsInDailySheetDatabaseIT extends Specification {
 
     PatronId patronId = anyPatronId()
     PatronInformation.PatronType regular = Regular
@@ -44,76 +44,45 @@ class FindingHoldsInDailySheetDatabaseIT extends Specification {
         readModel = new SheetsReadModel(new JdbcTemplate(dataSource), fixed(TIME_OF_EXPIRE_CHECK, systemDefault()))
     }
 
-    def 'should find expired holds'() {
+    def 'should find overdue checkouts'() {
         given:
-            int currentNoOfExpiredHolds = readModel.holdsToExpireSheet().count()
+            int currentNoOfOverdueCheckouts = readModel.checkoutsToOverdue().count()
         when:
-            readModel.handle(placedOnHold(aCloseEndedHoldTillYesterday()))
+            readModel.handle(bookCollected(tillYesterday()))
         and:
-            readModel.handle(placedOnHold(aCloseEndedHoldTillTomorrow()))
+            readModel.handle(bookCollected(tillTomorrow()))
         then:
-            readModel.holdsToExpireSheet().count() == currentNoOfExpiredHolds + 1
+            readModel.checkoutsToOverdue().count() == currentNoOfOverdueCheckouts + 1
     }
 
-    def 'handling placed on hold should de idempotent'() {
+    def 'handling bookCollected should de idempotent'() {
         given:
-            int currentNoOfExpiredHolds = readModel.holdsToExpireSheet().count()
+            int currentNoOfOverdueCheckouts = readModel.checkoutsToOverdue().count()
         and:
-            PatronBooksEvent.BookPlacedOnHold event = placedOnHold(aCloseEndedHoldTillYesterday())
+            PatronBooksEvent.BookCollected event = bookCollected(tillYesterday())
         when:
             2.times { readModel.handle(event) }
         then:
-            readModel.holdsToExpireSheet().count() == currentNoOfExpiredHolds + 1
+            readModel.checkoutsToOverdue().count() == currentNoOfOverdueCheckouts + 1
     }
 
-    def 'should never find open-ended holds'() {
+    def 'should never find returned books'() {
         given:
-            int currentNoOfExpiredHolds = readModel.holdsToExpireSheet().count()
-        when:
-            readModel.handle(placedOnHold(anOpenEndedHold()))
-        then:
-            readModel.holdsToExpireSheet().count() == currentNoOfExpiredHolds
-    }
-
-    def 'should never find canceled holds'() {
-        given:
-            int currentNoOfExpiredHolds = readModel.holdsToExpireSheet().count()
-        when:
-            readModel.handle(placedOnHold(aCloseEndedHoldTillYesterday()))
+            int currentNoOfOverdueCheckouts = readModel.checkoutsToOverdue().count()
         and:
-            readModel.handle(holdCanceled())
-        then:
-            readModel.holdsToExpireSheet().count() == currentNoOfExpiredHolds
-    }
-
-    def 'should never find already expired holds'() {
-        given:
-            int currentNoOfExpiredHolds = readModel.holdsToExpireSheet().count()
+            readModel.handle(bookCollected(tillTomorrow()))
         when:
-            readModel.handle(placedOnHold(anOpenEndedHold()))
-        and:
-            readModel.handle(holdExpired())
+            readModel.handle(bookReturned())
         then:
-            readModel.holdsToExpireSheet().count() == currentNoOfExpiredHolds
-    }
-
-    def 'should never find already collected holds'() {
-        given:
-            int currentNoOfExpiredHolds = readModel.holdsToExpireSheet().count()
-        when:
-            readModel.handle(placedOnHold(aCloseEndedHoldTillYesterday()))
-        and:
-            readModel.handle(bookCollected())
-        then:
-            readModel.holdsToExpireSheet().count() == currentNoOfExpiredHolds
+            readModel.checkoutsToOverdue().count() == currentNoOfOverdueCheckouts
     }
 
 
-    Instant aCloseEndedHoldTillTomorrow() {
+    Instant tillTomorrow() {
         return TIME_OF_EXPIRE_CHECK.plus(Duration.ofDays(1))
     }
 
-    Instant aCloseEndedHoldTillYesterday() {
+    Instant tillYesterday() {
         return TIME_OF_EXPIRE_CHECK.minus(Duration.ofDays(1))
     }
 
@@ -148,14 +117,23 @@ class FindingHoldsInDailySheetDatabaseIT extends Specification {
                 libraryBranchId.getLibraryBranchId())
     }
 
-    PatronBooksEvent.BookCollected bookCollected() {
+    PatronBooksEvent.BookCollected bookCollected(Instant till) {
         return new PatronBooksEvent.BookCollected(
                 now(),
                 patronId.getPatronId(),
                 bookInformation.getBookId().getBookId(),
                 BookType.Restricted,
                 libraryBranchId.getLibraryBranchId(),
-                now())
+                till)
+    }
+
+    PatronBooksEvent.BookReturned bookReturned() {
+        return new PatronBooksEvent.BookReturned(
+                now(),
+                patronId.getPatronId(),
+                bookInformation.getBookId().getBookId(),
+                BookType.Restricted,
+                libraryBranchId.getLibraryBranchId())
     }
 
 

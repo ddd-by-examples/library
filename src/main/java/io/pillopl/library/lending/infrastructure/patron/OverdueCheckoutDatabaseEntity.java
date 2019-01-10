@@ -24,4 +24,9 @@ class OverdueCheckoutDatabaseEntity {
         this.libraryBranchId = libraryBranchId;
     }
 
+    public boolean is(UUID patronId, UUID bookId, UUID libraryBranchId) {
+        return  this.patronId.equals(patronId) &&
+                this.bookId.equals(bookId) &&
+                this.libraryBranchId.equals(libraryBranchId);
+    }
 }

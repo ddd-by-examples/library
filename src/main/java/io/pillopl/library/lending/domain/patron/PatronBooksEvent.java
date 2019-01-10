@@ -217,12 +217,14 @@ public interface PatronBooksEvent {
         @NonNull Instant when;
         @NonNull UUID patronId;
         @NonNull UUID bookId;
+        @NonNull UUID libraryBranchId;
 
-        public static OverdueCheckoutRegistered now(PatronId patronId, BookId bookId) {
+        public static OverdueCheckoutRegistered now(PatronId patronId, BookId bookId, LibraryBranchId libraryBranchId) {
             return new OverdueCheckoutRegistered(
                     Instant.now(),
                     patronId.getPatronId(),
-                    bookId.getBookId());
+                    bookId.getBookId(),
+                    libraryBranchId.getLibraryBranchId());
         }
     }
 

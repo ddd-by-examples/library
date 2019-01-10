@@ -40,7 +40,9 @@ class PatronBooksDatabaseEntity {
                 Case($(Predicates.instanceOf(BookPlacedOnHold.class)), this::handle),
                 Case($(Predicates.instanceOf(BookCollected.class)), this::handle),
                 Case($(Predicates.instanceOf(BookHoldCanceled.class)), this::handle),
-                Case($(Predicates.instanceOf(BookHoldExpired.class)), this::handle)
+                Case($(Predicates.instanceOf(BookHoldExpired.class)), this::handle),
+                Case($(Predicates.instanceOf(OverdueCheckoutRegistered.class)), this::handle),
+                Case($(Predicates.instanceOf(BookReturned.class)), this::handle)
 
         );
     }
@@ -68,12 +70,30 @@ class PatronBooksDatabaseEntity {
         return removeHoldIfPresent(event.getPatronId(), event.getBookId(), event.getLibraryBranchId());
     }
 
+    private PatronBooksDatabaseEntity handle(OverdueCheckoutRegistered event) {
+        checkouts.add(new OverdueCheckoutDatabaseEntity(event.getBookId(), event.getPatronId(), event.getLibraryBranchId()));
+        return this;
+    }
+
+    private PatronBooksDatabaseEntity handle(BookReturned event) {
+        return removeOverdueCheckoutIfPresent(event.getPatronId(), event.getBookId(), event.getLibraryBranchId());
+    }
+
     private PatronBooksDatabaseEntity removeHoldIfPresent(UUID patronId, UUID bookId, UUID libraryBranchId) {
         booksOnHold
                 .stream()
                 .filter(entity -> entity.is(patronId, bookId, libraryBranchId))
                 .findAny()
                 .ifPresent(entity -> booksOnHold.remove(entity));
+        return this;
+    }
+
+    private PatronBooksDatabaseEntity removeOverdueCheckoutIfPresent(UUID patronId, UUID bookId, UUID libraryBranchId) {
+        checkouts
+                .stream()
+                .filter(entity -> entity.is(patronId, bookId, libraryBranchId))
+                .findAny()
+                .ifPresent(entity -> checkouts.remove(entity));
         return this;
     }
 
