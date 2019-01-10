@@ -28,7 +28,6 @@ import static io.vavr.collection.List.ofAll;
 import static java.sql.Timestamp.from;
 
 @AllArgsConstructor
-//TODO check the view - content of tuples in tests
 class SheetsReadModel implements DailySheet {
 
     private final JdbcTemplate sheets;
