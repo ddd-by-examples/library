@@ -49,7 +49,7 @@ class PatronBooksDatabaseRepositoryIT extends Specification {
                 bookInformation,
                 libraryBranchId,
                 new PatronInformation(patronId, Regular),
-                HoldDuration.forCloseEnded(5)))
+                HoldDuration.closeEnded(5)))
     }
 
 

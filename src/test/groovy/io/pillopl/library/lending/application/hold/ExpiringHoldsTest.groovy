@@ -1,6 +1,7 @@
 package io.pillopl.library.lending.application.hold
 
-
+import io.pillopl.library.lending.domain.dailysheet.DailySheet
+import io.pillopl.library.lending.domain.dailysheet.HoldsToExpireSheet
 import io.pillopl.library.lending.domain.patron.PatronBooksRepository
 import io.pillopl.library.lending.domain.patron.PatronId
 import io.vavr.control.Try
@@ -15,11 +16,16 @@ class ExpiringHoldsTest extends Specification {
 
     //TODO test events emitted
     PatronBooksRepository repository = Stub()
+    DailySheet dailySheet = Stub()
+
     PatronId patronWithExpiringHolds = anyPatronId()
     PatronId anotherPatronWithExpiringHolds = anyPatronId()
 
-    ExpiringHolds expiring = new ExpiringHolds( { -> expiredHoldsBy(patronWithExpiringHolds, anotherPatronWithExpiringHolds) }, repository)
+    ExpiringHolds expiring = new ExpiringHolds(dailySheet, repository)
 
+    def setup() {
+        dailySheet.holdsToExpireSheet() >> expiredHoldsBy(patronWithExpiringHolds, anotherPatronWithExpiringHolds)
+    }
 
     def 'should return success if all holds were marked as expired'() {
         given:
@@ -51,8 +57,8 @@ class ExpiringHoldsTest extends Specification {
         repository.handle(_) >> Try.success(null)
     }
 
-    FindHoldsToExpirePolicy.HoldsToExpire expiredHoldsBy(PatronId patronId, PatronId anotherPatronId) {
-        return new FindHoldsToExpirePolicy.HoldsToExpire(
+    HoldsToExpireSheet expiredHoldsBy(PatronId patronId, PatronId anotherPatronId) {
+        return new HoldsToExpireSheet(
                 of(
                         io.vavr.Tuple.of(anyBookId(), patronId, anyBranch()),
                         io.vavr.Tuple.of(anyBookId(), anotherPatronId, anyBranch())

@@ -17,7 +17,6 @@ import java.time.Instant;
 
 import static io.pillopl.library.lending.application.hold.PlacingOnHold.Result.Rejection;
 import static io.pillopl.library.lending.application.hold.PlacingOnHold.Result.Success;
-import static io.pillopl.library.lending.domain.patron.HoldDuration.forOpenEnded;
 import static io.vavr.API.*;
 import static io.vavr.Patterns.$Left;
 import static io.vavr.Patterns.$Right;
@@ -70,14 +69,13 @@ public class PlacingOnHold {
     }
 }
 
-
 @Value
 class PlaceOnHoldCommand {
     @NonNull Instant timestamp;
     @NonNull PatronId patronId;
     @NonNull LibraryBranchId libraryId;
     @NonNull BookId bookId;
-    Option<Integer> holdForDays;
+    Option<Integer> noOfDays;
 
     static PlaceOnHoldCommand closeEnded(PatronId patronId, LibraryBranchId libraryBranchId, BookId bookId, int forDays) {
         return new PlaceOnHoldCommand(Instant.now(), patronId, libraryBranchId, bookId, Option.of(forDays));
@@ -88,9 +86,9 @@ class PlaceOnHoldCommand {
     }
 
     HoldDuration getHoldDuration() {
-        return holdForDays
+        return noOfDays
                 .map(NumberOfDays::of)
-                .map(HoldDuration::forCloseEnded)
-                .getOrElse(forOpenEnded());
+                .map(HoldDuration::closeEnded)
+                .getOrElse(HoldDuration.openEnded());
     }
 }

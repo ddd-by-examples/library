@@ -1,5 +1,6 @@
 package io.pillopl.library.lending.application.hold;
 
+import io.pillopl.library.lending.domain.dailysheet.DailySheet;
 import io.pillopl.library.lending.domain.patron.PatronBooksRepository;
 import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
@@ -11,12 +12,12 @@ public class ExpiringHolds {
         Success, Error
     }
 
-    private final FindHoldsToExpirePolicy find;
+    private final DailySheet find;
     private final PatronBooksRepository patronBooksRepository;
 
     public Try<Result> expireHolds() {
         return Try.of(() ->
-                find.allHoldsToExpire()
+                find.holdsToExpireSheet()
                 .toStreamOfEvents()
                 .map(patronBooksRepository::handle)
                 .find(Try::isFailure)

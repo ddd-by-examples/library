@@ -30,13 +30,13 @@ public class PatronBooks {
     private final PatronHolds patronHolds;
 
     public Either<BookHoldFailed, BookPlacedOnHoldEvents> placeOnHold(AvailableBook book) {
-        return placeOnHold(book, HoldDuration.forOpenEnded());
+        return placeOnHold(book, HoldDuration.openEnded());
     }
 
-    public Either<BookHoldFailed, BookPlacedOnHoldEvents> placeOnHold(AvailableBook aBook, HoldDuration forDuration) {
-        Option<Rejection> rejection = patronCanHold(aBook, forDuration);
+    public Either<BookHoldFailed, BookPlacedOnHoldEvents> placeOnHold(AvailableBook aBook, HoldDuration duration) {
+        Option<Rejection> rejection = patronCanHold(aBook, duration);
         if (rejection.isEmpty()) {
-            BookPlacedOnHold bookPlacedOnHold = BookPlacedOnHold.now(aBook.getBookInformation(), aBook.getLibraryBranch(), patron, forDuration);
+            BookPlacedOnHold bookPlacedOnHold = BookPlacedOnHold.now(aBook.getBookInformation(), aBook.getLibraryBranch(), patron, duration);
             if (patronHolds.maximumHoldsAfterHolding(aBook)) {
                 return right(events(patron, bookPlacedOnHold, MaximumNumberOhHoldsReached.now(patron, MAX_NUMBER_OF_HOLDS)));
             }
@@ -52,15 +52,11 @@ public class PatronBooks {
         return left(BookHoldCancelingFailed.now(book.getBookId(), book.getHoldPlacedAt(), patron));
     }
 
-    public Either<BookCollectingFailed, BookCollected> collect(BookOnHold book) {
+    public Either<BookCollectingFailed, BookCollected> collect(BookOnHold book, CheckoutDuration duration) {
         if (patronHolds.a(book)) {
-            return right(BookCollected.now(book.getBookInformation(), book.getHoldPlacedAt(), patron.getPatronId()));
+            return right(BookCollected.now(book.getBookInformation(), book.getHoldPlacedAt(), patron.getPatronId(), duration));
         }
         return left(BookCollectingFailed.now(Rejection.withReason("book is not on hold by patron"), book.getBookId(), book.getHoldPlacedAt(), patron));
-    }
-
-    public List<BookHoldExpired> expireHold() {
-        return List.of();
     }
 
     private Option<Rejection> patronCanHold(AvailableBook aBook, HoldDuration forDuration) {

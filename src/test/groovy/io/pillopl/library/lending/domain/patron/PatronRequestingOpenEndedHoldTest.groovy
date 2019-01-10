@@ -25,7 +25,7 @@ class PatronRequestingOpenEndedHoldTest extends Specification {
         and:
             PatronBooks researcherPatron = researcherPatronWithPolicy(patronId, onlyResearcherPatronsCanPlaceOpenEndedHolds)
         when:
-            Either<BookHoldFailed, BookPlacedOnHoldEvents> hold = researcherPatron.placeOnHold(aBook, HoldDuration.forOpenEnded(from))
+            Either<BookHoldFailed, BookPlacedOnHoldEvents> hold = researcherPatron.placeOnHold(aBook, HoldDuration.openEnded(from))
         then:
             hold.isRight()
             hold.get().with {
@@ -47,7 +47,7 @@ class PatronRequestingOpenEndedHoldTest extends Specification {
         and:
             PatronBooks regularPatron = regularPatronWithPolicy(patronId, onlyResearcherPatronsCanPlaceOpenEndedHolds)
         when:
-            Either<BookHoldFailed, BookPlacedOnHoldEvents> hold = regularPatron.placeOnHold(aBook, HoldDuration.forOpenEnded(from))
+            Either<BookHoldFailed, BookPlacedOnHoldEvents> hold = regularPatron.placeOnHold(aBook, HoldDuration.openEnded(from))
         then:
             hold.isLeft()
             hold.getLeft().with {

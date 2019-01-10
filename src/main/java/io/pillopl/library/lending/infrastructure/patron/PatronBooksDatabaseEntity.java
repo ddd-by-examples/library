@@ -18,21 +18,20 @@ import static io.vavr.API.$;
 import static io.vavr.API.Case;
 
 @NoArgsConstructor
-public class PatronBooksDatabaseEntity {
+class PatronBooksDatabaseEntity {
 
     @Id
     Long id;
     UUID patronId;
     PatronType patronType;
     Set<BookOnHoldDatabaseEntity> booksOnHold;
-    Set<CheckoutDatabaseEntity> overdueCheckouts;
-
+    Set<OverdueCheckoutDatabaseEntity> checkouts;
 
     PatronBooksDatabaseEntity(PatronInformation patronInformation) {
         this.patronId = patronInformation.getPatronId().getPatronId();
         this.patronType = patronInformation.getType();
         this.booksOnHold = new HashSet<>();
-        this.overdueCheckouts = new HashSet<>();
+        this.checkouts = new HashSet<>();
     }
 
     PatronBooksDatabaseEntity handle(PatronBooksEvent event) {
@@ -72,7 +71,7 @@ public class PatronBooksDatabaseEntity {
     private PatronBooksDatabaseEntity removeHoldIfPresent(UUID patronId, UUID bookId, UUID libraryBranchId) {
         booksOnHold
                 .stream()
-                .filter(entity -> entity.hasSamePropertiesAs(patronId, bookId, libraryBranchId))
+                .filter(entity -> entity.is(patronId, bookId, libraryBranchId))
                 .findAny()
                 .ifPresent(entity -> booksOnHold.remove(entity));
         return this;

@@ -5,7 +5,7 @@ import io.vavr.control.Either
 import spock.lang.Specification
 
 import static io.pillopl.library.lending.domain.book.BookFixture.circulatingBook
-import static io.pillopl.library.lending.domain.patron.HoldDuration.forCloseEnded
+import static io.pillopl.library.lending.domain.patron.HoldDuration.closeEnded
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.*
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.regularPatronWithHolds
 
@@ -16,7 +16,7 @@ class PatronRequestingLastPossibleHoldTest extends Specification {
         given:
             AvailableBook book = circulatingBook()
         when:
-            Either<BookHoldFailed, BookPlacedOnHoldEvents> hold = regularPatronWithHolds(4).placeOnHold(book, forCloseEnded(3))
+            Either<BookHoldFailed, BookPlacedOnHoldEvents> hold = regularPatronWithHolds(4).placeOnHold(book, closeEnded(3))
         then:
             hold.isRight()
             hold.get().with {

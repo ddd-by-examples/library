@@ -68,13 +68,13 @@ class DomainModelMapper {
     OverdueCheckouts mapPatronOverdueCheckouts(PatronBooksDatabaseEntity patronBooksDatabaseEntity) {
         return new OverdueCheckouts(
                 patronBooksDatabaseEntity
-                .overdueCheckouts
+                .checkouts
                 .stream()
-                .collect(groupingBy(CheckoutDatabaseEntity::getLibraryBranchId, toSet()))
+                .collect(groupingBy(OverdueCheckoutDatabaseEntity::getLibraryBranchId, toSet()))
                 .entrySet()
                 .stream()
                 .collect(toMap(
-                        (Entry<UUID,Set<CheckoutDatabaseEntity>> entry) -> new LibraryBranchId(entry.getKey()),
+                        (Entry<UUID,Set<OverdueCheckoutDatabaseEntity>> entry) -> new LibraryBranchId(entry.getKey()),
                         entry -> entry
                                 .getValue()
                                 .stream()

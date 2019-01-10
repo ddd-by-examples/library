@@ -1,5 +1,6 @@
 package io.pillopl.library.lending.application.checkout;
 
+import io.pillopl.library.lending.domain.dailysheet.DailySheet;
 import io.pillopl.library.lending.domain.patron.PatronBooksRepository;
 import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
@@ -11,12 +12,12 @@ public class RegisteringOverdueCheckout {
         Success, Error
     }
 
-    private final FindCheckoutsToOverduePolicy find;
+    private final DailySheet find;
     private final PatronBooksRepository patronBooksRepository;
 
     public Try<Result> registerOverdueCheckouts() {
         return Try.of(() ->
-                find.allCheckoutsToOverdue()
+                find.checkoutsToOverdue()
                 .toStreamOfEvents()
                 .map(patronBooksRepository::handle)
                 .find(Try::isFailure)

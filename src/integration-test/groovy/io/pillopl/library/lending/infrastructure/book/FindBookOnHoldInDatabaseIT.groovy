@@ -25,7 +25,7 @@ import static io.pillopl.library.lending.domain.patron.PatronInformation.PatronT
 
 @ContextConfiguration(classes = BookDatabaseConfiguration.class)
 @SpringBootTest
-class FindAvailableBookInDatabaseIT extends Specification {
+class FindBookOnHoldInDatabaseIT extends Specification {
 
     BookId bookId = anyBookId()
     LibraryBranchId libraryBranchId = anyBranch()
@@ -34,23 +34,22 @@ class FindAvailableBookInDatabaseIT extends Specification {
     @Autowired
     BookDatabaseRepository bookEntityRepository
 
-    def 'should find available book in database'() {
+    def 'should find book on hold in database'() {
         given:
             AvailableBook availableBook = circulatingAvailableBookAt(bookId, libraryBranchId)
         when:
             bookEntityRepository.save(availableBook)
         then:
-            bookEntityRepository.findAvailableBookBy(bookId).isDefined()
+            bookEntityRepository.findBookOnHold(bookId, patronId).isEmpty()
         when:
-            BookOnHold bookOnHold = availableBook.handle(placedOnHold())
+            BookOnHold bookOnHold = availableBook.handle(placedOnHoldBy(patronId))
         and:
             bookEntityRepository.save(bookOnHold)
         then:
-            bookEntityRepository.findAvailableBookBy(bookId).isEmpty()
+            bookEntityRepository.findBookOnHold(bookId, patronId).isDefined()
     }
 
-
-    BookPlacedOnHoldEvents placedOnHold() {
+    BookPlacedOnHoldEvents placedOnHoldBy(PatronId patronId) {
         return events(
                 new PatronInformation(patronId, Regular), now(
                 new BookInformation(bookId, Circulating),

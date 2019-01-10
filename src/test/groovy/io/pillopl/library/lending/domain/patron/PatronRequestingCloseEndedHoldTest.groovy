@@ -11,6 +11,7 @@ import static io.pillopl.library.lending.domain.book.BookFixture.circulatingAvai
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldFailed
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldEvents
+import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.regularPatron
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.regularPatronWithPolicy
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.researcherPatronWithPolicy
 
@@ -24,7 +25,7 @@ class PatronRequestingCloseEndedHoldTest extends Specification {
         given:
             AvailableBook aBook = circulatingAvailableBook()
         when:
-            Either<BookHoldFailed, BookPlacedOnHoldEvents> hold = patron.placeOnHold(aBook, HoldDuration.forCloseEnded(from, NumberOfDays.of(3)))
+            Either<BookHoldFailed, BookPlacedOnHoldEvents> hold = patron.placeOnHold(aBook, HoldDuration.closeEnded(from, NumberOfDays.of(3)))
         then:
             hold.isRight()
             hold.get().with {
@@ -38,6 +39,21 @@ class PatronRequestingCloseEndedHoldTest extends Specification {
         where:
             patron << [regularPatronWithPolicy(onlyResearcherPatronsCanPlaceOpenEndedHolds),
                        researcherPatronWithPolicy(onlyResearcherPatronsCanPlaceOpenEndedHolds)]
+
+    }
+
+    def 'patron cannot hold a book for 0 or negative amount of days'() {
+        given:
+            AvailableBook aBook = circulatingAvailableBook()
+        and:
+            PatronBooks patron = regularPatron()
+        when:
+            patron.placeOnHold(aBook, HoldDuration.closeEnded(from, NumberOfDays.of(days)))
+        then:
+           thrown(IllegalArgumentException)
+
+        where:
+            days << (-10 .. 0)
 
     }
 

@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @NoArgsConstructor
 @Getter
-public class BookOnHoldDatabaseEntity {
+class BookOnHoldDatabaseEntity {
 
     @Id
     Long id;
@@ -25,7 +25,7 @@ public class BookOnHoldDatabaseEntity {
         this.till = till;
     }
 
-    boolean hasSamePropertiesAs(UUID patronId, UUID bookId, UUID libraryBranchId) {
+    boolean is(UUID patronId, UUID bookId, UUID libraryBranchId) {
         return  this.patronId.equals(patronId) &&
                 this.bookId.equals(bookId) &&
                 this.libraryBranchId.equals(libraryBranchId);

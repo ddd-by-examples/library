@@ -99,14 +99,16 @@ public interface PatronBooksEvent {
         @NonNull UUID bookId;
         @NonNull BookType bookType;
         @NonNull UUID libraryBranchId;
+        @NonNull Instant till;
 
-        public static BookCollected now(BookInformation book, LibraryBranchId libraryBranchId, PatronId patronId) {
+        public static BookCollected now(BookInformation book, LibraryBranchId libraryBranchId, PatronId patronId, CheckoutDuration checkoutDuration) {
             return new BookCollected(
                     Instant.now(),
                     patronId.getPatronId(),
                     book.getBookId().getBookId(),
                     book.getBookType(),
-                    libraryBranchId.getLibraryBranchId());
+                    libraryBranchId.getLibraryBranchId(),
+                    checkoutDuration.to());
         }
     }
 

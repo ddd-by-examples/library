@@ -1,6 +1,7 @@
 package io.pillopl.library.lending.application.checkout
 
-
+import io.pillopl.library.lending.domain.dailysheet.CheckoutsToOverdueSheet
+import io.pillopl.library.lending.domain.dailysheet.DailySheet
 import io.pillopl.library.lending.domain.patron.PatronBooksRepository
 import io.pillopl.library.lending.domain.patron.PatronId
 import io.vavr.control.Try
@@ -14,13 +15,16 @@ class RegisteringOverdueCheckoutsTest extends Specification {
 
     //TODO test events emitted
     PatronBooksRepository repository = Stub()
+    DailySheet dailySheet = Stub()
     PatronId patronWithOverdueCheckouts = anyPatronId()
     PatronId anotherPatronWithOverdueCheckouts = anyPatronId()
 
     RegisteringOverdueCheckout registeringOverdueCheckout =
-            new RegisteringOverdueCheckout({ ->
-                overdueCheckoutsBy(patronWithOverdueCheckouts, anotherPatronWithOverdueCheckouts)
-            }, repository)
+            new RegisteringOverdueCheckout(dailySheet, repository)
+
+    def setup() {
+        dailySheet.checkoutsToOverdue() >> overdueCheckoutsBy(patronWithOverdueCheckouts, anotherPatronWithOverdueCheckouts)
+    }
 
 
     def 'should return success if all checkouts were marked as overdue'() {
@@ -53,9 +57,8 @@ class RegisteringOverdueCheckoutsTest extends Specification {
         repository.handle(_) >> Try.success(null)
     }
 
-
-    FindCheckoutsToOverduePolicy.CheckoutsToMarkAsOverdueView overdueCheckoutsBy(PatronId patronId, PatronId anotherPatronId) {
-        return new FindCheckoutsToOverduePolicy.CheckoutsToMarkAsOverdueView(
+    CheckoutsToOverdueSheet overdueCheckoutsBy(PatronId patronId, PatronId anotherPatronId) {
+        return new CheckoutsToOverdueSheet(
                 of(
                         io.vavr.Tuple.of(anyBookId(), patronId),
                         io.vavr.Tuple.of(anyBookId(), anotherPatronId)

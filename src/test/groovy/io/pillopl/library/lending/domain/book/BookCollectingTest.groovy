@@ -32,7 +32,8 @@ class BookCollectingTest extends Specification {
                 patronId.patronId,
                 bookOnHold.getBookId().bookId,
                 bookOnHold.bookInformation.bookType,
-                libraryBranchId.libraryBranchId)
+                libraryBranchId.libraryBranchId,
+                Instant.now())
     }
 
 

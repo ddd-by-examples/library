@@ -28,23 +28,23 @@ public class HoldDuration {
         return Option.of(to);
     }
 
-    public static HoldDuration forOpenEnded() {
-        return forOpenEnded(Instant.now());
+    public static HoldDuration openEnded() {
+        return openEnded(Instant.now());
     }
 
-    public static HoldDuration forOpenEnded(Instant from) {
+    public static HoldDuration openEnded(Instant from) {
         return new HoldDuration(from, null);
     }
 
-    public static HoldDuration forCloseEnded(NumberOfDays days) {
-        return forCloseEnded(Instant.now(), days);
+    public static HoldDuration closeEnded(NumberOfDays days) {
+        return closeEnded(Instant.now(), days);
     }
 
-    public static HoldDuration forCloseEnded(int days) {
-        return forCloseEnded(Instant.now(), NumberOfDays.of(days));
+    public static HoldDuration closeEnded(int days) {
+        return closeEnded(Instant.now(), NumberOfDays.of(days));
     }
 
-    public static HoldDuration forCloseEnded(Instant from, NumberOfDays days) {
+    public static HoldDuration closeEnded(Instant from, NumberOfDays days) {
         Instant till = from.plus(Duration.ofDays(days.getDays()));
         return new HoldDuration(from, till);
     }

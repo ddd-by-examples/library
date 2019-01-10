@@ -84,6 +84,15 @@ public class PatronBooksFixture {
                 patronHolds);
     }
 
+    public static PatronBooks regularPatronWith(BookOnHold bookOnHold, PatronId patronId) {
+        PatronHolds patronHolds = new PatronHolds(Collections.singleton(new PatronHold(bookOnHold.getBookId(), bookOnHold.getHoldPlacedAt())));
+        return new PatronBooks(
+                patronInformation(patronId, Regular),
+                allCurrentPolicies(),
+                new OverdueCheckouts(new HashMap<>()),
+                patronHolds);
+    }
+
     public static PatronHold onHold() {
         return new PatronHold(anyBookId(), anyBranch());
     }
@@ -147,4 +156,6 @@ public class PatronBooksFixture {
     public static PatronBooks regularPatronWithHold(BookOnHold bookOnHold) {
         return regularPatronWith(new PatronHold(bookOnHold.getBookId(), bookOnHold.getHoldPlacedAt()));
     }
+
+
 }

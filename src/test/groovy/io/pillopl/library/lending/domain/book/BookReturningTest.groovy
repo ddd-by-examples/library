@@ -98,7 +98,8 @@ class BookReturningTest extends Specification {
                 patronId.patronId,
                 bookOnHold.getBookId().bookId,
                 bookOnHold.bookInformation.bookType,
-                libraryBranchId.libraryBranchId)
+                libraryBranchId.libraryBranchId,
+                Instant.now())
     }
 
     PatronBooksEvent.BookPlacedOnHoldEvents bookPlacedOnHold(AvailableBook availableBook, PatronId byPatron, LibraryBranchId libraryBranchId, Instant from, Instant till) {

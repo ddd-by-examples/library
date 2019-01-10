@@ -1,11 +1,9 @@
-package io.pillopl.library.lending.infrastructure.patron;
+package io.pillopl.library.lending.infrastructure.dailysheet;
 
-import io.pillopl.library.lending.domain.patron.PatronBooksFactory;
-import io.pillopl.library.lending.domain.patron.PatronBooksRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 import org.springframework.data.jdbc.repository.config.JdbcConfiguration;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -17,8 +15,7 @@ import javax.sql.DataSource;
 import java.time.Clock;
 
 @Configuration
-@EnableJdbcRepositories
-class PatronDatabaseConfiguration extends JdbcConfiguration {
+class SheetReadModelDatabaseConfiguration extends JdbcConfiguration {
 
     @Bean
     NamedParameterJdbcOperations operations() {
@@ -35,13 +32,13 @@ class PatronDatabaseConfiguration extends JdbcConfiguration {
         return new EmbeddedDatabaseBuilder()
                 .generateUniqueName(true)
                 .setType(EmbeddedDatabaseType.H2)
-                .addScript("create_patron_db.sql")
+                .addScript("create_sheets_db.sql")
                 .build();
     }
 
     @Bean
-    PatronBooksRepository patronBooksRepository(PatronBooksEntityRepository patronBooksEntityRepository) {
-        return new PatronBooksDatabaseRepository(patronBooksEntityRepository, new DomainModelMapper(new PatronBooksFactory()));
+    SheetsReadModel sheetReadModel(DataSource dataSource) {
+        return new SheetsReadModel(new JdbcTemplate(dataSource), Clock.systemDefaultZone());
     }
 
 

@@ -3,6 +3,7 @@ package io.pillopl.library.lending.infrastructure.patron
 import io.pillopl.library.lending.domain.book.BookInformation
 import io.pillopl.library.lending.domain.book.BookType
 import io.pillopl.library.lending.domain.library.LibraryBranchId
+import io.pillopl.library.lending.domain.patron.CheckoutDuration
 import io.pillopl.library.lending.domain.patron.HoldDuration
 import io.pillopl.library.lending.domain.patron.NumberOfDays
 import io.pillopl.library.lending.domain.patron.PatronBooksEvent
@@ -15,8 +16,8 @@ import java.time.Instant
 
 import static io.pillopl.library.lending.domain.book.BookFixture.anyBookId
 import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.domain.patron.HoldDuration.forCloseEnded
-import static io.pillopl.library.lending.domain.patron.HoldDuration.forOpenEnded
+import static io.pillopl.library.lending.domain.patron.HoldDuration.closeEnded
+import static io.pillopl.library.lending.domain.patron.HoldDuration.openEnded
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold.now
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldEvents.events
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.anyPatronId
@@ -34,7 +35,7 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
         given:
             PatronBooksDatabaseEntity entity = createPatron()
         when:
-            entity.handle(placedOnHold(forCloseEnded(holdFrom, NumberOfDays.of(1))))
+            entity.handle(placedOnHold(closeEnded(holdFrom, NumberOfDays.of(1))))
         then:
             entity.booksOnHold.size() == 1
             entity.booksOnHold.iterator().next().till == holdFrom.plus(Duration.ofDays(1))
@@ -45,7 +46,7 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
         given:
             PatronBooksDatabaseEntity entity = createPatron()
         when:
-            entity.handle(placedOnHold(forOpenEnded()))
+            entity.handle(placedOnHold(openEnded()))
         then:
             entity.booksOnHold.size() == 1
             entity.booksOnHold.iterator().next().till == null
@@ -60,7 +61,7 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
         then:
             entity.booksOnHold.size() == 1
         when:
-            entity.handle(patronCollected())
+            entity.handle(bookCollected())
         then:
             entity.booksOnHold.size() == 0
 
@@ -93,15 +94,32 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
 
     }
 
+    def 'should add checkout on bookCollected event'() {
+        given:
+            PatronBooksDatabaseEntity entity = createPatron()
+        when:
+            entity.handle(placedOnHold())
+        then:
+            entity.booksOnHold.size() == 1
+        when:
+            entity.handle(bookCollected())
+        then:
+            entity.booksOnHold.size() == 0
+            entity.checkouts.size() == 0
+
+
+    }
+
     PatronBooksDatabaseEntity createPatron() {
         new PatronBooksDatabaseEntity(new PatronInformation(patronId, Regular))
     }
 
-    PatronBooksEvent.BookCollected patronCollected() {
+    PatronBooksEvent.BookCollected bookCollected() {
         return PatronBooksEvent.BookCollected.now(
                 bookInformation,
                 libraryBranchId,
-                patronId)
+                patronId,
+                    CheckoutDuration.forNoOfDays(1))
     }
 
     PatronBooksEvent.BookHoldCanceled holdCanceled() {
@@ -112,7 +130,7 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
         )
     }
 
-    PatronBooksEvent.BookPlacedOnHoldEvents placedOnHold(HoldDuration duration = forCloseEnded(5)) {
+    PatronBooksEvent.BookPlacedOnHoldEvents placedOnHold(HoldDuration duration = closeEnded(5)) {
         return events(
                 new PatronInformation(patronId, Regular), now(
                 bookInformation,

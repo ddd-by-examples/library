@@ -8,7 +8,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-public interface PatronBooksEntityRepository extends CrudRepository<PatronBooksDatabaseEntity, Long> {
+interface PatronBooksEntityRepository extends CrudRepository<PatronBooksDatabaseEntity, Long> {
 
     @Query("SELECT p.* FROM patron_books_database_entity p where p.patron_id = :patronId")
     PatronBooksDatabaseEntity findByPatronId(@Param("patronId") UUID patronId);
