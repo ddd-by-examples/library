@@ -1,5 +1,6 @@
 package io.pillopl.library.lending.domain.patron;
 
+import io.pillopl.library.common.events.DomainEvent;
 import io.pillopl.library.lending.domain.book.BookId;
 import io.pillopl.library.lending.domain.book.BookInformation;
 import io.pillopl.library.lending.domain.book.BookType;
@@ -12,7 +13,7 @@ import lombok.Value;
 import java.time.Instant;
 import java.util.UUID;
 
-public interface PatronBooksEvent {
+public interface PatronBooksEvent extends DomainEvent {
 
     default PatronId patronId() {
         return new PatronId(getPatronId());
@@ -60,6 +61,7 @@ public interface PatronBooksEvent {
 
     @Value
     class BookPlacedOnHoldEvents implements PatronBooksEvent {
+        @NonNull UUID eventId = UUID.randomUUID();
         @NonNull UUID patronId;
         @NonNull BookPlacedOnHold bookPlacedOnHold;
         @NonNull Option<MaximumNumberOhHoldsReached> maximumNumberOhHoldsReached;

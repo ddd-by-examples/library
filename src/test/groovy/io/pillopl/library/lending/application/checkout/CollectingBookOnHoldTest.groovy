@@ -1,5 +1,6 @@
 package io.pillopl.library.lending.application.checkout
 
+import io.pillopl.library.lending.application.hold.FindBookOnHold
 import io.pillopl.library.lending.domain.book.BookOnHold
 import io.pillopl.library.lending.domain.patron.PatronBooks
 import io.pillopl.library.lending.domain.patron.PatronBooksRepository
@@ -27,7 +28,7 @@ class CollectingBookOnHoldTest extends Specification {
         given:
             CollectingBookOnHold collecting = new CollectingBookOnHold(willFindBook, repository)
         and:
-             persisted(regularPatronWith(bookOnHold, patronId))
+            persisted(regularPatronWith(bookOnHold, patronId))
         when:
             Try<CollectingBookOnHold.Result> result = collecting.collect(for3days(patronId))
         then:

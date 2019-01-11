@@ -23,7 +23,7 @@ class CheckoutsToOverdueSheetTest extends Specification {
     LibraryBranchId libraryBranchId = anyBranch()
     LibraryBranchId anotherLibraryBranchId = anyBranch()
 
-    def 'should transform sheet into stream of BookHoldExpired events'() {
+    def 'should transform sheet into stream of OverdueCheckoutRegistered events'() {
         given:
             CheckoutsToOverdueSheet sheet = sheet(patronId, anotherPatronId, bookId, anotherBookId, libraryBranchId, anotherLibraryBranchId)
         expect:

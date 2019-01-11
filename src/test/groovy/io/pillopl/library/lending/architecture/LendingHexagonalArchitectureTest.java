@@ -9,65 +9,62 @@ import org.junit.runner.RunWith;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 @RunWith(ArchUnitRunner.class)
-@AnalyzeClasses(packages = "io.pillopl.library.lending")
-public class HexagonalArchitectureTest {
-
-    //TODO no spring nor stubs, mockito in domain
+@AnalyzeClasses(packages = {"io.pillopl.library.lending", "org.springframework"})
+public class LendingHexagonalArchitectureTest {
 
     @ArchTest
     public static final ArchRule domain_should_not_depend_on_application =
-                    noClasses()
+            noClasses()
                     .that()
                     .resideInAPackage("..domain..")
                     .should()
                     .dependOnClassesThat()
-                    .resideInAPackage("..application..");
+                    .resideInAPackage("io.pillopl.library.lending.application..");
 
     @ArchTest
     public static final ArchRule domain_should_not_depend_on_infrastructure =
-                    noClasses()
+            noClasses()
                     .that()
-                    .resideInAPackage("..domain..")
+                    .resideInAPackage("io.pillopl.library.lending.domain..")
                     .should()
                     .dependOnClassesThat()
-                    .resideInAPackage("..infrastructure..");
+                    .resideInAPackage("io.pillopl.library.lending.infrastructure..");
 
     @ArchTest
     public static final ArchRule domain_should_not_depend_on_ui =
-                    noClasses()
+            noClasses()
                     .that()
-                    .resideInAPackage("..domain..")
+                    .resideInAPackage("io.pillopl.library.lending.domain..")
                     .should()
                     .dependOnClassesThat()
-                    .resideInAPackage("..ut..");
+                    .resideInAPackage("io.pillopl.library.lending.ui..");
 
     @ArchTest
     public static final ArchRule application_should_not_depend_on_infrastructure =
-                    noClasses()
+            noClasses()
                     .that()
-                    .resideInAPackage("..application..")
+                    .resideInAPackage("io.pillopl.library.lending.application..")
                     .should()
                     .dependOnClassesThat()
-                    .resideInAPackage("..infrastructure..");
+                    .resideInAPackage("io.pillopl.library.lending.infrastructure..");
 
     @ArchTest
     public static final ArchRule application_should_not_depend_on_ui =
-                    noClasses()
+            noClasses()
                     .that()
-                    .resideInAPackage("..application..")
+                    .resideInAPackage("io.pillopl.library.lending.application..")
                     .should()
                     .dependOnClassesThat()
-                    .resideInAPackage("..ui..");
+                    .resideInAPackage("io.pillopl.library.lending.ui..");
 
     @ArchTest
     public static final ArchRule ui_should_not_depend_on_infrastructure =
-                    noClasses()
+            noClasses()
                     .that()
-                    .resideInAPackage("..ui..")
+                    .resideInAPackage("io.pillopl.library.lending.ui..")
                     .should()
                     .dependOnClassesThat()
-                    .resideInAPackage("..infrastructure..");
-
+                    .resideInAPackage("io.pillopl.library.lending.infrastructure..");
 
 
 }

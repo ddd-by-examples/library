@@ -1,5 +1,6 @@
 package io.pillopl.library.lending.application.checkout;
 
+import io.pillopl.library.lending.application.hold.FindBookOnHold;
 import io.pillopl.library.lending.domain.book.BookId;
 import io.pillopl.library.lending.domain.book.BookOnHold;
 import io.pillopl.library.lending.domain.library.LibraryBranchId;
@@ -39,8 +40,7 @@ class CollectingBookOnHold {
             Either<BookCollectingFailed, BookCollected> result = patronBooks.collect(bookOnHold, command.getCheckoutDuration());
             return Match(result).of(
                     Case($Left($()), this::publishEvents),
-                    Case($Right($()), this::saveAndPublishEvents)
-            );
+                    Case($Right($()), this::saveAndPublishEvents));
         });
     }
 

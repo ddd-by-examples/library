@@ -1,6 +1,6 @@
 package io.pillopl.library.lending.infrastructure.book;
 
-import io.pillopl.library.lending.application.checkout.FindBookOnHold;
+import io.pillopl.library.lending.application.hold.FindBookOnHold;
 import io.pillopl.library.lending.application.hold.FindAvailableBook;
 import io.pillopl.library.lending.domain.book.*;
 import io.pillopl.library.lending.domain.patron.PatronId;

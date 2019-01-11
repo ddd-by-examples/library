@@ -1,4 +1,4 @@
-package io.pillopl.library.lending.application.checkout;
+package io.pillopl.library.lending.application.hold;
 
 
 import io.pillopl.library.lending.domain.book.BookId;
