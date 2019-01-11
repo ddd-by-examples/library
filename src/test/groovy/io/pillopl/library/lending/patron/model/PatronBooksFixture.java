@@ -144,6 +144,10 @@ public class PatronBooksFixture {
         return patronId(UUID.randomUUID());
     }
 
+    public static PatronId anyPatron() {
+        return patronId(UUID.randomUUID());
+    }
+
     static PatronId patronId(UUID patronId) {
         return new PatronId(patronId);
     }
