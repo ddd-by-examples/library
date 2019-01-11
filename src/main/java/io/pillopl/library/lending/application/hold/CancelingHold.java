@@ -1,5 +1,6 @@
 package io.pillopl.library.lending.application.hold;
 
+import io.pillopl.commons.commands.Result;
 import io.pillopl.library.lending.domain.book.BookId;
 import io.pillopl.library.lending.domain.book.BookOnHold;
 import io.pillopl.library.lending.domain.library.LibraryBranchId;
@@ -16,18 +17,14 @@ import lombok.Value;
 
 import java.time.Instant;
 
-import static io.pillopl.library.lending.application.hold.CancelingHold.Result.Rejection;
-import static io.pillopl.library.lending.application.hold.CancelingHold.Result.Success;
+import static io.pillopl.commons.commands.Result.Rejection;
+import static io.pillopl.commons.commands.Result.Success;
 import static io.vavr.API.*;
 import static io.vavr.Patterns.$Left;
 import static io.vavr.Patterns.$Right;
 
 @AllArgsConstructor
 public class CancelingHold {
-
-    enum Result {
-        Success, Rejection
-    }
 
     private final FindBookOnHold findBookOnHold;
     private final PatronBooksRepository patronBooksRepository;

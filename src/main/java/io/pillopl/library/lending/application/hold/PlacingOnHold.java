@@ -1,5 +1,6 @@
 package io.pillopl.library.lending.application.hold;
 
+import io.pillopl.commons.commands.Result;
 import io.pillopl.library.lending.domain.book.AvailableBook;
 import io.pillopl.library.lending.domain.book.BookId;
 import io.pillopl.library.lending.domain.library.LibraryBranchId;
@@ -15,18 +16,12 @@ import lombok.Value;
 
 import java.time.Instant;
 
-import static io.pillopl.library.lending.application.hold.PlacingOnHold.Result.Rejection;
-import static io.pillopl.library.lending.application.hold.PlacingOnHold.Result.Success;
 import static io.vavr.API.*;
 import static io.vavr.Patterns.$Left;
 import static io.vavr.Patterns.$Right;
 
 @AllArgsConstructor
 public class PlacingOnHold {
-
-    enum Result {
-        Success, Rejection
-    }
 
     private final FindAvailableBook findAvailableBook;
     private final PatronBooksRepository patronBooksRepository;
@@ -45,15 +40,15 @@ public class PlacingOnHold {
 
     private Result publishEvents(BookHoldFailed bookHoldFailed) {
         //TODO publish events
-        return Rejection;
+        return Result.Rejection;
     }
 
     private Result saveAndPublishEvents(BookPlacedOnHoldEvents placedOnHold) {
         //TODO publish events
         return patronBooksRepository
                 .handle(placedOnHold)
-                .map((PatronBooks success) -> Success)
-                .getOrElse(Rejection);
+                .map((PatronBooks success) -> Result.Success)
+                .getOrElse(Result.Rejection);
     }
 
     private AvailableBook find(BookId id) {

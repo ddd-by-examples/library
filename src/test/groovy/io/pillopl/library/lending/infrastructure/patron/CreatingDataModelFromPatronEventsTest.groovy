@@ -13,7 +13,7 @@ import static io.pillopl.library.lending.domain.book.BookFixture.anyBookId
 import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.domain.patron.HoldDuration.closeEnded
 import static io.pillopl.library.lending.domain.patron.HoldDuration.openEnded
-import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold.now
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold.bookPlacedOnHoldNow
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldEvents.events
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.anyPatronId
 import static io.pillopl.library.lending.domain.patron.PatronInformation.PatronType.Regular
@@ -118,7 +118,7 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
     }
 
     PatronBooksEvent.BookCollected bookCollected() {
-        return PatronBooksEvent.BookCollected.now(
+        return PatronBooksEvent.BookCollected.bookCollectedNow(
                 bookInformation,
                 libraryBranchId,
                 patronId,
@@ -135,7 +135,7 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
     }
 
     PatronBooksEvent.BookHoldCanceled holdCanceled() {
-        return PatronBooksEvent.BookHoldCanceled.now(
+        return PatronBooksEvent.BookHoldCanceled.holdCanceledNow(
                 bookInformation,
                 libraryBranchId,
                 new PatronInformation(patronId, Regular),
@@ -143,8 +143,7 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
     }
 
     PatronBooksEvent.BookPlacedOnHoldEvents placedOnHold(HoldDuration duration = closeEnded(5)) {
-        return events(
-                new PatronInformation(patronId, Regular), now(
+        return events(bookPlacedOnHoldNow(
                 bookInformation,
                 libraryBranchId,
                 new PatronInformation(patronId, Regular),

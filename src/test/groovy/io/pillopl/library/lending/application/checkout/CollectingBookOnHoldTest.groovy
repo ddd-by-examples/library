@@ -1,5 +1,6 @@
 package io.pillopl.library.lending.application.checkout
 
+import io.pillopl.commons.commands.Result
 import io.pillopl.library.lending.application.hold.FindBookOnHold
 import io.pillopl.library.lending.domain.book.BookOnHold
 import io.pillopl.library.lending.domain.patron.PatronBooks
@@ -9,7 +10,6 @@ import io.vavr.control.Option
 import io.vavr.control.Try
 import spock.lang.Specification
 
-import static io.pillopl.library.lending.application.checkout.CollectingBookOnHold.Result.Success
 import static io.pillopl.library.lending.domain.book.BookFixture.anyBookId
 import static io.pillopl.library.lending.domain.book.BookFixture.bookOnHold
 import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
@@ -30,13 +30,12 @@ class CollectingBookOnHoldTest extends Specification {
         and:
             persisted(regularPatronWith(bookOnHold, patronId))
         when:
-            Try<CollectingBookOnHold.Result> result = collecting.collect(for3days(patronId))
+            Try<Result> result = collecting.collect(for3days(patronId))
         then:
             result.isSuccess()
-            result.get() == Success
+            result.get() == Result.Success
 
     }
-
 
     def 'should reject collecting if one of the domain rules is broken (but should not fail!)'() {
         given:
@@ -44,10 +43,10 @@ class CollectingBookOnHoldTest extends Specification {
         and:
             persisted(regularPatron(patronId))
         when:
-            Try<CollectingBookOnHold.Result> result = collecting.collect(for3days(patronId))
+            Try<Result> result = collecting.collect(for3days(patronId))
         then:
             result.isSuccess()
-            result.get() == CollectingBookOnHold.Result.Rejection
+            result.get() == Result.Rejection
 
     }
 
@@ -57,7 +56,7 @@ class CollectingBookOnHoldTest extends Specification {
         and:
             unknownPatron()
         when:
-            Try<CollectingBookOnHold.Result> result = collecting.collect(for3days(patronId))
+            Try<Result> result = collecting.collect(for3days(patronId))
         then:
             result.isFailure()
 
@@ -70,7 +69,7 @@ class CollectingBookOnHoldTest extends Specification {
         and:
             persisted(regularPatronWith(bookOnHold, patronId))
         when:
-            Try<CollectingBookOnHold.Result> result = collecting.collect(for3days(patronId))
+            Try<Result> result = collecting.collect(for3days(patronId))
         then:
             result.isFailure()
     }
@@ -81,10 +80,10 @@ class CollectingBookOnHoldTest extends Specification {
         and:
             PatronId patron = persistedRegularPatronThatFailsOnSaving(patronId)
         when:
-            Try<CollectingBookOnHold.Result> result = collecting.collect(for3days(patronId))
+            Try<Result> result = collecting.collect(for3days(patronId))
         then:
             result.isSuccess()
-            result.get() == CollectingBookOnHold.Result.Rejection
+            result.get() == Result.Rejection
 
     }
 

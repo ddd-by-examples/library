@@ -34,7 +34,7 @@ class SheetsReadModel implements DailySheet {
     private final Clock clock;
 
     @Override
-    public HoldsToExpireSheet holdsToExpireSheet() {
+    public HoldsToExpireSheet queryForHoldsToExpireSheet() {
         return new HoldsToExpireSheet(ofAll(
                 findHoldsToExpire()
                         .stream()
@@ -57,7 +57,7 @@ class SheetsReadModel implements DailySheet {
     }
 
     @Override
-    public CheckoutsToOverdueSheet checkoutsToOverdue() {
+    public CheckoutsToOverdueSheet queryForCheckoutsToOverdue() {
         return new CheckoutsToOverdueSheet(ofAll(
                 findCheckoutsToOverdue()
                         .stream()

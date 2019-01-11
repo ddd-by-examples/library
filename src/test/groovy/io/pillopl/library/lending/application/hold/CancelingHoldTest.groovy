@@ -1,5 +1,6 @@
 package io.pillopl.library.lending.application.hold
 
+import io.pillopl.commons.commands.Result
 import io.pillopl.library.lending.domain.book.BookOnHold
 import io.pillopl.library.lending.domain.patron.PatronBooks
 import io.pillopl.library.lending.domain.patron.PatronBooksFixture
@@ -11,7 +12,6 @@ import spock.lang.Specification
 
 import java.time.Instant
 
-import static io.pillopl.library.lending.application.hold.CancelingHold.Result.Success
 import static io.pillopl.library.lending.domain.book.BookFixture.anyBookId
 import static io.pillopl.library.lending.domain.book.BookFixture.bookOnHold
 import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
@@ -32,10 +32,10 @@ class CancelingHoldTest extends Specification {
         and:
             persistedRegularPatronWithBookOnHold()
         when:
-            Try<CancelingHold.Result> result = canceling.cancelHold(cmd())
+            Try<Result> result = canceling.cancelHold(cmd())
         then:
             result.isSuccess()
-            result.get() == Success
+            result.get() == Result.Success
     }
 
     def 'should reject placing on hold book if one of the domain rules is broken (but should not fail!)'() {
@@ -44,10 +44,10 @@ class CancelingHoldTest extends Specification {
         and:
             persistedRegularPatronWithoutBookOnHold()
         when:
-            Try<CancelingHold.Result> result = canceling.cancelHold(cmd())
+            Try<Result> result = canceling.cancelHold(cmd())
         then:
             result.isSuccess()
-            result.get() == CancelingHold.Result.Rejection
+            result.get() == Result.Rejection
 
     }
 
@@ -57,7 +57,7 @@ class CancelingHoldTest extends Specification {
         and:
             unknownPatron()
         when:
-            Try<CancelingHold.Result> result = canceling.cancelHold(cmd())
+            Try<Result> result = canceling.cancelHold(cmd())
         then:
             result.isFailure()
 
@@ -69,7 +69,7 @@ class CancelingHoldTest extends Specification {
         and:
             persistedRegularPatronWithBookOnHold()
         when:
-            Try<CancelingHold.Result> result = canceling.cancelHold(cmd())
+            Try<Result> result = canceling.cancelHold(cmd())
         then:
             result.isFailure()
     }
@@ -80,10 +80,10 @@ class CancelingHoldTest extends Specification {
         and:
             persistedRegularPatronThatFailsOnSaving()
         when:
-            Try<CancelingHold.Result> result = canceling.cancelHold(cmd())
+            Try<Result> result = canceling.cancelHold(cmd())
         then:
             result.isSuccess()
-            result.get() == CancelingHold.Result.Rejection
+            result.get() == Result.Rejection
 
     }
 

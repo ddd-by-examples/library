@@ -17,7 +17,7 @@ import static io.pillopl.library.lending.domain.book.BookFixture.anyBookId
 import static io.pillopl.library.lending.domain.book.BookFixture.circulatingAvailableBookAt
 import static io.pillopl.library.lending.domain.book.BookType.Circulating
 import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold.now
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold.bookPlacedOnHoldNow
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldEvents
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldEvents.events
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.anyPatronId
@@ -50,8 +50,7 @@ class FindBookOnHoldInDatabaseIT extends Specification {
     }
 
     BookPlacedOnHoldEvents placedOnHoldBy(PatronId patronId) {
-        return events(
-                new PatronInformation(patronId, Regular), now(
+        return events(bookPlacedOnHoldNow(
                 new BookInformation(bookId, Circulating),
                 libraryBranchId,
                 new PatronInformation(patronId, Regular),

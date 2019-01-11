@@ -12,7 +12,7 @@ import spock.lang.Specification
 
 import static io.pillopl.library.lending.domain.book.BookFixture.anyBookId
 import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold.now
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold.bookPlacedOnHoldNow
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldEvents
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldEvents.events
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.PatronCreated
@@ -44,8 +44,7 @@ class PatronBooksDatabaseRepositoryIT extends Specification {
     }
 
     BookPlacedOnHoldEvents placedOnHold() {
-        return events(
-                new PatronInformation(patronId, Regular), now(
+        return events(bookPlacedOnHoldNow(
                 bookInformation,
                 libraryBranchId,
                 new PatronInformation(patronId, Regular),

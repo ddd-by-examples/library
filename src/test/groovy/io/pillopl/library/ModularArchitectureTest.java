@@ -9,7 +9,7 @@ import org.junit.runner.RunWith;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 @RunWith(ArchUnitRunner.class)
-@AnalyzeClasses(packages = "io.pillopl.library")
+@AnalyzeClasses(packages = "io.pillopl")
 public class ModularArchitectureTest {
 
     //with maven modules - this tests go to hell

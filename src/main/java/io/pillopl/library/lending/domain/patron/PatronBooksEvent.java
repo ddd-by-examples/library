@@ -1,6 +1,6 @@
 package io.pillopl.library.lending.domain.patron;
 
-import io.pillopl.library.common.events.DomainEvent;
+import io.pillopl.commons.events.DomainEvent;
 import io.pillopl.library.lending.domain.book.BookId;
 import io.pillopl.library.lending.domain.book.BookInformation;
 import io.pillopl.library.lending.domain.book.BookType;
@@ -47,7 +47,7 @@ public interface PatronBooksEvent extends DomainEvent {
         @NonNull Instant holdFrom;
         Instant holdTill;
 
-        public static BookPlacedOnHold now(BookInformation book, LibraryBranchId libraryBranchId, PatronInformation patronInformation, HoldDuration holdDuration) {
+        public static BookPlacedOnHold bookPlacedOnHoldNow(BookInformation book, LibraryBranchId libraryBranchId, PatronInformation patronInformation, HoldDuration holdDuration) {
             return new BookPlacedOnHold(
                     Instant.now(),
                     patronInformation.getPatronId().getPatronId(),
@@ -66,12 +66,12 @@ public interface PatronBooksEvent extends DomainEvent {
         @NonNull BookPlacedOnHold bookPlacedOnHold;
         @NonNull Option<MaximumNumberOhHoldsReached> maximumNumberOhHoldsReached;
 
-        public static BookPlacedOnHoldEvents events(PatronInformation patron, BookPlacedOnHold bookPlacedOnHold) {
-            return new BookPlacedOnHoldEvents(patron.getPatronId().getPatronId(), bookPlacedOnHold, Option.none());
+        public static BookPlacedOnHoldEvents events(BookPlacedOnHold bookPlacedOnHold) {
+            return new BookPlacedOnHoldEvents(bookPlacedOnHold.getPatronId(), bookPlacedOnHold, Option.none());
         }
 
-        public static BookPlacedOnHoldEvents events(PatronInformation patron, BookPlacedOnHold bookPlacedOnHold, MaximumNumberOhHoldsReached maximumNumberOhHoldsReached) {
-            return new BookPlacedOnHoldEvents(patron.getPatronId().getPatronId(), bookPlacedOnHold, Option.of(maximumNumberOhHoldsReached));
+        public static BookPlacedOnHoldEvents events(BookPlacedOnHold bookPlacedOnHold, MaximumNumberOhHoldsReached maximumNumberOhHoldsReached) {
+            return new BookPlacedOnHoldEvents(bookPlacedOnHold.patronId, bookPlacedOnHold, Option.of(maximumNumberOhHoldsReached));
         }
 
     }
@@ -101,7 +101,7 @@ public interface PatronBooksEvent extends DomainEvent {
         @NonNull UUID libraryBranchId;
         @NonNull Instant till;
 
-        public static BookCollected now(BookInformation book, LibraryBranchId libraryBranchId, PatronId patronId, CheckoutDuration checkoutDuration) {
+        public static BookCollected bookCollectedNow(BookInformation book, LibraryBranchId libraryBranchId, PatronId patronId, CheckoutDuration checkoutDuration) {
             return new BookCollected(
                     Instant.now(),
                     patronId.getPatronId(),
@@ -131,7 +131,7 @@ public interface PatronBooksEvent extends DomainEvent {
         @NonNull UUID bookId;
         @NonNull UUID libraryBranchId;
 
-        static BookHoldFailed now(Rejection rejection, BookId bookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
+        static BookHoldFailed bookHoldFailedNow(Rejection rejection, BookId bookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
             return new BookHoldFailed(
                     rejection.getReason().getReason(),
                     Instant.now(),
@@ -150,7 +150,7 @@ public interface PatronBooksEvent extends DomainEvent {
         @NonNull UUID bookId;
         @NonNull UUID libraryBranchId;
 
-        static BookCollectingFailed now(Rejection rejection, BookId bookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
+        static BookCollectingFailed bookCollectingFailedNow(Rejection rejection, BookId bookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
             return new BookCollectingFailed(
                     rejection.getReason().getReason(),
                     Instant.now(),
@@ -168,7 +168,7 @@ public interface PatronBooksEvent extends DomainEvent {
         @NonNull UUID bookId;
         @NonNull UUID libraryBranchId;
 
-        public static BookHoldCanceled now(BookInformation bookInformation, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
+        public static BookHoldCanceled holdCanceledNow(BookInformation bookInformation, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
             return new BookHoldCanceled(
                     Instant.now(),
                     patronInformation.getPatronId().getPatronId(),
@@ -185,7 +185,7 @@ public interface PatronBooksEvent extends DomainEvent {
         @NonNull UUID bookId;
         @NonNull UUID libraryBranchId;
 
-        static BookHoldCancelingFailed now(BookId bookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
+        static BookHoldCancelingFailed holdCancelingFailedNow(BookId bookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
             return new BookHoldCancelingFailed(
                     Instant.now(),
                     patronInformation.getPatronId().getPatronId(),

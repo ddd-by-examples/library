@@ -3,7 +3,6 @@ package io.pillopl.library.lending.domain.book
 import io.pillopl.library.lending.domain.library.LibraryBranchId
 import io.pillopl.library.lending.domain.patron.PatronBooksEvent
 import io.pillopl.library.lending.domain.patron.PatronId
-import io.pillopl.library.lending.domain.patron.PatronInformation
 import spock.lang.Specification
 
 import java.time.Instant
@@ -35,7 +34,6 @@ class BookPlacingOnHoldTest extends Specification {
 
     PatronBooksEvent.BookPlacedOnHoldEvents bookPlacedOnHold(AvailableBook availableBook, PatronId byPatron, LibraryBranchId libraryBranchId, Instant from, Instant till) {
         return PatronBooksEvent.BookPlacedOnHoldEvents.events(
-                new PatronInformation(byPatron, PatronInformation.PatronType.Regular),
                 new PatronBooksEvent.BookPlacedOnHold(Instant.now(),
                         byPatron.patronId,
                         availableBook.getBookId().bookId,

@@ -30,6 +30,7 @@ class BookDatabaseRepository implements BookRepository, FindAvailableBook, FindB
 
     @Override
     public Try<Void> save(Book book) {
+        //TODO optimistic locking
         return Try.run(() -> {
             BookDatabaseEntity foundBook = bookEntityRepository
                     .findByBookId(book.bookId().getBookId())

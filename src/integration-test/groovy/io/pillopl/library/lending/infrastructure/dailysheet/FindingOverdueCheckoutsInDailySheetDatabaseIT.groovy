@@ -46,35 +46,35 @@ class FindingOverdueCheckoutsInDailySheetDatabaseIT extends Specification {
 
     def 'should find overdue checkouts'() {
         given:
-            int currentNoOfOverdueCheckouts = readModel.checkoutsToOverdue().count()
+            int currentNoOfOverdueCheckouts = readModel.queryForCheckoutsToOverdue().count()
         when:
             readModel.handle(bookCollected(tillYesterday()))
         and:
             readModel.handle(bookCollected(tillTomorrow()))
         then:
-            readModel.checkoutsToOverdue().count() == currentNoOfOverdueCheckouts + 1
+            readModel.queryForCheckoutsToOverdue().count() == currentNoOfOverdueCheckouts + 1
     }
 
     def 'handling bookCollected should de idempotent'() {
         given:
-            int currentNoOfOverdueCheckouts = readModel.checkoutsToOverdue().count()
+            int currentNoOfOverdueCheckouts = readModel.queryForCheckoutsToOverdue().count()
         and:
             PatronBooksEvent.BookCollected event = bookCollected(tillYesterday())
         when:
             2.times { readModel.handle(event) }
         then:
-            readModel.checkoutsToOverdue().count() == currentNoOfOverdueCheckouts + 1
+            readModel.queryForCheckoutsToOverdue().count() == currentNoOfOverdueCheckouts + 1
     }
 
     def 'should never find returned books'() {
         given:
-            int currentNoOfOverdueCheckouts = readModel.checkoutsToOverdue().count()
+            int currentNoOfOverdueCheckouts = readModel.queryForCheckoutsToOverdue().count()
         and:
             readModel.handle(bookCollected(tillTomorrow()))
         when:
             readModel.handle(bookReturned())
         then:
-            readModel.checkoutsToOverdue().count() == currentNoOfOverdueCheckouts
+            readModel.queryForCheckoutsToOverdue().count() == currentNoOfOverdueCheckouts
     }
 
 

@@ -1,12 +1,14 @@
 package io.pillopl.library.lending.application.hold
 
-import io.pillopl.library.lending.domain.patron.*
+import io.pillopl.commons.commands.Result
+import io.pillopl.library.lending.domain.patron.PatronBooks
+import io.pillopl.library.lending.domain.patron.PatronBooksFixture
+import io.pillopl.library.lending.domain.patron.PatronBooksRepository
+import io.pillopl.library.lending.domain.patron.PatronId
 import io.vavr.control.Option
 import io.vavr.control.Try
 import spock.lang.Specification
 
-
-import static io.pillopl.library.lending.application.hold.PlacingOnHold.Result.Success
 import static io.pillopl.library.lending.domain.book.BookFixture.anyBookId
 import static io.pillopl.library.lending.domain.book.BookFixture.circulatingBook
 import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
@@ -24,10 +26,10 @@ class PlacingBookOnHoldTest extends Specification {
         and:
             PatronId patron = persistedRegularPatron()
         when:
-            Try<PlacingOnHold.Result> result = holding.placeOnHold(for3days(patron))
+            Try<Result> result = holding.placeOnHold(for3days(patron))
         then:
             result.isSuccess()
-            result.get() == Success
+            result.get() == Result.Success
 
     }
 
@@ -38,10 +40,10 @@ class PlacingBookOnHoldTest extends Specification {
         and:
             PatronId patron = persistedRegularPatronWithManyHolds()
         when:
-            Try<PlacingOnHold.Result> result = holding.placeOnHold(for3days(patron))
+            Try<Result> result = holding.placeOnHold(for3days(patron))
         then:
             result.isSuccess()
-            result.get() == PlacingOnHold.Result.Rejection
+            result.get() == Result.Rejection
 
     }
 
@@ -51,7 +53,7 @@ class PlacingBookOnHoldTest extends Specification {
         and:
             PatronId patron = unknownPatron()
         when:
-            Try<PlacingOnHold.Result> result = holding.placeOnHold(for3days(patron))
+            Try<Result> result = holding.placeOnHold(for3days(patron))
         then:
             result.isFailure()
 
@@ -64,7 +66,7 @@ class PlacingBookOnHoldTest extends Specification {
         and:
             PatronId patron = persistedRegularPatron()
         when:
-            Try<PlacingOnHold.Result> result = holding.placeOnHold(for3days(patron))
+            Try<Result> result = holding.placeOnHold(for3days(patron))
         then:
             result.isFailure()
     }
@@ -75,10 +77,10 @@ class PlacingBookOnHoldTest extends Specification {
         and:
             PatronId patron = persistedRegularPatronThatFailsOnSaving()
         when:
-            Try<PlacingOnHold.Result> result = holding.placeOnHold(for3days(patron))
+            Try<Result> result = holding.placeOnHold(for3days(patron))
         then:
             result.isSuccess()
-            result.get() == PlacingOnHold.Result.Rejection
+            result.get() == Result.Rejection
 
     }
 

@@ -11,9 +11,17 @@ import io.vavr.control.Option;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 
+import static io.pillopl.commons.commands.EitherResult.announceFailure;
+import static io.pillopl.commons.commands.EitherResult.announceSuccess;
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookCollected.bookCollectedNow;
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookCollectingFailed.bookCollectingFailedNow;
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldCanceled.*;
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldCancelingFailed.*;
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldFailed.bookHoldFailedNow;
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold.bookPlacedOnHoldNow;
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldEvents.events;
 import static io.pillopl.library.lending.domain.patron.PatronHolds.MAX_NUMBER_OF_HOLDS;
-import static io.vavr.control.Either.left;
+import static io.pillopl.library.lending.domain.patron.Rejection.withReason;
 import static io.vavr.control.Either.right;
 
 //TODO - rename to patron?
@@ -36,27 +44,27 @@ public class PatronBooks {
     public Either<BookHoldFailed, BookPlacedOnHoldEvents> placeOnHold(AvailableBook aBook, HoldDuration duration) {
         Option<Rejection> rejection = patronCanHold(aBook, duration);
         if (rejection.isEmpty()) {
-            BookPlacedOnHold bookPlacedOnHold = BookPlacedOnHold.now(aBook.getBookInformation(), aBook.getLibraryBranch(), patron, duration);
+            BookPlacedOnHold bookPlacedOnHold = bookPlacedOnHoldNow(aBook.getBookInformation(), aBook.getLibraryBranch(), patron, duration);
             if (patronHolds.maximumHoldsAfterHolding(aBook)) {
-                return right(events(patron, bookPlacedOnHold, MaximumNumberOhHoldsReached.now(patron, MAX_NUMBER_OF_HOLDS)));
+                return announceSuccess(events(bookPlacedOnHold, MaximumNumberOhHoldsReached.now(patron, MAX_NUMBER_OF_HOLDS)));
             }
-            return right(events(patron, bookPlacedOnHold));
+            return right(events(bookPlacedOnHold));
         }
-        return left(BookHoldFailed.now(rejection.get(), aBook.getBookId(), aBook.getLibraryBranch(), patron));
+        return announceFailure(bookHoldFailedNow(rejection.get(), aBook.getBookId(), aBook.getLibraryBranch(), patron));
     }
 
     public Either<BookHoldCancelingFailed, BookHoldCanceled> cancelHold(BookOnHold book) {
         if (patronHolds.a(book)) {
-            return right(BookHoldCanceled.now(book.getBookInformation(), book.getHoldPlacedAt(), patron));
+            return announceSuccess(holdCanceledNow(book.getBookInformation(), book.getHoldPlacedAt(), patron));
         }
-        return left(BookHoldCancelingFailed.now(book.getBookId(), book.getHoldPlacedAt(), patron));
+        return announceFailure(holdCancelingFailedNow(book.getBookId(), book.getHoldPlacedAt(), patron));
     }
 
     public Either<BookCollectingFailed, BookCollected> collect(BookOnHold book, CheckoutDuration duration) {
         if (patronHolds.a(book)) {
-            return right(BookCollected.now(book.getBookInformation(), book.getHoldPlacedAt(), patron.getPatronId(), duration));
+            return announceSuccess(bookCollectedNow(book.getBookInformation(), book.getHoldPlacedAt(), patron.getPatronId(), duration));
         }
-        return left(BookCollectingFailed.now(Rejection.withReason("book is not on hold by patron"), book.getBookId(), book.getHoldPlacedAt(), patron));
+        return announceFailure(bookCollectingFailedNow(withReason("book is not on hold by patron"), book.getBookId(), book.getHoldPlacedAt(), patron));
     }
 
     private Option<Rejection> patronCanHold(AvailableBook aBook, HoldDuration forDuration) {
@@ -78,6 +86,8 @@ public class PatronBooks {
     public int numberOfHolds() {
         return patronHolds.count();
     }
+
+
 
 }
 

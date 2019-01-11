@@ -1,5 +1,6 @@
 package io.pillopl.library.lending.application.hold
 
+import io.pillopl.commons.commands.BatchResult
 import io.pillopl.library.lending.domain.dailysheet.DailySheet
 import io.pillopl.library.lending.domain.dailysheet.HoldsToExpireSheet
 import io.pillopl.library.lending.domain.patron.PatronBooksRepository
@@ -24,17 +25,17 @@ class ExpiringHoldsTest extends Specification {
     ExpiringHolds expiring = new ExpiringHolds(dailySheet, repository)
 
     def setup() {
-        dailySheet.holdsToExpireSheet() >> expiredHoldsBy(patronWithExpiringHolds, anotherPatronWithExpiringHolds)
+        dailySheet.queryForHoldsToExpireSheet() >> expiredHoldsBy(patronWithExpiringHolds, anotherPatronWithExpiringHolds)
     }
 
     def 'should return success if all holds were marked as expired'() {
         given:
             holdsWillBeExpiredSuccessfullyForBothPatrons()
         when:
-            Try<ExpiringHolds.Result> result = expiring.expireHolds()
+            Try<BatchResult> result = expiring.expireHolds()
         then:
             result.isSuccess()
-            result.get() == ExpiringHolds.Result.Success
+            result.get() == BatchResult.FullSuccess
 
     }
 
@@ -42,10 +43,10 @@ class ExpiringHoldsTest extends Specification {
         given:
             expiringHoldWillFailForSecondPatron()
         when:
-            Try<ExpiringHolds.Result> result = expiring.expireHolds()
+            Try<BatchResult> result = expiring.expireHolds()
         then:
             result.isSuccess()
-            result.get() == ExpiringHolds.Result.Error
+            result.get() == BatchResult.SomeFailed
 
     }
 

@@ -1,4 +1,4 @@
-package io.pillopl.library.common.events;
+package io.pillopl.commons.events;
 
 import io.vavr.control.Try;
 

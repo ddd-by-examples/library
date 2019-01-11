@@ -4,9 +4,9 @@ import io.pillopl.library.lending.domain.patron.PatronBooksEvent.*;
 
 public interface DailySheet {
 
-    CheckoutsToOverdueSheet checkoutsToOverdue();
+    CheckoutsToOverdueSheet queryForCheckoutsToOverdue();
 
-    HoldsToExpireSheet holdsToExpireSheet();
+    HoldsToExpireSheet queryForHoldsToExpireSheet();
 
     void handle(BookPlacedOnHold event);
 

@@ -1,5 +1,6 @@
 package io.pillopl.library.lending.application.checkout
 
+import io.pillopl.commons.commands.BatchResult
 import io.pillopl.library.lending.domain.dailysheet.CheckoutsToOverdueSheet
 import io.pillopl.library.lending.domain.dailysheet.DailySheet
 import io.pillopl.library.lending.domain.patron.PatronBooksRepository
@@ -24,7 +25,7 @@ class RegisteringOverdueCheckoutsTest extends Specification {
             new RegisteringOverdueCheckout(dailySheet, repository)
 
     def setup() {
-        dailySheet.checkoutsToOverdue() >> overdueCheckoutsBy(patronWithOverdueCheckouts, anotherPatronWithOverdueCheckouts)
+        dailySheet.queryForCheckoutsToOverdue() >> overdueCheckoutsBy(patronWithOverdueCheckouts, anotherPatronWithOverdueCheckouts)
     }
 
 
@@ -32,10 +33,10 @@ class RegisteringOverdueCheckoutsTest extends Specification {
         given:
             checkoutsWillBeMarkedAsOverdueForBothPatrons()
         when:
-            Try<RegisteringOverdueCheckout.Result> result = registeringOverdueCheckout.registerOverdueCheckouts()
+            Try<BatchResult> result = registeringOverdueCheckout.registerOverdueCheckouts()
         then:
             result.isSuccess()
-            result.get() == RegisteringOverdueCheckout.Result.Success
+            result.get() == BatchResult.FullSuccess
 
     }
 
@@ -43,10 +44,10 @@ class RegisteringOverdueCheckoutsTest extends Specification {
         given:
             registeringOverdueCheckoutWillFailForSecondPatron()
         when:
-            Try<RegisteringOverdueCheckout.Result> result = registeringOverdueCheckout.registerOverdueCheckouts()
+            Try<BatchResult> result = registeringOverdueCheckout.registerOverdueCheckouts()
         then:
             result.isSuccess()
-            result.get() == RegisteringOverdueCheckout.Result.Error
+            result.get() == BatchResult.SomeFailed
 
     }
 
