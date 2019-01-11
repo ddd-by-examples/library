@@ -76,8 +76,6 @@ public interface PatronBooksEvent extends DomainEvent {
 
     }
 
-
-
     @Value
     class MaximumNumberOhHoldsReached implements PatronBooksEvent {
         @NonNull UUID eventId = UUID.randomUUID();
