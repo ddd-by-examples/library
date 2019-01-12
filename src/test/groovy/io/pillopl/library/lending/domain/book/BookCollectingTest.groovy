@@ -25,6 +25,7 @@ class BookCollectingTest extends Specification {
         then:
             collectedBook.bookId == onHold.bookId
             collectedBook.collectedAt == collectedAt
+            collectedBook.version == onHold.version
     }
 
     BookCollected bookCollected(BookOnHold bookOnHold, PatronId patronId, LibraryBranchId libraryBranchId) {

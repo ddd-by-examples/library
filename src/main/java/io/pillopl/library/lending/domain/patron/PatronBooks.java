@@ -11,12 +11,12 @@ import io.vavr.control.Option;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 
-import static io.pillopl.commons.commands.EitherResult.announceFailure;
-import static io.pillopl.commons.commands.EitherResult.announceSuccess;
+import static io.pillopl.library.commons.events.EitherResult.announceFailure;
+import static io.pillopl.library.commons.events.EitherResult.announceSuccess;
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookCollected.bookCollectedNow;
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookCollectingFailed.bookCollectingFailedNow;
-import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldCanceled.*;
-import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldCancelingFailed.*;
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldCanceled.holdCanceledNow;
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldCancelingFailed.holdCancelingFailedNow;
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldFailed.bookHoldFailedNow;
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHold.bookPlacedOnHoldNow;
 import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldEvents.events;

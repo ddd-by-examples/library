@@ -1,9 +1,11 @@
 package io.pillopl.library.lending.application.checkout
 
-import io.pillopl.commons.commands.Result
+
+import io.pillopl.library.commons.commands.Result
 import io.pillopl.library.lending.application.hold.FindBookOnHold
 import io.pillopl.library.lending.domain.book.BookOnHold
 import io.pillopl.library.lending.domain.patron.PatronBooks
+import io.pillopl.library.lending.domain.patron.PatronBooksEvent
 import io.pillopl.library.lending.domain.patron.PatronBooksRepository
 import io.pillopl.library.lending.domain.patron.PatronId
 import io.vavr.control.Option
@@ -93,7 +95,7 @@ class CollectingBookOnHoldTest extends Specification {
 
     PatronId persisted(PatronBooks patron) {
         repository.findBy(patronId) >> Option.of(patron)
-        repository.handle(_) >> Try.success(patron)
+        repository.handle(_ as PatronBooksEvent) >> Try.success(patron)
         return patronId
     }
 
@@ -101,7 +103,7 @@ class CollectingBookOnHoldTest extends Specification {
     PatronId persistedRegularPatronThatFailsOnSaving(PatronId patronId) {
         PatronBooks patron = regularPatron(patronId)
         repository.findBy(patronId) >> Option.of(patron)
-        repository.handle(_) >> Try.failure(new IllegalStateException())
+        repository.handle(_ as PatronBooksEvent) >> Try.failure(new IllegalStateException())
         return patronId
     }
 

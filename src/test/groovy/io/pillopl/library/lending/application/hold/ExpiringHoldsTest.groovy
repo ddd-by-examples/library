@@ -1,8 +1,10 @@
 package io.pillopl.library.lending.application.hold
 
-import io.pillopl.commons.commands.BatchResult
+
+import io.pillopl.library.commons.commands.BatchResult
 import io.pillopl.library.lending.domain.dailysheet.DailySheet
 import io.pillopl.library.lending.domain.dailysheet.HoldsToExpireSheet
+import io.pillopl.library.lending.domain.patron.PatronBooksEvent
 import io.pillopl.library.lending.domain.patron.PatronBooksRepository
 import io.pillopl.library.lending.domain.patron.PatronId
 import io.vavr.control.Try
@@ -51,11 +53,11 @@ class ExpiringHoldsTest extends Specification {
     }
 
     void expiringHoldWillFailForSecondPatron() {
-        repository.handle(_) >>> [Try.success(null), Try.failure(new IllegalStateException())]
+        repository.handle(_ as PatronBooksEvent) >>> [Try.success(null), Try.failure(new IllegalStateException())]
     }
 
     void holdsWillBeExpiredSuccessfullyForBothPatrons() {
-        repository.handle(_) >> Try.success(null)
+        repository.handle(_ as PatronBooksEvent) >> Try.success(null)
     }
 
     HoldsToExpireSheet expiredHoldsBy(PatronId patronId, PatronId anotherPatronId) {

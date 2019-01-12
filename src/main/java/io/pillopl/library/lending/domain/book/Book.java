@@ -1,5 +1,7 @@
 package io.pillopl.library.lending.domain.book;
 
+import io.pillopl.library.commons.aggregates.Version;
+
 public interface Book {
 
     default BookId bookId() {
@@ -7,6 +9,8 @@ public interface Book {
     }
 
     BookInformation getBookInformation();
+
+    Version getVersion();
 
 }
 

@@ -9,7 +9,6 @@ import spock.lang.Specification
 import java.time.Instant
 
 import static io.pillopl.library.lending.domain.book.BookFixture.anyBookId
-import static io.pillopl.library.lending.domain.book.BookFixture.circulatingAvailableBookAt
 import static io.pillopl.library.lending.domain.book.BookType.Circulating
 import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.anyPatronId
@@ -24,61 +23,6 @@ class BookEntityToDomainModelMappingTest extends Specification {
     PatronId anotherPatronId = anyPatronId()
     BookId bookId = anyBookId()
     Instant holdTill = Instant.now()
-
-    def 'should create a new instance with id, isbn and book type from domain model'() {
-        given:
-            AvailableBook availableBook = circulatingAvailableBookAt(bookId, libraryBranchId)
-        when:
-            BookDatabaseEntity entity = BookDatabaseEntity.from(availableBook)
-        then:
-            entity.bookId == bookId.bookId
-            entity.bookType == Circulating
-            entity.bookState == Available
-
-
-    }
-
-    def 'should update data model to on hold book'() {
-        given:
-            AvailableBook availableBook = circulatingAvailableBookAt(bookId, libraryBranchId)
-        and:
-            BookDatabaseEntity entity = BookDatabaseEntity.from(availableBook)
-        and:
-            BookOnHold bookOnHold =  new BookOnHold(new BookInformation(bookId, Circulating), libraryBranchId, patronId, holdTill)
-        when:
-            entity = entity.updateFromDomainModel(bookOnHold)
-        then:
-            entity.bookId == bookId.bookId
-            entity.bookType == Circulating
-            entity.bookState == OnHold
-            entity.onHoldAtBranch == libraryBranchId.libraryBranchId
-            entity.onHoldByPatron == patronId.patronId
-            entity.onHoldTill == holdTill
-    }
-
-    def 'should update data model to collected book'() {
-        given:
-            AvailableBook availableBook = circulatingAvailableBookAt(bookId, libraryBranchId)
-        and:
-            BookDatabaseEntity entity = BookDatabaseEntity.from(availableBook)
-        and:
-            BookOnHold bookOnHold =  new BookOnHold(new BookInformation(bookId, Circulating), libraryBranchId, patronId, holdTill)
-        and:
-            entity = entity.updateFromDomainModel(bookOnHold)
-        and:
-            CollectedBook collectedBook = new CollectedBook(new BookInformation(bookId, Circulating), anotherBranchId, anotherPatronId)
-        when:
-            entity = entity.updateFromDomainModel(collectedBook)
-        then:
-            entity.bookId == bookId.bookId
-            entity.bookType == Circulating
-            entity.bookState == Collected
-            entity.onHoldAtBranch == libraryBranchId.libraryBranchId
-            entity.onHoldByPatron == patronId.patronId
-            entity.onHoldTill == holdTill
-            entity.collectedByPatron == anotherPatronId.patronId
-            entity.collectedAtBranch == anotherBranchId.libraryBranchId
-    }
 
 
     def 'should map to available book'() {
@@ -126,15 +70,14 @@ class BookEntityToDomainModelMappingTest extends Specification {
 
     BookDatabaseEntity bookEntity(BookState state) {
         new BookDatabaseEntity(
-                id: 1L,
-                bookId: bookId.bookId,
-                bookType: Circulating,
-                bookState: state,
-                availableAtBranch: libraryBranchId.libraryBranchId,
-                onHoldAtBranch: anotherBranchId.libraryBranchId,
-                onHoldByPatron: patronId.patronId,
-                onHoldTill: holdTill,
-                collectedAtBranch: yetAnotherBranchId.libraryBranchId,
-                collectedByPatron: anotherPatronId.patronId)
+                book_id: bookId.bookId,
+                book_type: Circulating,
+                book_state: state,
+                available_at_branch: libraryBranchId.libraryBranchId,
+                on_hold_at_branch: anotherBranchId.libraryBranchId,
+                on_hold_by_patron: patronId.patronId,
+                on_hold_till: holdTill,
+                collected_at_branch: yetAnotherBranchId.libraryBranchId,
+                collected_by_patron: anotherPatronId.patronId)
     }
 }

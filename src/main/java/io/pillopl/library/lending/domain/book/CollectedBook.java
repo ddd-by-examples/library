@@ -1,5 +1,6 @@
 package io.pillopl.library.lending.domain.book;
 
+import io.pillopl.library.commons.aggregates.Version;
 import io.pillopl.library.lending.domain.library.LibraryBranchId;
 import io.pillopl.library.lending.domain.patron.PatronBooksEvent;
 import io.pillopl.library.lending.domain.patron.PatronId;
@@ -10,13 +11,16 @@ import lombok.Value;
 public class CollectedBook implements Book {
 
     @NonNull
-    private final BookInformation bookInformation;
+    BookInformation bookInformation;
 
     @NonNull
-    private final LibraryBranchId collectedAt;
+    LibraryBranchId collectedAt;
 
     @NonNull
-    private final PatronId byPatron;
+    PatronId byPatron;
+
+    @NonNull
+    Version version;
 
     public BookId getBookId() {
         return bookInformation.getBookId();
@@ -25,7 +29,8 @@ public class CollectedBook implements Book {
     AvailableBook handle(PatronBooksEvent.BookReturned bookReturnedByPatron) {
         return new AvailableBook(
                 bookInformation,
-                new LibraryBranchId(bookReturnedByPatron.getLibraryBranchId()));
+                new LibraryBranchId(bookReturnedByPatron.getLibraryBranchId()),
+                version);
     }
 
 

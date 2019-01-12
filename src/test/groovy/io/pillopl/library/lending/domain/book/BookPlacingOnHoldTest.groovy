@@ -30,6 +30,8 @@ class BookPlacingOnHoldTest extends Specification {
             onHold.byPatron == onHoldByPatron
             onHold.holdTill == till
             onHold.holdPlacedAt == libraryBranchId
+            onHold.version == available.version
+
     }
 
     PatronBooksEvent.BookPlacedOnHoldEvents bookPlacedOnHold(AvailableBook availableBook, PatronId byPatron, LibraryBranchId libraryBranchId, Instant from, Instant till) {

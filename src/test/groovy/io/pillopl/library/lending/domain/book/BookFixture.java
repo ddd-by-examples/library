@@ -1,5 +1,6 @@
 package io.pillopl.library.lending.domain.book;
 
+import io.pillopl.library.commons.aggregates.Version;
 import io.pillopl.library.lending.domain.library.LibraryBranchId;
 import io.pillopl.library.lending.domain.patron.PatronId;
 
@@ -13,27 +14,31 @@ import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.any
 public class BookFixture {
 
     public static BookOnHold bookOnHold(BookId bookId, LibraryBranchId libraryBranchId) {
-        return new BookOnHold(new BookInformation(bookId, Circulating), libraryBranchId, anyPatronId(), Instant.now());
+        return new BookOnHold(new BookInformation(bookId, Circulating), libraryBranchId, anyPatronId(), Instant.now(), version0());
     }
 
     public static AvailableBook circulatingBook() {
-        return new AvailableBook(new BookInformation(anyBookId(), Circulating), anyBranch());
+        return new AvailableBook(new BookInformation(anyBookId(), Circulating), anyBranch(), version0());
     }
 
     public static BookOnHold bookOnHold() {
-        return new BookOnHold(new BookInformation(anyBookId(), Circulating), anyBranch(), anyPatronId(), Instant.now());
+        return new BookOnHold(new BookInformation(anyBookId(), Circulating), anyBranch(), anyPatronId(), Instant.now(), version0());
     }
 
     public static AvailableBook circulatingAvailableBookAt(LibraryBranchId libraryBranchId) {
-        return new AvailableBook(new BookInformation(anyBookId(), Circulating), libraryBranchId);
+        return new AvailableBook(new BookInformation(anyBookId(), Circulating), libraryBranchId, version0());
     }
 
     public static AvailableBook circulatingAvailableBookAt(BookId bookId, LibraryBranchId libraryBranchId) {
-        return new AvailableBook(new BookInformation(bookId, Circulating), libraryBranchId);
+        return new AvailableBook(new BookInformation(bookId, Circulating), libraryBranchId, version0());
     }
 
     public static AvailableBook aBookAt(LibraryBranchId libraryBranchId) {
-        return new AvailableBook(new BookInformation(anyBookId(), Circulating), libraryBranchId);
+        return new AvailableBook(new BookInformation(anyBookId(), Circulating), libraryBranchId, version0());
+    }
+
+    private static Version version0() {
+        return new Version(0);
     }
 
     public static AvailableBook circulatingAvailableBook() {
@@ -41,11 +46,11 @@ public class BookFixture {
     }
 
     public static CollectedBook collectedBook() {
-        return new CollectedBook(new BookInformation(anyBookId(), Circulating), anyBranch(), anyPatronId());
+        return new CollectedBook(new BookInformation(anyBookId(), Circulating), anyBranch(), anyPatronId(), version0());
     }
 
     public static AvailableBook restrictedBook() {
-        return new AvailableBook(new BookInformation(anyBookId(), Restricted), anyBranch());
+        return new AvailableBook(new BookInformation(anyBookId(), Restricted), anyBranch(), version0());
     }
 
     public static BookId anyBookId() {

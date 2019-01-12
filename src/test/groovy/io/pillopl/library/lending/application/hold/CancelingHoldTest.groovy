@@ -1,11 +1,9 @@
 package io.pillopl.library.lending.application.hold
 
-import io.pillopl.commons.commands.Result
+
+import io.pillopl.library.commons.commands.Result
 import io.pillopl.library.lending.domain.book.BookOnHold
-import io.pillopl.library.lending.domain.patron.PatronBooks
-import io.pillopl.library.lending.domain.patron.PatronBooksFixture
-import io.pillopl.library.lending.domain.patron.PatronBooksRepository
-import io.pillopl.library.lending.domain.patron.PatronId
+import io.pillopl.library.lending.domain.patron.*
 import io.vavr.control.Option
 import io.vavr.control.Try
 import spock.lang.Specification
@@ -94,7 +92,7 @@ class CancelingHoldTest extends Specification {
     PatronId persistedRegularPatronWithBookOnHold() {
         PatronBooks patron = PatronBooksFixture.regularPatronWithHold(bookOnHold)
         repository.findBy(patronId) >> Option.of(patron)
-        repository.handle(_) >> Try.success(patron)
+        repository.handle(_ as PatronBooksEvent) >> Try.success(patron)
         return patronId
     }
 
@@ -107,7 +105,7 @@ class CancelingHoldTest extends Specification {
     PatronId persistedRegularPatronThatFailsOnSaving() {
         PatronBooks patron = PatronBooksFixture.regularPatron(patronId)
         repository.findBy(patronId) >> Option.of(patron)
-        repository.handle(_) >> Try.failure(new IllegalStateException())
+        repository.handle(_ as PatronBooksEvent) >> Try.failure(new IllegalStateException())
         return patronId
     }
 

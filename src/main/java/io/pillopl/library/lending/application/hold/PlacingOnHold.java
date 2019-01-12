@@ -1,6 +1,6 @@
 package io.pillopl.library.lending.application.hold;
 
-import io.pillopl.commons.commands.Result;
+import io.pillopl.library.commons.commands.Result;
 import io.pillopl.library.lending.domain.book.AvailableBook;
 import io.pillopl.library.lending.domain.book.BookId;
 import io.pillopl.library.lending.domain.library.LibraryBranchId;

@@ -7,6 +7,9 @@ import io.pillopl.library.lending.domain.patron.PatronBooksEvent.PatronCreated;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
+import org.springframework.data.jdbc.repository.query.Query;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Map.Entry;
 import java.util.Set;
@@ -49,6 +52,13 @@ class PatronBooksDatabaseRepository implements PatronBooksRepository {
         entity = patronBooksEntityRepository.save(entity);
         return domainModelMapper.map(entity);
     }
+
+}
+
+interface PatronBooksEntityRepository extends CrudRepository<PatronBooksDatabaseEntity, Long> {
+
+    @Query("SELECT p.* FROM patron_books_database_entity p where p.patron_id = :patronId")
+    PatronBooksDatabaseEntity findByPatronId(@Param("patronId") UUID patronId);
 
 }
 

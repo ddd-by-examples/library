@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS checkouts_sheet (
 id INTEGER IDENTITY PRIMARY KEY,
-  book_id UUID,
-  status VARCHAR(20),
+  book_id UUID NOT NULL,
+  status VARCHAR(20) NOT NULL,
   checkout_event_id UUID UNIQUE,
   collected_by_patron_id UUID,
   collected_at TIMESTAMP,
@@ -12,8 +12,8 @@ id INTEGER IDENTITY PRIMARY KEY,
 
 CREATE TABLE IF NOT EXISTS holds_sheet (
 id INTEGER IDENTITY PRIMARY KEY,
-  book_id UUID,
-  status VARCHAR(20),
+  book_id UUID NOT NULL,
+  status VARCHAR(20) NOT NULL,
   hold_event_id UUID UNIQUE,
   hold_at_branch UUID,
   hold_by_patron_id UUID,

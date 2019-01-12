@@ -27,6 +27,7 @@ class BookReturningTest extends Specification {
         then:
             available.bookId == onHold.bookId
             available.libraryBranch == libraryBranchId
+            available.version == onHold.version
     }
 
     def 'should place on hold book which is marked as available in the system'() {

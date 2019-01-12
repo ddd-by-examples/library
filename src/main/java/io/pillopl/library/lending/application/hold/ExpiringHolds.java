@@ -1,6 +1,6 @@
 package io.pillopl.library.lending.application.hold;
 
-import io.pillopl.commons.commands.BatchResult;
+import io.pillopl.library.commons.commands.BatchResult;
 import io.pillopl.library.lending.domain.dailysheet.DailySheet;
 import io.pillopl.library.lending.domain.patron.PatronBooksRepository;
 import io.vavr.control.Try;

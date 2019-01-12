@@ -1,5 +1,6 @@
 package io.pillopl.library.lending.domain.book;
 
+import io.pillopl.library.commons.aggregates.Version;
 import io.pillopl.library.lending.domain.library.LibraryBranchId;
 import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookCollected;
 import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldExpired;
@@ -14,38 +15,47 @@ import java.time.Instant;
 public class BookOnHold implements Book {
 
     @NonNull
-    private final BookInformation bookInformation;
+    BookInformation bookInformation;
 
     @NonNull
-    private final LibraryBranchId holdPlacedAt;
+    LibraryBranchId holdPlacedAt;
 
     @NonNull
-    private final PatronId byPatron;
+    PatronId byPatron;
 
     @NonNull
-    private final Instant holdTill;
+    Instant holdTill;
+
+    @NonNull
+    Version version;
 
     public AvailableBook handle(BookReturned bookReturned) {
         return new AvailableBook(
-                bookInformation, new LibraryBranchId(bookReturned.getLibraryBranchId()));
+                bookInformation, new LibraryBranchId(bookReturned.getLibraryBranchId()),
+                version);
     }
 
     public AvailableBook handle(BookHoldExpired bookHoldExpired) {
         return new AvailableBook(
                 bookInformation,
-                new LibraryBranchId(bookHoldExpired.getLibraryBranchId()));
+                new LibraryBranchId(bookHoldExpired.getLibraryBranchId()),
+                version);
     }
 
     public CollectedBook handle(BookCollected bookCollected) {
         return new CollectedBook(
                 bookInformation,
                 new LibraryBranchId(bookCollected.getLibraryBranchId()),
-                new PatronId(bookCollected.getPatronId()));
+                new PatronId(bookCollected.getPatronId()),
+                version);
     }
 
     public BookId getBookId() {
         return bookInformation.getBookId();
     }
 
+    public boolean by(PatronId patronId) {
+        return byPatron.equals(patronId);
+    }
 }
 

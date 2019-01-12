@@ -1,6 +1,6 @@
 package io.pillopl.library.lending.domain.patron;
 
-import io.pillopl.commons.events.DomainEvent;
+import io.pillopl.library.commons.events.DomainEvent;
 import io.pillopl.library.lending.domain.book.BookId;
 import io.pillopl.library.lending.domain.book.BookInformation;
 import io.pillopl.library.lending.domain.book.BookType;
@@ -66,6 +66,11 @@ public interface PatronBooksEvent extends DomainEvent {
         @NonNull BookPlacedOnHold bookPlacedOnHold;
         @NonNull Option<MaximumNumberOhHoldsReached> maximumNumberOhHoldsReached;
 
+        @Override
+        public Instant getWhen() {
+            return bookPlacedOnHold.when;
+        }
+
         public static BookPlacedOnHoldEvents events(BookPlacedOnHold bookPlacedOnHold) {
             return new BookPlacedOnHoldEvents(bookPlacedOnHold.getPatronId(), bookPlacedOnHold, Option.none());
         }
@@ -73,7 +78,6 @@ public interface PatronBooksEvent extends DomainEvent {
         public static BookPlacedOnHoldEvents events(BookPlacedOnHold bookPlacedOnHold, MaximumNumberOhHoldsReached maximumNumberOhHoldsReached) {
             return new BookPlacedOnHoldEvents(bookPlacedOnHold.patronId, bookPlacedOnHold, Option.of(maximumNumberOhHoldsReached));
         }
-
     }
 
     @Value

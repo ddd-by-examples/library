@@ -23,6 +23,7 @@ class BookHoldExpiredTest extends Specification {
         then:
             availableBook.bookId == bookOnHold.bookId
             availableBook.libraryBranch == branchId
+            availableBook.version == bookOnHold.version
     }
 
     BookHoldExpired bookHoldExpired(BookOnHold bookOnHold, PatronId patronId, LibraryBranchId libraryBranchId) {

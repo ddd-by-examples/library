@@ -1,5 +1,6 @@
 package io.pillopl.library.lending.domain.book;
 
+import io.pillopl.library.commons.aggregates.Version;
 import io.pillopl.library.lending.domain.library.LibraryBranchId;
 import io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookPlacedOnHoldEvents;
 import io.pillopl.library.lending.domain.patron.PatronId;
@@ -10,10 +11,13 @@ import lombok.Value;
 public class AvailableBook implements Book {
 
     @NonNull
-    private final BookInformation bookInformation;
+    BookInformation bookInformation;
 
     @NonNull
-    private final LibraryBranchId libraryBranch;
+    LibraryBranchId libraryBranch;
+
+    @NonNull
+    Version version;
 
     public boolean isRestricted() {
         return bookInformation.getBookType().equals(BookType.Restricted);
@@ -28,7 +32,8 @@ public class AvailableBook implements Book {
                 bookInformation,
                 new LibraryBranchId(bookPlacedOnHold.getBookPlacedOnHold().getLibraryBranchId()),
                 new PatronId(bookPlacedOnHold.getBookPlacedOnHold().getPatronId()),
-                bookPlacedOnHold.getBookPlacedOnHold().getHoldTill());
+                bookPlacedOnHold.getBookPlacedOnHold().getHoldTill(),
+                version);
     }
 }
 

@@ -1,6 +1,6 @@
 package io.pillopl.library.lending.application.checkout;
 
-import io.pillopl.commons.commands.Result;
+import io.pillopl.library.commons.commands.Result;
 import io.pillopl.library.lending.application.hold.FindBookOnHold;
 import io.pillopl.library.lending.domain.book.BookId;
 import io.pillopl.library.lending.domain.book.BookOnHold;
@@ -19,8 +19,8 @@ import lombok.Value;
 
 import java.time.Instant;
 
-import static io.pillopl.commons.commands.Result.Rejection;
-import static io.pillopl.commons.commands.Result.Success;
+import static io.pillopl.library.commons.commands.Result.Rejection;
+import static io.pillopl.library.commons.commands.Result.Success;
 import static io.vavr.API.*;
 import static io.vavr.Patterns.$Left;
 import static io.vavr.Patterns.$Right;

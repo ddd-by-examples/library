@@ -34,14 +34,12 @@ class BookDatabaseRepositoryIT extends Specification {
             bookEntityRepository.save(availableBook)
         then:
             bookIsPersistedAs(AvailableBook.class)
-
     }
 
     void bookIsPersistedAs(Class<?> clz) {
         Book book = loadPersistedBook(bookId)
         assert book.class == clz
     }
-
 
     Book loadPersistedBook(BookId bookId) {
         Option<Book> loaded = bookEntityRepository.findBy(bookId)
