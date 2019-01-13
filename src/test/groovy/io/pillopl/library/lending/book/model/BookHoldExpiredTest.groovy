@@ -1,38 +1,30 @@
 package io.pillopl.library.lending.book.model
 
 
-import io.pillopl.library.lending.library.model.LibraryBranchId
-import io.pillopl.library.lending.patron.model.PatronId
 import spock.lang.Specification
 
-import java.time.Instant
-
-import static BookFixture.bookOnHold
-import static io.pillopl.library.lending.library.model.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookHoldExpired
-import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
+import static io.pillopl.library.lending.domain.book.BookDSL.aCirculatingBook
+import static io.pillopl.library.lending.domain.book.BookDSL.the
+import static io.pillopl.library.lending.domain.book.BookFixture.anyBookId
+import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
+import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldExpired
+import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.anyPatron
 
 class BookHoldExpiredTest extends Specification {
 
     def 'should make book available when hold expired'() {
         given:
-            BookOnHold bookOnHold = bookOnHold()
+        def bookOnHold = aCirculatingBook() with anyBookId() locatedIn anyBranch() placedOnHoldBy anyPatron()
+
         and:
-            LibraryBranchId branchId = anyBranch()
+        BookHoldExpired anEvent = the bookOnHold expired()
+
         when:
-            AvailableBook availableBook = bookOnHold.handle(bookHoldExpired(bookOnHold, anyPatronId(), branchId))
+        AvailableBook availableBook = the bookOnHold reactsTo anEvent
         then:
-            availableBook.bookId == bookOnHold.bookId
-            availableBook.libraryBranch == branchId
-            availableBook.version == bookOnHold.version
+        availableBook.bookId == bookOnHold.bookId
+        availableBook.libraryBranch == bookOnHold.libraryBranchId
+        availableBook.version == bookOnHold.version
     }
-
-    BookHoldExpired bookHoldExpired(BookOnHold bookOnHold, PatronId patronId, LibraryBranchId libraryBranchId) {
-        return new BookHoldExpired(Instant.now(),
-                bookOnHold.getBookId().bookId,
-                patronId.patronId,
-                libraryBranchId.libraryBranchId)
-    }
-
 
 }

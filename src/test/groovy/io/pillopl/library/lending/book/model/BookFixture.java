@@ -37,7 +37,7 @@ public class BookFixture {
         return new AvailableBook(new BookInformation(anyBookId(), Circulating), libraryBranchId, version0());
     }
 
-    private static Version version0() {
+    public static Version version0() {
         return new Version(0);
     }
 
