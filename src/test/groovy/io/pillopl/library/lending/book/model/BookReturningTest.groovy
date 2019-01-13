@@ -15,82 +15,81 @@ import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.anyPat
 
 class BookReturningTest extends Specification {
 
+    private static Instant now = Instant.MIN
+    private static Instant oneHour = now.plusSeconds(3600)
+
     def 'should return book which is marked as placed on hold in the system'() {
         given:
-        def bookOnHold = aCirculatingBook() with anyBookId() locatedIn anyBranch() placedOnHoldBy anyPatron()
+            BookDSL bookOnHold = aCirculatingBook() with anyBookId() locatedIn anyBranch() placedOnHoldBy anyPatron()
 
         and:
-        LibraryBranchId aBranch = anyBranch()
+            LibraryBranchId aBranch = anyBranch()
 
         and:
-        PatronBooksEvent.BookReturned anEvent = the bookOnHold isReturnedBy anyPatron() at aBranch
+            PatronBooksEvent.BookReturned bookReturnedEvent = the bookOnHold isReturnedBy anyPatron() at aBranch
 
         when:
-        AvailableBook availableBook = the bookOnHold reactsTo anEvent
+            AvailableBook availableBook = the bookOnHold reactsTo bookReturnedEvent
 
         then:
-        availableBook.bookId == bookOnHold.bookId
-        availableBook.libraryBranch == aBranch
-        availableBook.version == bookOnHold.version
+            availableBook.bookId == bookOnHold.bookId
+            availableBook.libraryBranch == aBranch
+            availableBook.version == bookOnHold.version
     }
 
     def 'should place on hold book which is marked as available in the system'() {
         given:
-        def availableBook = aCirculatingBook() with anyBookId() locatedIn anyBranch() stillAvailable()
+            BookDSL availableBook = aCirculatingBook() with anyBookId() locatedIn anyBranch() stillAvailable()
 
         and:
-        Instant now = Instant.MIN
-        Instant oneHour = now.plusSeconds(3600)
+            PatronId aPatron = anyPatron()
 
         and:
-        PatronId aPatron = anyPatron()
+            LibraryBranchId aBranch = anyBranch()
 
         and:
-        LibraryBranchId aBranch = anyBranch()
-
-        and:
-        def anEvent = the availableBook isPlacedOnHoldBy aPatron at aBranch from now till oneHour
+            PatronBooksEvent.BookPlacedOnHoldEvents bookPlacedOnHoldEvent = the availableBook isPlacedOnHoldBy aPatron at aBranch from now till oneHour
 
         when:
-        BookOnHold onHold = the availableBook reactsTo anEvent
+            BookOnHold onHold = the availableBook reactsTo bookPlacedOnHoldEvent
 
         then:
-        onHold.bookId == availableBook.bookId
-        onHold.byPatron == aPatron
-        onHold.holdTill == oneHour
-        onHold.holdPlacedAt == aBranch
+            onHold.bookId == availableBook.bookId
+            onHold.byPatron == aPatron
+            onHold.holdTill == oneHour
+            onHold.holdPlacedAt == aBranch
     }
 
     def 'should return book which is marked as collected in the system'() {
         given:
-        def collectedBook = aCirculatingBook() with anyBookId() locatedIn anyBranch() collectedBy anyPatron()
+            BookDSL collectedBook = aCirculatingBook() with anyBookId() locatedIn anyBranch() collectedBy anyPatron()
 
         and:
-        PatronBooksEvent.BookReturned anEvent = the collectedBook isReturnedBy anyPatron() at anyBranch()
+            PatronBooksEvent.BookReturned bookReturnedEvent = the collectedBook isReturnedBy anyPatron() at anyBranch()
 
         when:
-        AvailableBook available = the collectedBook reactsTo anEvent
+            AvailableBook available = the collectedBook reactsTo bookReturnedEvent
 
         then:
-        available.bookId == collectedBook.bookId
+            available.bookId == collectedBook.bookId
     }
 
     def 'should collect book which is marked as placed on hold in the system'() {
         given:
-        def onHoldBook = aCirculatingBook() with anyBookId() locatedIn anyBranch() placedOnHoldBy anyPatron()
+            BookDSL onHoldBook = aCirculatingBook() with anyBookId() locatedIn anyBranch() placedOnHoldBy anyPatron()
 
         and:
-        LibraryBranchId aBranch = anyBranch()
+            LibraryBranchId aBranch = anyBranch()
 
         and:
-        PatronBooksEvent.BookCollected anEvent = the onHoldBook isCollectedBy anyPatron() at aBranch
+            PatronBooksEvent.BookCollected bookCollectedEvent = the onHoldBook isCollectedBy anyPatron() at aBranch
 
         when:
-        CollectedBook collectedBook = the onHoldBook reactsTo anEvent
+            CollectedBook collectedBook = the onHoldBook reactsTo bookCollectedEvent
 
         then:
-        collectedBook.bookId == onHoldBook.bookId
-        collectedBook.collectedAt == aBranch
+            collectedBook.bookId == onHoldBook.bookId
+            collectedBook.collectedAt == aBranch
     }
 
 }

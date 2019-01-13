@@ -19,11 +19,11 @@ class BookDSL {
     Version version = version0()
 
     static BookDSL the(BookDSL book) {
-        book
+        return book
     }
 
     static BookDSL aCirculatingBook() {
-        new BookDSL(Circulating)
+        return new BookDSL(Circulating)
     }
 
     BookDSL(BookType type) {
@@ -39,54 +39,46 @@ class BookDSL {
         this.version = from.version
     }
 
-    def with(BookId id) {
+    BookDSL with(BookId id) {
         this.bookId = id
-        this
+        return this
     }
 
-    def locatedIn(LibraryBranchId libraryBranch) {
+    BookDSL locatedIn(LibraryBranchId libraryBranch) {
         this.libraryBranchId = libraryBranch
-        this
+        return this
     }
 
-    def placedOnHoldBy(PatronId aPatron) {
+    BookDSL placedOnHoldBy(PatronId aPatron) {
         this.patronId = aPatron
         this.bookProvider = { ->
             new BookOnHold(new BookInformation(bookId, bookType), libraryBranchId, patronId, Instant.now(), version0())
         }
-        this
+        return this
     }
 
-    def stillAvailable() {
+    BookDSL stillAvailable() {
         bookProvider = { -> new AvailableBook(new BookInformation(bookId, bookType), libraryBranchId, version0()) }
-        this
+        return this
     }
 
-    def collectedBy(PatronId aPatron) {
+    BookDSL collectedBy(PatronId aPatron) {
         bookProvider = { ->
             new CollectedBook(new BookInformation(bookId, bookType), libraryBranchId, aPatron, version0())
         }
-        this
+        return this
     }
 
     def isReturnedBy(PatronId aPatron) {
-        new BookDSL(this) {
+        return new BookDSL(this) {
             PatronBooksEvent.BookReturned at(LibraryBranchId branchId) {
-                bookReturned(bookProvider(), aPatron, branchId)
+                return bookReturned(bookProvider(), aPatron, branchId)
             }
         }
     }
 
-    def expired() {
-        bookHoldExpired(bookProvider(), patronId, libraryBranchId)
-    }
-
-    def reactsTo(PatronBooksEvent event) {
-        bookProvider().handle(event)
-    }
-
     def isPlacedOnHoldBy(PatronId aPatron) {
-        new BookDSL(this) {
+        return new BookDSL(this) {
 
             PatronId onHoldPatronId
             LibraryBranchId placeOnHoldBranchId
@@ -99,16 +91,16 @@ class BookDSL {
 
             def at(LibraryBranchId branchId) {
                 placeOnHoldBranchId = branchId
-                this
+                return this
             }
 
             def from(Instant from) {
                 onHoldFrom = from
-                this
+                return this
             }
 
             PatronBooksEvent.BookPlacedOnHoldEvents till(Instant till) {
-                bookPlacedOnHold(bookProvider(), onHoldPatronId, placeOnHoldBranchId, onHoldFrom, till)
+                return bookPlacedOnHold(bookProvider(), onHoldPatronId, placeOnHoldBranchId, onHoldFrom, till)
             }
         }
     }
@@ -116,9 +108,17 @@ class BookDSL {
     def isCollectedBy(PatronId aPatron) {
         new BookDSL(this) {
             PatronBooksEvent.BookCollected at(LibraryBranchId branchId) {
-                bookCollected(bookProvider(), aPatron, branchId)
+                return bookCollected(bookProvider(), aPatron, branchId)
             }
         }
+    }
+
+    PatronBooksEvent.BookHoldExpired expired() {
+        return bookHoldExpired(bookProvider(), patronId, libraryBranchId)
+    }
+
+    Book reactsTo(PatronBooksEvent event) {
+        return bookProvider().handle(event)
     }
 
 

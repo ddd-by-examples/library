@@ -14,17 +14,17 @@ class BookHoldExpiredTest extends Specification {
 
     def 'should make book available when hold expired'() {
         given:
-        def bookOnHold = aCirculatingBook() with anyBookId() locatedIn anyBranch() placedOnHoldBy anyPatron()
+            BookDSL bookOnHold = aCirculatingBook() with anyBookId() locatedIn anyBranch() placedOnHoldBy anyPatron()
 
         and:
-        BookHoldExpired anEvent = the bookOnHold expired()
+            BookHoldExpired bookHoldExpiredEvent = the bookOnHold expired()
 
         when:
-        AvailableBook availableBook = the bookOnHold reactsTo anEvent
+            AvailableBook availableBook = the bookOnHold reactsTo bookHoldExpiredEvent
         then:
-        availableBook.bookId == bookOnHold.bookId
-        availableBook.libraryBranch == bookOnHold.libraryBranchId
-        availableBook.version == bookOnHold.version
+            availableBook.bookId == bookOnHold.bookId
+            availableBook.libraryBranch == bookOnHold.libraryBranchId
+            availableBook.version == bookOnHold.version
     }
 
 }

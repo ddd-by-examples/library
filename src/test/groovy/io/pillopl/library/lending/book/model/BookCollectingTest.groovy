@@ -14,20 +14,20 @@ class BookCollectingTest extends Specification {
 
     def 'should collect book which is marked as placed on hold in the system'() {
         given:
-        def bookOnHold = aCirculatingBook() with anyBookId() locatedIn anyBranch() placedOnHoldBy anyPatron()
+            BookDSL bookOnHold = aCirculatingBook() with anyBookId() locatedIn anyBranch() placedOnHoldBy anyPatron()
 
         and:
-        LibraryBranchId aBranch = anyBranch()
+            LibraryBranchId aBranch = anyBranch()
 
         and:
-        BookCollected anEvent = the bookOnHold isCollectedBy anyPatron() at aBranch
+            BookCollected bookCollectedEvent = the bookOnHold isCollectedBy anyPatron() at aBranch
 
         when:
-        CollectedBook collectedBook = the bookOnHold reactsTo anEvent
+            CollectedBook collectedBook = the bookOnHold reactsTo bookCollectedEvent
 
         then:
-        collectedBook.bookId == bookOnHold.bookId
-        collectedBook.collectedAt == aBranch
-        collectedBook.version == bookOnHold.version
+            collectedBook.bookId == bookOnHold.bookId
+            collectedBook.collectedAt == aBranch
+            collectedBook.version == bookOnHold.version
     }
 }
