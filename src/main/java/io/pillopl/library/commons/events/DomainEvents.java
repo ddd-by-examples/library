@@ -1,8 +1,12 @@
 package io.pillopl.library.commons.events;
 
-import io.vavr.control.Try;
+import io.vavr.collection.List;
 
 public interface DomainEvents {
 
-    Try<Void> publish(DomainEvent event);
+    void publish(DomainEvent event);
+
+    default void publish(List<DomainEvent> events) {
+        events.forEach(this::publish);
+    }
 }

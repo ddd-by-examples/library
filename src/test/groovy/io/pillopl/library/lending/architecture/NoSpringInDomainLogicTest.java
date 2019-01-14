@@ -9,14 +9,15 @@ import org.junit.runner.RunWith;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 @RunWith(ArchUnitRunner.class)
-@AnalyzeClasses(packages = {"io.pillopl.library.lending", "org.springframework"})
+@AnalyzeClasses(packages = {"io.pillopl.library", "org.springframework"})
 public class NoSpringInDomainLogicTest {
 
     @ArchTest
-    public static final ArchRule domain_should_not_depend_on_spring =
+    public static final ArchRule model_should_not_depend_on_spring =
             noClasses()
                     .that()
-                    .resideInAPackage("io.pillopl.library.lending.domain..")
+                    .resideInAPackage(
+                            "..io.pillopl.library.lending..model..")
                     .should()
                     .dependOnClassesThat()
                     .resideInAPackage("org.springframework..");
@@ -25,7 +26,8 @@ public class NoSpringInDomainLogicTest {
     public static final ArchRule application_should_not_depend_on_spring =
             noClasses()
                     .that()
-                    .resideInAPackage("io.pillopl.library.lending.application..")
+                    .resideInAPackage(
+                            "..io.pillopl.library.lending..application..")
                     .should()
                     .dependOnClassesThat()
                     .resideInAPackage("org.springframework..");
