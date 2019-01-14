@@ -35,19 +35,13 @@ public class CancelingHold {
             PatronBooks patronBooks = find(command.getPatronId());
             Either<BookHoldCancelingFailed, BookHoldCanceled> result = patronBooks.cancelHold(bookOnHold);
             return Match(result).of(
-                    Case($Left($()), this::publishEvents),
+                    Case($Left($()), bookHoldCancelingFailed -> Rejection),
                     Case($Right($()), this::saveAndPublishEvents)
             );
         });
     }
 
-    private Result publishEvents(BookHoldCancelingFailed bookHoldCancelingFailed) {
-        //TODO publish events
-        return Rejection;
-    }
-
     private Result saveAndPublishEvents(BookHoldCanceled bookHoldCanceled) {
-        //TODO publish events
         patronBooksRepository
                 .publish(bookHoldCanceled);
         return Success;

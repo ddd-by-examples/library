@@ -17,7 +17,6 @@ import static io.vavr.collection.List.of
 
 class RegisteringOverdueCheckoutsTest extends Specification {
 
-    //TODO test events emitted
     PatronBooksRepository repository = Stub()
     DailySheet dailySheet = Stub()
     PatronId patronWithOverdueCheckouts = anyPatronId()

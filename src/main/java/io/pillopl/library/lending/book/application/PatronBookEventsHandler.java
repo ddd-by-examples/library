@@ -49,6 +49,7 @@ public class PatronBookEventsHandler {
         return API.Match(book).of(
                 Case($(instanceOf(AvailableBook.class)), availableBook -> availableBook.handle(bookPlacedOnHold)),
                 Case($(), () -> book)
+                //TODO raise BookAlreadyHeld?
         );
     }
 

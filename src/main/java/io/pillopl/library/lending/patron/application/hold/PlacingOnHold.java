@@ -32,19 +32,13 @@ public class PlacingOnHold {
             PatronBooks patronBooks = find(command.getPatronId());
             Either<BookHoldFailed, BookPlacedOnHoldEvents> result = patronBooks.placeOnHold(availableBook, command.getHoldDuration());
             return Match(result).of(
-                    Case($Left($()), this::publishEvents),
+                    Case($Left($()), bookHoldFailed -> Result.Rejection),
                     Case($Right($()), this::saveAndPublishEvents)
             );
         });
     }
 
-    private Result publishEvents(BookHoldFailed bookHoldFailed) {
-        //TODO publish events
-        return Result.Rejection;
-    }
-
     private Result saveAndPublishEvents(BookPlacedOnHoldEvents placedOnHold) {
-        //TODO publish events
         patronBooksRepository.publish(placedOnHold);
         return Result.Success;
     }

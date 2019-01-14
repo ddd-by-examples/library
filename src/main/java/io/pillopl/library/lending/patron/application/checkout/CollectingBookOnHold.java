@@ -37,18 +37,12 @@ class CollectingBookOnHold {
             PatronBooks patronBooks = find(command.getPatronId());
             Either<BookCollectingFailed, BookCollected> result = patronBooks.collect(bookOnHold, command.getCheckoutDuration());
             return Match(result).of(
-                    Case($Left($()), this::publishEvents),
+                    Case($Left($()), bookCollectingFailed -> Rejection),
                     Case($Right($()), this::saveAndPublishEvents));
         });
     }
 
-    private Result publishEvents(BookCollectingFailed bookCollectingFailed) {
-        //TODO publish events
-        return Rejection;
-    }
-
     private Result saveAndPublishEvents(BookCollected bookCollected) {
-        //TODO publish events
         patronBooksRepository
                 .publish(bookCollected);
         return Success;
