@@ -1,14 +1,14 @@
-package io.pillopl.library.lending.domain.book
+package io.pillopl.library.lending.book.model
 
 import io.pillopl.library.commons.aggregates.Version
-import io.pillopl.library.lending.domain.library.LibraryBranchId
-import io.pillopl.library.lending.domain.patron.PatronBooksEvent
-import io.pillopl.library.lending.domain.patron.PatronId
+import io.pillopl.library.lending.library.model.LibraryBranchId
+import io.pillopl.library.lending.patron.model.PatronBooksEvent
+import io.pillopl.library.lending.patron.model.PatronId
 
 import java.time.Instant
 
-import static io.pillopl.library.lending.domain.book.BookFixture.version0
-import static io.pillopl.library.lending.domain.book.BookType.Circulating
+import static io.pillopl.library.lending.book.model.BookFixture.version0
+import static io.pillopl.library.lending.book.model.BookType.Circulating
 
 class BookDSL {
     BookType bookType
@@ -99,7 +99,7 @@ class BookDSL {
                 return this
             }
 
-            PatronBooksEvent.BookPlacedOnHoldEvents till(Instant till) {
+            PatronBooksEvent.BookPlacedOnHold till(Instant till) {
                 return bookPlacedOnHold(bookProvider(), onHoldPatronId, placeOnHoldBranchId, onHoldFrom, till)
             }
         }
@@ -111,6 +111,10 @@ class BookDSL {
                 return bookCollected(bookProvider(), aPatron, branchId)
             }
         }
+    }
+
+    PatronBooksEvent.BookHoldCanceled isCancelledBy(PatronId aPatron) {
+        return bookHoldCanceled(bookProvider(), aPatron, libraryBranchId)
     }
 
     PatronBooksEvent.BookHoldExpired expired() {
@@ -139,20 +143,26 @@ class BookDSL {
                 Instant.now())
     }
 
-    private static PatronBooksEvent.BookPlacedOnHoldEvents bookPlacedOnHold(Book availableBook, PatronId byPatron, LibraryBranchId libraryBranchId, Instant from, Instant till) {
-        return PatronBooksEvent.BookPlacedOnHoldEvents.events(
-                new PatronBooksEvent.BookPlacedOnHold(Instant.now(),
-                        byPatron.patronId,
-                        availableBook.getBookId().bookId,
-                        availableBook.bookInformation.bookType,
-                        libraryBranchId.libraryBranchId,
-                        from,
-                        till),
-        )
+    private static PatronBooksEvent.BookPlacedOnHold bookPlacedOnHold(Book availableBook, PatronId byPatron, LibraryBranchId libraryBranchId, Instant from, Instant till) {
+        return new PatronBooksEvent.BookPlacedOnHold(Instant.now(),
+                byPatron.patronId,
+                availableBook.getBookId().bookId,
+                availableBook.bookInformation.bookType,
+                libraryBranchId.libraryBranchId,
+                from,
+                till)
     }
+
 
     private static PatronBooksEvent.BookHoldExpired bookHoldExpired(Book bookOnHold, PatronId patronId, LibraryBranchId libraryBranchId) {
         return new PatronBooksEvent.BookHoldExpired(Instant.now(),
+                bookOnHold.getBookId().bookId,
+                patronId.patronId,
+                libraryBranchId.libraryBranchId)
+    }
+
+    private static PatronBooksEvent.BookHoldCanceled bookHoldCanceled(Book bookOnHold, PatronId patronId, LibraryBranchId libraryBranchId) {
+        return new PatronBooksEvent.BookHoldCanceled(Instant.now(),
                 bookOnHold.getBookId().bookId,
                 patronId.patronId,
                 libraryBranchId.libraryBranchId)

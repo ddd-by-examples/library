@@ -1,14 +1,14 @@
 package io.pillopl.library.lending.book.model
 
-import io.pillopl.library.lending.domain.library.LibraryBranchId
+import io.pillopl.library.lending.library.model.LibraryBranchId
 import spock.lang.Specification
 
-import static io.pillopl.library.lending.domain.book.BookDSL.aCirculatingBook
-import static io.pillopl.library.lending.domain.book.BookDSL.the
-import static io.pillopl.library.lending.domain.book.BookFixture.anyBookId
-import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookCollected
-import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.anyPatron
+import static BookDSL.aCirculatingBook
+import static BookDSL.the
+import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
+import static io.pillopl.library.lending.library.model.LibraryBranchFixture.anyBranch
+import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookCollected
+import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatron
 
 class BookCollectingTest extends Specification {
 

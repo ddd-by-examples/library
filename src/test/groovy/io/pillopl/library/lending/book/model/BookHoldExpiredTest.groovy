@@ -3,12 +3,12 @@ package io.pillopl.library.lending.book.model
 
 import spock.lang.Specification
 
-import static io.pillopl.library.lending.domain.book.BookDSL.aCirculatingBook
-import static io.pillopl.library.lending.domain.book.BookDSL.the
-import static io.pillopl.library.lending.domain.book.BookFixture.anyBookId
-import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.domain.patron.PatronBooksEvent.BookHoldExpired
-import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.anyPatron
+import static BookDSL.aCirculatingBook
+import static BookDSL.the
+import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
+import static io.pillopl.library.lending.library.model.LibraryBranchFixture.anyBranch
+import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookHoldExpired
+import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatron
 
 class BookHoldExpiredTest extends Specification {
 

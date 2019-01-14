@@ -1,17 +1,17 @@
 package io.pillopl.library.lending.book.model
 
-import io.pillopl.library.lending.domain.library.LibraryBranchId
-import io.pillopl.library.lending.domain.patron.PatronBooksEvent
-import io.pillopl.library.lending.domain.patron.PatronId
+import io.pillopl.library.lending.library.model.LibraryBranchId
+import io.pillopl.library.lending.patron.model.PatronBooksEvent
+import io.pillopl.library.lending.patron.model.PatronId
 import spock.lang.Specification
 
 import java.time.Instant
 
 import static BookDSL.aCirculatingBook
 import static BookDSL.the
-import static io.pillopl.library.lending.domain.book.BookFixture.anyBookId
-import static io.pillopl.library.lending.domain.library.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.domain.patron.PatronBooksFixture.anyPatron
+import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
+import static io.pillopl.library.lending.library.model.LibraryBranchFixture.anyBranch
+import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatron
 
 class BookReturningTest extends Specification {
 
@@ -48,7 +48,7 @@ class BookReturningTest extends Specification {
             LibraryBranchId aBranch = anyBranch()
 
         and:
-            PatronBooksEvent.BookPlacedOnHoldEvents bookPlacedOnHoldEvent = the availableBook isPlacedOnHoldBy aPatron at aBranch from now till oneHour
+            PatronBooksEvent.BookPlacedOnHold bookPlacedOnHoldEvent = the availableBook isPlacedOnHoldBy aPatron at aBranch from now till oneHour
 
         when:
             BookOnHold onHold = the availableBook reactsTo bookPlacedOnHoldEvent
