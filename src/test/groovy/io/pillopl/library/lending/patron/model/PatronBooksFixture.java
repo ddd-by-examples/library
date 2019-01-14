@@ -74,9 +74,9 @@ public class PatronBooksFixture {
                 booksOnHold(numberOfHolds));
     }
 
-    static PatronBooks regularPatronWith(PatronHold patronHold) {
+    static PatronBooks regularPatronWith(Hold hold) {
         PatronId patronId = anyPatronId();
-        PatronHolds patronHolds = new PatronHolds(Collections.singleton(patronHold));
+        PatronHolds patronHolds = new PatronHolds(Collections.singleton(hold));
         return new PatronBooks(
                 patronInformation(patronId, Regular),
                 allCurrentPolicies(),
@@ -85,7 +85,7 @@ public class PatronBooksFixture {
     }
 
     public static PatronBooks regularPatronWith(BookOnHold bookOnHold, PatronId patronId) {
-        PatronHolds patronHolds = new PatronHolds(Collections.singleton(new PatronHold(bookOnHold.getBookId(), bookOnHold.getHoldPlacedAt())));
+        PatronHolds patronHolds = new PatronHolds(Collections.singleton(new Hold(bookOnHold.getBookId(), bookOnHold.getHoldPlacedAt())));
         return new PatronBooks(
                 patronInformation(patronId, Regular),
                 allCurrentPolicies(),
@@ -93,13 +93,13 @@ public class PatronBooksFixture {
                 patronHolds);
     }
 
-    public static PatronHold onHold() {
-        return new PatronHold(anyBookId(), anyBranch());
+    public static Hold onHold() {
+        return new Hold(anyBookId(), anyBranch());
     }
 
     static PatronHolds booksOnHold(int numberOfHolds) {
         return new PatronHolds(rangeClosed(1, numberOfHolds)
-                .mapToObj(i -> new PatronHold(anyBookId(), anyBranch()))
+                .mapToObj(i -> new Hold(anyBookId(), anyBranch()))
                 .collect(toSet()));
     }
 
@@ -154,7 +154,7 @@ public class PatronBooksFixture {
 
 
     public static PatronBooks regularPatronWithHold(BookOnHold bookOnHold) {
-        return regularPatronWith(new PatronHold(bookOnHold.getBookId(), bookOnHold.getHoldPlacedAt()));
+        return regularPatronWith(new Hold(bookOnHold.getBookId(), bookOnHold.getHoldPlacedAt()));
     }
 
 

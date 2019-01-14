@@ -6,7 +6,6 @@ import io.pillopl.library.lending.patron.model.PatronBooksEvent.*;
 import io.pillopl.library.lending.patron.model.PatronInformation;
 import io.pillopl.library.lending.patron.model.PatronInformation.PatronType;
 import io.vavr.API;
-import io.vavr.Predicates;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
@@ -16,6 +15,7 @@ import java.util.UUID;
 
 import static io.vavr.API.$;
 import static io.vavr.API.Case;
+import static io.vavr.Predicates.instanceOf;
 
 @NoArgsConstructor
 class PatronBooksDatabaseEntity {
@@ -24,7 +24,7 @@ class PatronBooksDatabaseEntity {
     Long id;
     UUID patronId;
     PatronType patronType;
-    Set<BookOnHoldDatabaseEntity> booksOnHold;
+    Set<HoldDatabaseEntity> booksOnHold;
     Set<OverdueCheckoutDatabaseEntity> checkouts;
 
     PatronBooksDatabaseEntity(PatronInformation patronInformation) {
@@ -36,13 +36,13 @@ class PatronBooksDatabaseEntity {
 
     PatronBooksDatabaseEntity handle(PatronBooksEvent event) {
         return API.Match(event).of(
-                Case($(Predicates.instanceOf(BookPlacedOnHoldEvents.class)), this::handle),
-                Case($(Predicates.instanceOf(BookPlacedOnHold.class)), this::handle),
-                Case($(Predicates.instanceOf(BookCollected.class)), this::handle),
-                Case($(Predicates.instanceOf(BookHoldCanceled.class)), this::handle),
-                Case($(Predicates.instanceOf(BookHoldExpired.class)), this::handle),
-                Case($(Predicates.instanceOf(OverdueCheckoutRegistered.class)), this::handle),
-                Case($(Predicates.instanceOf(BookReturned.class)), this::handle)
+                Case($(instanceOf(BookPlacedOnHoldEvents.class)), this::handle),
+                Case($(instanceOf(BookPlacedOnHold.class)), this::handle),
+                Case($(instanceOf(BookCollected.class)), this::handle),
+                Case($(instanceOf(BookHoldCanceled.class)), this::handle),
+                Case($(instanceOf(BookHoldExpired.class)), this::handle),
+                Case($(instanceOf(OverdueCheckoutRegistered.class)), this::handle),
+                Case($(instanceOf(BookReturned.class)), this::handle)
 
         );
     }
@@ -53,7 +53,7 @@ class PatronBooksDatabaseEntity {
     }
 
     private PatronBooksDatabaseEntity handle(BookPlacedOnHold event) {
-        booksOnHold.add(new BookOnHoldDatabaseEntity(event.getBookId(), event.getPatronId(), event.getLibraryBranchId(), event.getHoldTill()));
+        booksOnHold.add(new HoldDatabaseEntity(event.getBookId(), event.getPatronId(), event.getLibraryBranchId(), event.getHoldTill()));
         return this;
     }
 

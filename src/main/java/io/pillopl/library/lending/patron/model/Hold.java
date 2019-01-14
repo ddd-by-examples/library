@@ -6,7 +6,7 @@ import lombok.NonNull;
 import lombok.Value;
 
 @Value
-public class PatronHold {
+public class Hold {
 
     @NonNull BookId bookId;
     @NonNull LibraryBranchId libraryBranchId;

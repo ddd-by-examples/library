@@ -24,7 +24,7 @@ class PatronBooksDatabaseRepository implements PatronBooksRepository {
 
     private final PatronBooksEntityRepository patronBooksEntityRepository;
     private final DomainModelMapper domainModelMapper;
-    private final DomainEvents publisher;
+    private final DomainEvents domainEvents;
 
     @Override
     public Option<PatronBooks> findBy(PatronId patronId) {
@@ -35,10 +35,11 @@ class PatronBooksDatabaseRepository implements PatronBooksRepository {
 
     @Override
     public PatronBooks publish(PatronBooksEvent domainEvent) {
-        publisher.publish(domainEvent.normalize());
-        return Match(domainEvent).of(
+        PatronBooks result = Match(domainEvent).of(
                 Case($(instanceOf(PatronCreated.class)), this::createNewPatron),
                 Case($(), this::handleNextEvent));
+        domainEvents.publish(domainEvent.normalize());
+        return result;
     }
 
     private PatronBooks createNewPatron(PatronCreated domainEvent) {
@@ -97,7 +98,7 @@ class DomainModelMapper {
         return new PatronHolds(patronBooksDatabaseEntity
                 .booksOnHold
                 .stream()
-                .map(entity -> new PatronHold(new BookId(entity.bookId), new LibraryBranchId(entity.libraryBranchId)))
+                .map(entity -> new Hold(new BookId(entity.bookId), new LibraryBranchId(entity.libraryBranchId)))
                 .collect(toSet()));
     }
 

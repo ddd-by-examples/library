@@ -11,10 +11,10 @@ public class PatronHolds {
 
     static int MAX_NUMBER_OF_HOLDS = 5;
 
-    Set<PatronHold> resourcesOnHold;
+    Set<Hold> resourcesOnHold;
 
     boolean a(BookOnHold bookOnHold) {
-        PatronHold hold = new PatronHold(bookOnHold.getBookId(), bookOnHold.getHoldPlacedAt());
+        Hold hold = new Hold(bookOnHold.getBookId(), bookOnHold.getHoldPlacedAt());
         return resourcesOnHold.contains(hold);
     }
 

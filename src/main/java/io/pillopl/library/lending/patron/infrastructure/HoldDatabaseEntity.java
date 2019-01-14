@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @NoArgsConstructor
 @Getter
-class BookOnHoldDatabaseEntity {
+class HoldDatabaseEntity {
 
     @Id
     Long id;
@@ -18,7 +18,7 @@ class BookOnHoldDatabaseEntity {
     UUID libraryBranchId;
     Instant till;
 
-    BookOnHoldDatabaseEntity(UUID bookId, UUID patronId, UUID libraryBranchId, Instant till) {
+    HoldDatabaseEntity(UUID bookId, UUID patronId, UUID libraryBranchId, Instant till) {
         this.bookId = bookId;
         this.patronId = patronId;
         this.libraryBranchId = libraryBranchId;

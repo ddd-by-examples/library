@@ -31,7 +31,7 @@ class PatronCollectingBookTest extends Specification {
 
     def 'patron can collect book which was placed on hold by him'() {
         given:
-            PatronHold onHold = onHold()
+            Hold onHold = onHold()
         and:
             PatronBooks patron = regularPatronWith(onHold)
         when:
@@ -42,7 +42,7 @@ class PatronCollectingBookTest extends Specification {
 
     def 'patron can checkout up to 60 days'() {
         given:
-            PatronHold onHold = onHold()
+            Hold onHold = onHold()
         and:
             Instant checkoutTime = Instant.now()
         and:
@@ -65,7 +65,7 @@ class PatronCollectingBookTest extends Specification {
 
     def 'patron cannot checkout for 0 or less'() {
         given:
-            PatronHold onHold = onHold()
+            Hold onHold = onHold()
         and:
             PatronBooks patron = regularPatronWith(onHold)
         when:
