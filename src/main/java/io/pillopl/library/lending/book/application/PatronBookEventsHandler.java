@@ -1,9 +1,13 @@
 package io.pillopl.library.lending.book.application;
 
+import io.pillopl.library.commons.events.DomainEvents;
 import io.pillopl.library.lending.book.model.*;
 import io.pillopl.library.lending.patron.model.PatronBooksEvent.*;
+import io.pillopl.library.lending.patron.model.PatronId;
 import io.vavr.API;
 import lombok.AllArgsConstructor;
+
+import java.time.Instant;
 
 import static io.vavr.API.$;
 import static io.vavr.API.Case;
@@ -13,6 +17,7 @@ import static io.vavr.Predicates.instanceOf;
 public class PatronBookEventsHandler {
 
     private final BookRepository bookRepository;
+    private final DomainEvents domainEvents;
 
     public void handle(BookPlacedOnHold bookPlacedOnHold) {
         bookRepository.findBy(new BookId(bookPlacedOnHold.getBookId()))
@@ -48,10 +53,25 @@ public class PatronBookEventsHandler {
     private Book handleBookPlacedOnHold(Book book, BookPlacedOnHold bookPlacedOnHold) {
         return API.Match(book).of(
                 Case($(instanceOf(AvailableBook.class)), availableBook -> availableBook.handle(bookPlacedOnHold)),
+                Case($(instanceOf(BookOnHold.class)), bookOnHold -> raiseDuplicateHoldFoundEvent(bookOnHold, bookPlacedOnHold)),
                 Case($(), () -> book)
-                //TODO raise BookAlreadyHeld?
         );
     }
+
+    private BookOnHold raiseDuplicateHoldFoundEvent(BookOnHold onHold, BookPlacedOnHold bookPlacedOnHold) {
+        if(onHold.by(new PatronId(bookPlacedOnHold.getPatronId()))) {
+            return onHold;
+        }
+        domainEvents.publish(
+                new BookDuplicateHoldFound(
+                        Instant.now(),
+                        onHold.getByPatron().getPatronId(),
+                        bookPlacedOnHold.getPatronId(),
+                        bookPlacedOnHold.getLibraryBranchId(),
+                        bookPlacedOnHold.getBookId()));
+        return onHold;
+    }
+
 
     private Book handleBookHoldExpired(Book book, BookHoldExpired holdExpired) {
         return API.Match(book).of(

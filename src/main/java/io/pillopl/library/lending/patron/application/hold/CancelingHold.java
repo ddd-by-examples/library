@@ -42,8 +42,7 @@ public class CancelingHold {
     }
 
     private Result saveAndPublishEvents(BookHoldCanceled bookHoldCanceled) {
-        patronBooksRepository
-                .publish(bookHoldCanceled);
+        patronBooksRepository.publish(bookHoldCanceled);
         return Success;
     }
 

@@ -17,7 +17,7 @@ import static io.pillopl.library.lending.book.model.BookFixture.circulatingAvail
 import static io.pillopl.library.lending.library.model.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
 
-@ContextConfiguration(classes = BookDatabaseConfiguration.class)
+@ContextConfiguration(classes = BookConfiguration.class)
 @SpringBootTest
 class BookDatabaseRepositoryIT extends Specification {
 

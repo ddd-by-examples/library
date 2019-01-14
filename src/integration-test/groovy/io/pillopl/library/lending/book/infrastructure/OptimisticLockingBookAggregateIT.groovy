@@ -26,7 +26,7 @@ import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlace
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
 import static io.pillopl.library.lending.patron.model.PatronInformation.PatronType.Regular
 
-@ContextConfiguration(classes = BookDatabaseConfiguration.class)
+@ContextConfiguration(classes = BookConfiguration.class)
 @SpringBootTest
 class OptimisticLockingBookAggregateIT extends Specification {
 

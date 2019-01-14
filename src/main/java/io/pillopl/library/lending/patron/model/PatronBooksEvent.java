@@ -22,6 +22,10 @@ public interface PatronBooksEvent extends DomainEvent {
 
     UUID getPatronId();
 
+    default UUID getAggregateId() {
+       return getPatronId();
+    }
+
     default List<DomainEvent> normalize() {
         return List.of(this);
     }

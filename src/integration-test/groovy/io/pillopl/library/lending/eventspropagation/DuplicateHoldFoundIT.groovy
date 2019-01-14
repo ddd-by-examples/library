@@ -1,21 +1,17 @@
 package io.pillopl.library.lending.eventspropagation
 
-import io.pillopl.library.lending.book.infrastructure.BookDatabaseConfiguration
+import io.pillopl.library.lending.LendingContext
 import io.pillopl.library.lending.book.model.AvailableBook
 import io.pillopl.library.lending.book.model.BookFixture
-import io.pillopl.library.lending.book.model.BookOnHold
 import io.pillopl.library.lending.book.model.BookRepository
-import io.pillopl.library.lending.dailysheet.infrastructure.SheetReadModelDatabaseConfiguration
 import io.pillopl.library.lending.library.model.LibraryBranchId
-import io.pillopl.library.lending.patron.infrastructure.PatronDatabaseConfiguration
 import io.pillopl.library.lending.patron.model.*
 import io.vavr.control.Option
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.jdbc.core.ColumnMapRowMapper
-import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification
+import spock.util.concurrent.PollingConditions
 
 import javax.sql.DataSource
 
@@ -25,14 +21,15 @@ import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlace
 import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHoldEvents.events
 import static io.pillopl.library.lending.patron.model.PatronBooksEvent.PatronCreated
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
-import static io.pillopl.library.lending.patron.model.PatronBooksFixture.regularPatron
 import static io.pillopl.library.lending.patron.model.PatronInformation.PatronType.Regular
 
-@ContextConfiguration(classes = [PatronDatabaseConfiguration.class, BookDatabaseConfiguration.class, SheetReadModelDatabaseConfiguration.class])
+@ContextConfiguration(classes = [LendingContext.class])
 @SpringBootTest
-class EventsPropagationBetweenAggregatesAndReadModelsIT extends Specification {
+class DuplicateHoldFoundIT extends Specification {
 
-    PatronId patronId = anyPatronId()
+    PatronId patron = anyPatronId()
+    PatronId anotherPatron = anyPatronId()
+
     LibraryBranchId libraryBranchId = anyBranch()
     AvailableBook book = BookFixture.circulatingBook()
 
@@ -43,35 +40,27 @@ class EventsPropagationBetweenAggregatesAndReadModelsIT extends Specification {
     BookRepository bookRepository
 
     @Autowired
-    DataSource datasource;
+    DataSource datasource
 
-    def 'should synchronize PatronBooks, Book and DailySheet with events'() {
+    PollingConditions pollingConditions = new PollingConditions(timeout: 15)
+
+    def 'should react to compensation event - duplicate hold on book found'() {
         given:
             bookRepository.save(book)
         and:
-            patronBooksRepo.publish(patronCreated())
+            patronBooksRepo.publish(patronCreated(patron))
+        and:
+            patronBooksRepo.publish(patronCreated(anotherPatron))
         when:
-            patronBooksRepo.publish(placedOnHold(book))
+            patronBooksRepo.publish(placedOnHold(book, patron))
+        and:
+            patronBooksRepo.publish(placedOnHold(book, anotherPatron))
         then:
-            patronShouldBeFoundInDatabaseWithOneBookOnHold(patronId)
-        and:
-            bookReactedToPlacedOnHoldEvent()
-        and:
-            dailySheetIsUpdated()
+            patronShouldBeFoundInDatabaseWithZeroBookOnHold(anotherPatron)
+
     }
 
-    boolean bookReactedToPlacedOnHoldEvent() {
-        return bookRepository.findBy(book.bookId).get() instanceof BookOnHold
-    }
-
-    boolean dailySheetIsUpdated() {
-        new JdbcTemplate(datasource).query("select count(*) from holds_sheet s where s.hold_by_patron_id = ?",
-                [patronId.patronId] as Object[],
-                new ColumnMapRowMapper()).get(0)
-                .get("COUNT(*)") == 1
-    }
-
-    BookPlacedOnHoldEvents placedOnHold(AvailableBook book) {
+    BookPlacedOnHoldEvents placedOnHold(AvailableBook book, PatronId patronId) {
         return events(bookPlacedOnHoldNow(
                 book.bookInformation,
                 book.libraryBranch,
@@ -79,18 +68,15 @@ class EventsPropagationBetweenAggregatesAndReadModelsIT extends Specification {
                 HoldDuration.closeEnded(5)))
     }
 
-    PatronCreated patronCreated() {
+    PatronCreated patronCreated(PatronId patronId) {
         return PatronCreated.now(new PatronInformation(patronId, Regular))
     }
 
-    void patronShouldBeFoundInDatabaseWithOneBookOnHold(PatronId patronId) {
-        PatronBooks patronBooks = loadPersistedPatron(patronId)
-        assert patronBooks.numberOfHolds() == 1
-        assertPatronInformation(patronBooks, patronId)
-    }
-
-    void assertPatronInformation(PatronBooks patronBooks, PatronId patronId) {
-        assert patronBooks.equals(regularPatron(patronId))
+    void patronShouldBeFoundInDatabaseWithZeroBookOnHold(PatronId patronId) {
+        pollingConditions.eventually {
+            PatronBooks patronBooks = loadPersistedPatron(patronId)
+            assert patronBooks.numberOfHolds() == 0
+        }
     }
 
     PatronBooks loadPersistedPatron(PatronId patronId) {

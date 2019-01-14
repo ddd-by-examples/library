@@ -136,11 +136,10 @@ class BookDatabaseRepository implements BookRepository, FindAvailableBook, FindB
 
     @Override
     public Option<BookOnHold> findBookOnHold(BookId bookId, PatronId patronId) {
-        Option<BookOnHold> bookOnHold = Match(findBy(bookId)).of(
+            return Match(findBy(bookId)).of(
                 Case($Some($(instanceOf(BookOnHold.class))), Option::of),
                 Case($(), Option::none)
         );
-        return bookOnHold.filter(onHold -> onHold.by(patronId));
     }
 
 }

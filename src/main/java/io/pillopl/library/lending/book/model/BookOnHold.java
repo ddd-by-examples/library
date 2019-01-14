@@ -57,6 +57,7 @@ public class BookOnHold implements Book {
                 version);
     }
 
+
     public BookId getBookId() {
         return bookInformation.getBookId();
     }

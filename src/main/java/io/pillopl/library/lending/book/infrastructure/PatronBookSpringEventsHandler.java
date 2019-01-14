@@ -1,15 +1,16 @@
 package io.pillopl.library.lending.book.infrastructure;
 
 
+import io.pillopl.library.commons.events.DomainEvents;
 import io.pillopl.library.lending.book.application.PatronBookEventsHandler;
 import io.pillopl.library.lending.book.model.BookRepository;
 import io.pillopl.library.lending.patron.model.PatronBooksEvent.*;
 import org.springframework.context.event.EventListener;
 
-public class PatronBookSpringEventsHandler extends PatronBookEventsHandler {
+class PatronBookSpringEventsHandler extends PatronBookEventsHandler {
 
-    PatronBookSpringEventsHandler(BookRepository bookRepository) {
-        super(bookRepository);
+    PatronBookSpringEventsHandler(BookRepository bookRepository, DomainEvents domainEvents) {
+        super(bookRepository, domainEvents);
     }
 
     @EventListener
