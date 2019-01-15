@@ -22,31 +22,31 @@ public class PatronBookEventsHandler {
     public void handle(BookPlacedOnHold bookPlacedOnHold) {
         bookRepository.findBy(new BookId(bookPlacedOnHold.getBookId()))
                 .map(book -> handleBookPlacedOnHold(book, bookPlacedOnHold))
-                .forEach(bookRepository::save);
+                .map(this::saveBook);
     }
 
     public void handle(BookCollected bookCollected) {
         bookRepository.findBy(new BookId(bookCollected.getBookId()))
                 .map(book -> handleBookCollected(book, bookCollected))
-                .forEach(bookRepository::save);
+                .map(this::saveBook);
     }
 
     public void handle(BookHoldExpired holdExpired) {
         bookRepository.findBy(new BookId(holdExpired.getBookId()))
                 .map(book -> handleBookHoldExpired(book, holdExpired))
-                .forEach(bookRepository::save);
+                .map(this::saveBook);
     }
 
     public void handle(BookHoldCanceled holdCanceled) {
         bookRepository.findBy(new BookId(holdCanceled.getBookId()))
                 .map(book -> handleBookHoldCanceled(book,  holdCanceled))
-                .forEach(bookRepository::save);
+                .map(this::saveBook);
     }
 
     public void handle(BookReturned bookReturned) {
         bookRepository.findBy(new BookId(bookReturned.getBookId()))
                 .map(book -> handleBookReturned(book, bookReturned))
-                .forEach(bookRepository::save);
+                .map(this::saveBook);
     }
 
 
@@ -101,5 +101,9 @@ public class PatronBookEventsHandler {
         );
     }
 
+    private Book saveBook(Book book) {
+        bookRepository.save(book);
+        return book;
+    }
 
 }

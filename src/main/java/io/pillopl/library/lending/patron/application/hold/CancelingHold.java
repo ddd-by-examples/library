@@ -35,15 +35,20 @@ public class CancelingHold {
             PatronBooks patronBooks = find(command.getPatronId());
             Either<BookHoldCancelingFailed, BookHoldCanceled> result = patronBooks.cancelHold(bookOnHold);
             return Match(result).of(
-                    Case($Left($()), bookHoldCancelingFailed -> Rejection),
-                    Case($Right($()), this::saveAndPublishEvents)
+                    Case($Left($()), this::publishEvents),
+                    Case($Right($()), this::publishEvents)
             );
         });
     }
 
-    private Result saveAndPublishEvents(BookHoldCanceled bookHoldCanceled) {
+    private Result publishEvents(BookHoldCanceled bookHoldCanceled) {
         patronBooksRepository.publish(bookHoldCanceled);
         return Success;
+    }
+
+    private Result publishEvents(BookHoldCancelingFailed bookHoldCancelingFailed) {
+        patronBooksRepository.publish(bookHoldCancelingFailed);
+        return Rejection;
     }
 
     private BookOnHold find(BookId bookId, PatronId patronId) {

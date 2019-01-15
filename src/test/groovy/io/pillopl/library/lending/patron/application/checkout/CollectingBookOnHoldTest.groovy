@@ -76,7 +76,7 @@ class CollectingBookOnHoldTest extends Specification {
             result.isFailure()
     }
 
-    def 'should reject (but not fail) if saving patron fails'() {
+    def 'should fail if saving patron fails'() {
         given:
             CollectingBookOnHold collecting = new CollectingBookOnHold(willFindBook, repository)
         and:
@@ -84,8 +84,7 @@ class CollectingBookOnHoldTest extends Specification {
         when:
             Try<Result> result = collecting.collect(for3days(patronId))
         then:
-            result.isSuccess()
-            result.get() == Result.Rejection
+            result.isFailure()
 
     }
 

@@ -16,6 +16,7 @@ import lombok.Value;
 
 import java.time.Instant;
 
+import static io.pillopl.library.commons.commands.Result.Success;
 import static io.vavr.API.*;
 import static io.vavr.Patterns.$Left;
 import static io.vavr.Patterns.$Right;
@@ -32,15 +33,20 @@ public class PlacingOnHold {
             PatronBooks patronBooks = find(command.getPatronId());
             Either<BookHoldFailed, BookPlacedOnHoldEvents> result = patronBooks.placeOnHold(availableBook, command.getHoldDuration());
             return Match(result).of(
-                    Case($Left($()), bookHoldFailed -> Result.Rejection),
-                    Case($Right($()), this::saveAndPublishEvents)
+                    Case($Left($()), this::publishEvents),
+                    Case($Right($()), this::publishEvents)
             );
         });
     }
 
-    private Result saveAndPublishEvents(BookPlacedOnHoldEvents placedOnHold) {
+    private Result publishEvents(BookPlacedOnHoldEvents placedOnHold) {
         patronBooksRepository.publish(placedOnHold);
-        return Result.Success;
+        return Success;
+    }
+
+    private Result publishEvents(BookHoldFailed bookHoldFailed) {
+        patronBooksRepository.publish(bookHoldFailed);
+        return Result.Rejection;
     }
 
     private AvailableBook find(BookId id) {
