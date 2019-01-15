@@ -35,8 +35,7 @@ class CollectingBookOnHold {
         return Try.of(() -> {
             BookOnHold bookOnHold = find( command.getBookId(), command.getPatronId());
             PatronBooks patronBooks = find(command.getPatronId());
-            Either<BookCollectingFailed, BookCollected> result =
-                    patronBooks.collect(bookOnHold, command.getCheckoutDuration());
+            Either<BookCollectingFailed, BookCollected> result = patronBooks.collect(bookOnHold, command.getCheckoutDuration());
             return Match(result).of(
                     Case($Left($()), this::publishEvents),
                     Case($Right($()), this::publishEvents));

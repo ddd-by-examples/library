@@ -1,34 +1,33 @@
 package io.pillopl.library.lending.patron.infrastructure
 
-import io.pillopl.library.lending.book.model.BookInformation
+import io.pillopl.library.lending.book.model.BookId
 import io.pillopl.library.lending.book.model.BookType
 import io.pillopl.library.lending.library.model.LibraryBranchId
-import io.pillopl.library.lending.patron.model.CheckoutDuration
-import io.pillopl.library.lending.patron.model.HoldDuration
-import io.pillopl.library.lending.patron.model.NumberOfDays
-import io.pillopl.library.lending.patron.model.PatronBooksEvent
-import io.pillopl.library.lending.patron.model.PatronId
-import io.pillopl.library.lending.patron.model.PatronInformation
+import io.pillopl.library.lending.patron.model.*
 import spock.lang.Specification
 
 import java.time.Duration
 import java.time.Instant
 
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
+import static io.pillopl.library.lending.book.model.BookType.Restricted
 import static io.pillopl.library.lending.library.model.LibraryBranchFixture.anyBranch
+import static io.pillopl.library.lending.patron.model.CheckoutDuration.forNoOfDays
 import static io.pillopl.library.lending.patron.model.HoldDuration.closeEnded
 import static io.pillopl.library.lending.patron.model.HoldDuration.openEnded
+import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookHoldCanceled.holdCanceledNow
 import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHold.bookPlacedOnHoldNow
 import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHoldEvents.events
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
-import static io.pillopl.library.lending.patron.model.PatronInformation.PatronType.Regular
+import static io.pillopl.library.lending.patron.model.PatronType.Regular
 
 class CreatingDataModelFromPatronEventsTest extends Specification {
 
     PatronId patronId = anyPatronId()
-    PatronInformation.PatronType regular = Regular
+    PatronType regular = Regular
     LibraryBranchId libraryBranchId = anyBranch()
-    BookInformation bookInformation = new BookInformation(anyBookId(), BookType.Restricted)
+    BookType type = Restricted
+    BookId bookId = anyBookId()
     Instant holdFrom = Instant.now()
 
     def 'should add hold on placedOnHold event with close ended duration'() {
@@ -119,52 +118,53 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
     }
 
     PatronBooksDatabaseEntity createPatron() {
-        new PatronBooksDatabaseEntity(new PatronInformation(patronId, Regular))
+        return new PatronBooksDatabaseEntity(patronId, Regular)
     }
 
     PatronBooksEvent.BookCollected bookCollected() {
         return PatronBooksEvent.BookCollected.bookCollectedNow(
-                bookInformation,
+                bookId,
+                type,
                 libraryBranchId,
                 patronId,
-                    CheckoutDuration.forNoOfDays(1))
+                forNoOfDays(1))
     }
 
     PatronBooksEvent.BookReturned bookReturned() {
         return new PatronBooksEvent.BookReturned(
                 Instant.now(),
                 patronId.patronId,
-                bookInformation.bookId.bookId,
-                bookInformation.bookType,
+                bookId.bookId,
+                type,
                 libraryBranchId.libraryBranchId)
     }
 
     PatronBooksEvent.BookHoldCanceled holdCanceled() {
-        return PatronBooksEvent.BookHoldCanceled.holdCanceledNow(
-                bookInformation,
+        return holdCanceledNow(
+                bookId,
                 libraryBranchId,
-                new PatronInformation(patronId, Regular),
-        )
+                patronId)
     }
 
     PatronBooksEvent.BookPlacedOnHoldEvents placedOnHold(HoldDuration duration = closeEnded(5)) {
         return events(bookPlacedOnHoldNow(
-                bookInformation,
+                bookId,
+                type,
                 libraryBranchId,
-                new PatronInformation(patronId, Regular),
+                patronId,
                 duration))
     }
 
     PatronBooksEvent.BookHoldExpired bookHoldExpired() {
         return PatronBooksEvent.BookHoldExpired.now(
-                bookInformation.bookId,
+                bookId,
                 patronId,
                 libraryBranchId
         )
     }
 
     PatronBooksEvent.OverdueCheckoutRegistered overdueCheckoutRegistered() {
-        return PatronBooksEvent.OverdueCheckoutRegistered.now(patronId, bookInformation.bookId, libraryBranchId)
+        return PatronBooksEvent.OverdueCheckoutRegistered.now(patronId, bookId, libraryBranchId)
     }
 
 }

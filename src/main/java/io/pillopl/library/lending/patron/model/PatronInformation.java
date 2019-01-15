@@ -3,12 +3,10 @@ package io.pillopl.library.lending.patron.model;
 import lombok.NonNull;
 import lombok.Value;
 
-import static io.pillopl.library.lending.patron.model.PatronInformation.PatronType.Regular;
+import static io.pillopl.library.lending.patron.model.PatronType.Regular;
 
 @Value
-public class PatronInformation {
-
-    public enum PatronType {Researcher, Regular}
+class PatronInformation {
 
     @NonNull PatronId patronId;
 

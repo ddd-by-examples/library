@@ -2,7 +2,9 @@ package io.pillopl.library.lending.patron.infrastructure
 
 import io.pillopl.library.lending.book.model.BookId
 import io.pillopl.library.lending.library.model.LibraryBranchId
-import io.pillopl.library.lending.patron.model.*
+import io.pillopl.library.lending.patron.model.PatronBooksFactory
+import io.pillopl.library.lending.patron.model.PatronId
+import io.pillopl.library.lending.patron.model.PatronType
 import spock.lang.Specification
 
 import java.time.Instant
@@ -10,7 +12,7 @@ import java.time.Instant
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
 import static io.pillopl.library.lending.library.model.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
-import static io.pillopl.library.lending.patron.model.PatronInformation.PatronType.Regular
+import static io.pillopl.library.lending.patron.model.PatronType.Regular
 import static java.util.Collections.emptyList
 
 class PatronEntityToDomainModelMappingTest extends Specification {
@@ -24,26 +26,15 @@ class PatronEntityToDomainModelMappingTest extends Specification {
     BookId anotherBookId = anyBookId()
     Instant anyDate = Instant.now()
 
-    def 'should map patron information'() {
-        given:
-            PatronBooksDatabaseEntity entity = patronEntity(patronId, Regular)
-        when:
-            PatronInformation patronInformation = domainModelMapper.mapPatronInformation(entity)
-        then:
-            patronInformation.patronId == patronId
-            patronInformation.type == Regular
-
-    }
-
     def 'should map patron holds'() {
         given:
             PatronBooksDatabaseEntity entity = patronEntity(patronId, Regular, [
                     new HoldDatabaseEntity(bookId.bookId, patronId.patronId, libraryBranchId.libraryBranchId, anyDate),
                     new HoldDatabaseEntity(anotherBookId.bookId, patronId.patronId, anotherBranchId.libraryBranchId, anyDate)])
         when:
-            PatronHolds patronHolds = domainModelMapper.mapPatronHolds(entity)
+            Set<Tuple2<BookId, LibraryBranchId>> patronHolds = domainModelMapper.mapPatronHolds(entity)
         then:
-            patronHolds.resourcesOnHold.size() == 2
+            patronHolds.size() == 2
 
 
     }
@@ -54,18 +45,18 @@ class PatronEntityToDomainModelMappingTest extends Specification {
                     new OverdueCheckoutDatabaseEntity(bookId.bookId, patronId.patronId, libraryBranchId.libraryBranchId),
                     new OverdueCheckoutDatabaseEntity(anotherBookId.bookId, patronId.patronId, anotherBranchId.libraryBranchId)])
         when:
-            OverdueCheckouts overdueCheckouts = domainModelMapper.mapPatronOverdueCheckouts(entity)
+            Map<LibraryBranchId, Set<BookId>> overdueCheckouts = domainModelMapper.mapPatronOverdueCheckouts(entity)
         then:
-            overdueCheckouts.getOverdueCheckouts().get(libraryBranchId).size() == 1
-            overdueCheckouts.getOverdueCheckouts().get(anotherBranchId).size() == 1
+            overdueCheckouts.get(libraryBranchId).size() == 1
+            overdueCheckouts.get(anotherBranchId).size() == 1
     }
 
 
     PatronBooksDatabaseEntity patronEntity(PatronId patronId,
-                                           PatronInformation.PatronType type,
+                                           PatronType type,
                                            List<HoldDatabaseEntity> holds = emptyList(),
                                            List<OverdueCheckoutDatabaseEntity> overdueCheckouts = emptyList()) {
-        PatronBooksDatabaseEntity entity = new PatronBooksDatabaseEntity(new PatronInformation(patronId, type))
+        PatronBooksDatabaseEntity entity = new PatronBooksDatabaseEntity(patronId, type)
         entity.booksOnHold = holds as Set
         entity.checkouts = overdueCheckouts as Set
         return entity

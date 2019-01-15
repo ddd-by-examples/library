@@ -96,20 +96,20 @@ class BookDatabaseRepository implements BookRepository, FindAvailableBook, FindB
     }
 
     private int insert(AvailableBook availableBook) {
-        return insert(availableBook.getBookInformation(), Available, availableBook.getLibraryBranch().getLibraryBranchId(), null, null, null, null, null);
+        return insert(availableBook.getBookId(), availableBook.type(), Available, availableBook.getLibraryBranch().getLibraryBranchId(), null, null, null, null, null);
     }
 
     private int insert(BookOnHold bookOnHold) {
-        return insert(bookOnHold.getBookInformation(), OnHold, null, bookOnHold.getHoldPlacedAt().getLibraryBranchId(), bookOnHold.getByPatron().getPatronId(), bookOnHold.getHoldTill(), null, null);
+        return insert(bookOnHold.getBookId(), bookOnHold.type(), OnHold, null, bookOnHold.getHoldPlacedAt().getLibraryBranchId(), bookOnHold.getByPatron().getPatronId(), bookOnHold.getHoldTill(), null, null);
 
     }
 
     private int insert(CollectedBook collectedBook) {
-        return insert(collectedBook.getBookInformation(), Collected, null, null, null, null, collectedBook.getCollectedAt().getLibraryBranchId(), collectedBook.getByPatron().getPatronId());
+        return insert(collectedBook.getBookId(), collectedBook.type(), Collected, null, null, null, null, collectedBook.getCollectedAt().getLibraryBranchId(), collectedBook.getByPatron().getPatronId());
 
     }
 
-    private int insert(BookInformation bookInformation, BookDatabaseEntity.BookState state, UUID availableAt, UUID onHoldAt, UUID onHoldBy, Instant onHoldTill, UUID collectedAt, UUID collectedBy) {
+    private int insert(BookId bookId, BookType bookType, BookDatabaseEntity.BookState state, UUID availableAt, UUID onHoldAt, UUID onHoldBy, Instant onHoldTill, UUID collectedAt, UUID collectedBy) {
         return jdbcTemplate.update("INSERT INTO book_database_entity " +
                         "(id, " +
                         "book_id, " +
@@ -123,7 +123,7 @@ class BookDatabaseRepository implements BookRepository, FindAvailableBook, FindB
                         "collected_by_patron, " +
                         "version) VALUES " +
                         "(book_database_entity_seq.nextval, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)",
-                bookInformation.getBookId().getBookId(), bookInformation.getBookType().toString(), state.toString(), availableAt, onHoldAt, onHoldBy, onHoldTill, collectedAt, collectedBy);
+                bookId.getBookId(), bookType.toString(), state.toString(), availableAt, onHoldAt, onHoldBy, onHoldTill, collectedAt, collectedBy);
     }
 
     @Override

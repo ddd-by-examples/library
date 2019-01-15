@@ -21,7 +21,7 @@ import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlace
 import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHoldEvents.events
 import static io.pillopl.library.lending.patron.model.PatronBooksEvent.PatronCreated
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
-import static io.pillopl.library.lending.patron.model.PatronInformation.PatronType.Regular
+import static io.pillopl.library.lending.patron.model.PatronType.Regular
 
 @ContextConfiguration(classes = [LendingContext.class])
 @SpringBootTest
@@ -62,14 +62,15 @@ class DuplicateHoldFoundIT extends Specification {
 
     BookPlacedOnHoldEvents placedOnHold(AvailableBook book, PatronId patronId) {
         return events(bookPlacedOnHoldNow(
-                book.bookInformation,
+                book.getBookId(),
+                book.type(),
                 book.libraryBranch,
-                new PatronInformation(patronId, Regular),
+                patronId,
                 HoldDuration.closeEnded(5)))
     }
 
     PatronCreated patronCreated(PatronId patronId) {
-        return PatronCreated.now(new PatronInformation(patronId, Regular))
+        return PatronCreated.now(patronId, Regular)
     }
 
     void patronShouldBeFoundInDatabaseWithZeroBookOnHold(PatronId patronId) {

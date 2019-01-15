@@ -8,6 +8,10 @@ public interface Book {
         return getBookInformation().getBookId();
     }
 
+    default BookType type() {
+        return getBookInformation().getBookType();
+    }
+
     BookInformation getBookInformation();
 
     Version getVersion();

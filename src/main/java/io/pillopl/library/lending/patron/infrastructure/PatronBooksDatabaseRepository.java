@@ -5,12 +5,15 @@ import io.pillopl.library.lending.book.model.BookId;
 import io.pillopl.library.lending.library.model.LibraryBranchId;
 import io.pillopl.library.lending.patron.model.*;
 import io.pillopl.library.lending.patron.model.PatronBooksEvent.PatronCreated;
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
 import io.vavr.control.Option;
 import lombok.AllArgsConstructor;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
@@ -44,7 +47,7 @@ class PatronBooksDatabaseRepository implements PatronBooksRepository {
 
     private PatronBooks createNewPatron(PatronCreated domainEvent) {
         PatronBooksDatabaseEntity entity = patronBooksEntityRepository
-                .save(new PatronBooksDatabaseEntity(new PatronInformation(domainEvent.patronId(), domainEvent.getPatronType())));
+                .save(new PatronBooksDatabaseEntity(domainEvent.patronId(), domainEvent.getPatronType()));
         return domainModelMapper.map(entity);
     }
 
@@ -71,14 +74,15 @@ class DomainModelMapper {
 
     PatronBooks map(PatronBooksDatabaseEntity entity) {
         return patronBooksFactory.recreateFrom(
-                mapPatronInformation(entity),
+                entity.patronType,
+                new PatronId(entity.patronId),
                 mapPatronHolds(entity),
                 mapPatronOverdueCheckouts(entity)
         );
     }
 
-    OverdueCheckouts mapPatronOverdueCheckouts(PatronBooksDatabaseEntity patronBooksDatabaseEntity) {
-        return new OverdueCheckouts(
+    Map<LibraryBranchId, Set<BookId>> mapPatronOverdueCheckouts(PatronBooksDatabaseEntity patronBooksDatabaseEntity) {
+        return
                 patronBooksDatabaseEntity
                         .checkouts
                         .stream()
@@ -86,23 +90,19 @@ class DomainModelMapper {
                         .entrySet()
                         .stream()
                         .collect(toMap(
-                                (Entry<UUID, Set<OverdueCheckoutDatabaseEntity>> entry) -> new LibraryBranchId(entry.getKey()),
-                                entry -> entry
+                                (Entry<UUID, Set<OverdueCheckoutDatabaseEntity>> entry) -> new LibraryBranchId(entry.getKey()), entry -> entry
                                         .getValue()
                                         .stream()
-                                        .map(entity -> new OverdueCheckout(new BookId(entity.bookId)))
-                                        .collect(toSet()))));
+                                        .map(entity -> (new BookId(entity.bookId)))
+                                        .collect(toSet())));
     }
 
-    PatronHolds mapPatronHolds(PatronBooksDatabaseEntity patronBooksDatabaseEntity) {
-        return new PatronHolds(patronBooksDatabaseEntity
+    Set<Tuple2<BookId, LibraryBranchId>> mapPatronHolds(PatronBooksDatabaseEntity patronBooksDatabaseEntity) {
+        return patronBooksDatabaseEntity
                 .booksOnHold
                 .stream()
-                .map(entity -> new Hold(new BookId(entity.bookId), new LibraryBranchId(entity.libraryBranchId)))
-                .collect(toSet()));
+                .map(entity -> Tuple.of((new BookId(entity.bookId)), new LibraryBranchId(entity.libraryBranchId)))
+                .collect(toSet());
     }
 
-    PatronInformation mapPatronInformation(PatronBooksDatabaseEntity patronBooksDatabaseEntity) {
-        return new PatronInformation(new PatronId(patronBooksDatabaseEntity.patronId), patronBooksDatabaseEntity.patronType);
-    }
 }

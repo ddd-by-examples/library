@@ -7,7 +7,7 @@ import lombok.Value;
 import java.util.Set;
 
 @Value
-public class PatronHolds {
+class PatronHolds {
 
     static int MAX_NUMBER_OF_HOLDS = 5;
 

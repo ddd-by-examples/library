@@ -3,15 +3,14 @@ package io.pillopl.library.lending.patron.model;
 import io.pillopl.library.lending.book.model.BookId;
 import io.pillopl.library.lending.book.model.BookOnHold;
 import io.pillopl.library.lending.library.model.LibraryBranchId;
-import io.pillopl.library.lending.patron.model.PatronInformation.PatronType;
 import io.vavr.collection.List;
 
 import java.util.*;
 
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId;
 import static io.pillopl.library.lending.library.model.LibraryBranchFixture.anyBranch;
-import static io.pillopl.library.lending.patron.model.PatronInformation.PatronType.Regular;
-import static io.pillopl.library.lending.patron.model.PatronInformation.PatronType.Researcher;
+import static io.pillopl.library.lending.patron.model.PatronType.Regular;
+import static io.pillopl.library.lending.patron.model.PatronType.Researcher;
 import static io.pillopl.library.lending.patron.model.PlacingOnHoldPolicy.*;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.IntStream.rangeClosed;
@@ -113,8 +112,8 @@ public class PatronBooksFixture {
     }
 
     static PatronBooks regularPatronWithOverdueCheckouts(LibraryBranchId libraryBranchId, Set<BookId> overdueBooks) {
-        Map<LibraryBranchId, Set<OverdueCheckout>> overdueCheckouts = new HashMap<>();
-        overdueCheckouts.put(libraryBranchId, createOverdueCheckouts(overdueBooks));
+        Map<LibraryBranchId, Set<BookId>> overdueCheckouts = new HashMap<>();
+        overdueCheckouts.put(libraryBranchId, overdueBooks);
         return new PatronBooks(
                 patronInformation(anyPatronId(), Regular),
                 List.of(overdueCheckoutsRejectionPolicy),
@@ -122,17 +121,9 @@ public class PatronBooksFixture {
                 noHolds());
     }
 
-    private static Set<OverdueCheckout> createOverdueCheckouts(Set<BookId> overdueBooks) {
-        return overdueBooks
-                .stream()
-                .map(OverdueCheckout::new)
-                .collect(toSet());
-    }
-
     static PatronBooks regularPatronWith3_OverdueCheckoutsAt(LibraryBranchId libraryBranchId) {
-        Map<LibraryBranchId, Set<OverdueCheckout>> overdueCheckouts = new HashMap<>();
-        Set<BookId> overdueBooks = Set.of(anyBookId(), anyBookId(), anyBookId());
-        overdueCheckouts.put(libraryBranchId, createOverdueCheckouts(overdueBooks));
+        Map<LibraryBranchId, Set<BookId>> overdueCheckouts = new HashMap<>();
+        overdueCheckouts.put(libraryBranchId, Set.of(anyBookId(), anyBookId(), anyBookId()));
         return new PatronBooks(
                 patronInformation(anyPatronId(), Regular),
                 List.of(overdueCheckoutsRejectionPolicy),

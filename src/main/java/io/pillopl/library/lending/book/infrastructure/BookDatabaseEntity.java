@@ -41,20 +41,15 @@ class BookDatabaseEntity {
     }
 
     private AvailableBook toAvailableBook() {
-        return new AvailableBook(bookInformation(), new LibraryBranchId(available_at_branch), new Version(version));
+        return new AvailableBook(new BookId(book_id), book_type,  new LibraryBranchId(available_at_branch), new Version(version));
     }
 
     private BookOnHold toBookOnHold() {
-        return new BookOnHold(bookInformation(), new LibraryBranchId(on_hold_at_branch), new PatronId(on_hold_by_patron), on_hold_till, new Version(version));
+        return new BookOnHold(new BookId(book_id), book_type, new LibraryBranchId(on_hold_at_branch), new PatronId(on_hold_by_patron), on_hold_till, new Version(version));
     }
-
-    private BookInformation bookInformation() {
-        return new BookInformation(new BookId(book_id), book_type);
-    }
-
 
     private CollectedBook toCollectedBook() {
-        return new CollectedBook(bookInformation(), new LibraryBranchId(collected_at_branch), new PatronId(collected_by_patron), new Version(version));
+        return new CollectedBook(new BookId(book_id), book_type,  new LibraryBranchId(collected_at_branch), new PatronId(collected_by_patron), new Version(version));
     }
 }
 

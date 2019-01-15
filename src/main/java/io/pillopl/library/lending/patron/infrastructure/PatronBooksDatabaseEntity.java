@@ -3,8 +3,8 @@ package io.pillopl.library.lending.patron.infrastructure;
 
 import io.pillopl.library.lending.patron.model.PatronBooksEvent;
 import io.pillopl.library.lending.patron.model.PatronBooksEvent.*;
-import io.pillopl.library.lending.patron.model.PatronInformation;
-import io.pillopl.library.lending.patron.model.PatronInformation.PatronType;
+import io.pillopl.library.lending.patron.model.PatronId;
+import io.pillopl.library.lending.patron.model.PatronType;
 import io.vavr.API;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -27,9 +27,9 @@ class PatronBooksDatabaseEntity {
     Set<HoldDatabaseEntity> booksOnHold;
     Set<OverdueCheckoutDatabaseEntity> checkouts;
 
-    PatronBooksDatabaseEntity(PatronInformation patronInformation) {
-        this.patronId = patronInformation.getPatronId().getPatronId();
-        this.patronType = patronInformation.getType();
+     PatronBooksDatabaseEntity(PatronId patronId, PatronType patronType) {
+        this.patronId = patronId.getPatronId();
+        this.patronType = patronType;
         this.booksOnHold = new HashSet<>();
         this.checkouts = new HashSet<>();
     }

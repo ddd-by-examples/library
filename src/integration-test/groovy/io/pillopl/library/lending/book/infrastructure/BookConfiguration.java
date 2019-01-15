@@ -23,7 +23,7 @@ public class BookConfiguration {
 
     @Bean
     PatronBookEventsHandler patronBookEventsHandler(BookRepository bookRepository, DomainEvents events) {
-        return new PatronBookSpringEventsHandler(bookRepository, events);
+        return new PatronBookEventsHandler(bookRepository, events);
     }
 
 

@@ -13,7 +13,6 @@ import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookHoldC
 
 class PatronCancelingHoldTest extends Specification {
 
-
     def 'patron should be able to cancel his holds'() {
         given:
             BookOnHold forBook = BookFixture.bookOnHold()

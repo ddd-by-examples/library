@@ -8,7 +8,10 @@ import io.pillopl.library.lending.book.model.BookRepository
 import io.pillopl.library.lending.dailysheet.infrastructure.SheetReadModelDatabaseConfiguration
 import io.pillopl.library.lending.library.model.LibraryBranchId
 import io.pillopl.library.lending.patron.infrastructure.PatronDatabaseConfiguration
-import io.pillopl.library.lending.patron.model.*
+import io.pillopl.library.lending.patron.model.HoldDuration
+import io.pillopl.library.lending.patron.model.PatronBooks
+import io.pillopl.library.lending.patron.model.PatronBooksRepository
+import io.pillopl.library.lending.patron.model.PatronId
 import io.vavr.control.Option
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -26,7 +29,7 @@ import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlace
 import static io.pillopl.library.lending.patron.model.PatronBooksEvent.PatronCreated
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.regularPatron
-import static io.pillopl.library.lending.patron.model.PatronInformation.PatronType.Regular
+import static io.pillopl.library.lending.patron.model.PatronType.Regular
 
 @ContextConfiguration(classes = [PatronDatabaseConfiguration.class, BookConfiguration.class, SheetReadModelDatabaseConfiguration.class])
 @SpringBootTest
@@ -73,25 +76,23 @@ class StrongConsistencyBetweenAggregatesAndReadModelsIT extends Specification {
 
     BookPlacedOnHoldEvents placedOnHold(AvailableBook book) {
         return events(bookPlacedOnHoldNow(
-                book.bookInformation,
+                book.bookId,
+                book.type(),
                 book.libraryBranch,
-                new PatronInformation(patronId, Regular),
+                patronId,
                 HoldDuration.closeEnded(5)))
     }
 
     PatronCreated patronCreated() {
-        return PatronCreated.now(new PatronInformation(patronId, Regular))
+        return PatronCreated.now(patronId, Regular)
     }
 
     void patronShouldBeFoundInDatabaseWithOneBookOnHold(PatronId patronId) {
         PatronBooks patronBooks = loadPersistedPatron(patronId)
         assert patronBooks.numberOfHolds() == 1
-        assertPatronInformation(patronBooks, patronId)
-    }
-
-    void assertPatronInformation(PatronBooks patronBooks, PatronId patronId) {
         assert patronBooks.equals(regularPatron(patronId))
     }
+
 
     PatronBooks loadPersistedPatron(PatronId patronId) {
         Option<PatronBooks> loaded = patronBooksRepo.findBy(patronId)

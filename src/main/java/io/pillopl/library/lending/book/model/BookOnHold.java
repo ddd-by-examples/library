@@ -7,12 +7,14 @@ import io.pillopl.library.lending.patron.model.PatronBooksEvent.BookHoldCanceled
 import io.pillopl.library.lending.patron.model.PatronBooksEvent.BookHoldExpired;
 import io.pillopl.library.lending.patron.model.PatronBooksEvent.BookReturned;
 import io.pillopl.library.lending.patron.model.PatronId;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
 
 import java.time.Instant;
 
 @Value
+@AllArgsConstructor
 public class BookOnHold implements Book {
 
     @NonNull
@@ -29,6 +31,10 @@ public class BookOnHold implements Book {
 
     @NonNull
     Version version;
+
+    public BookOnHold(BookId bookId, BookType type, LibraryBranchId libraryBranchId, PatronId patronId, Instant holdTill, Version version) {
+        this(new BookInformation(bookId, type), libraryBranchId, patronId, holdTill, version);
+    }
 
     public AvailableBook handle(BookReturned bookReturned) {
         return new AvailableBook(

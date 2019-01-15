@@ -25,7 +25,7 @@ import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlace
 import static io.pillopl.library.lending.patron.model.PatronBooksEvent.PatronCreated
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.regularPatron
-import static io.pillopl.library.lending.patron.model.PatronInformation.PatronType.Regular
+import static io.pillopl.library.lending.patron.model.PatronType.Regular
 
 @ContextConfiguration(classes = [LendingContext.class])
 @SpringBootTest
@@ -82,25 +82,23 @@ class EventualConsistencyBetweenAggregatesAndReadModelsIT extends Specification 
 
     BookPlacedOnHoldEvents placedOnHold(AvailableBook book) {
         return events(bookPlacedOnHoldNow(
-                book.bookInformation,
+                book.getBookId(),
+                book.type(),
                 book.libraryBranch,
-                new PatronInformation(patronId, Regular),
+                patronId,
                 HoldDuration.closeEnded(5)))
     }
 
     PatronCreated patronCreated() {
-        return PatronCreated.now(new PatronInformation(patronId, Regular))
+        return PatronCreated.now(patronId, Regular)
     }
 
     void patronShouldBeFoundInDatabaseWithOneBookOnHold(PatronId patronId) {
         PatronBooks patronBooks = loadPersistedPatron(patronId)
         assert patronBooks.numberOfHolds() == 1
-        assertPatronInformation(patronBooks, patronId)
-    }
-
-    void assertPatronInformation(PatronBooks patronBooks, PatronId patronId) {
         assert patronBooks.equals(regularPatron(patronId))
     }
+
 
     PatronBooks loadPersistedPatron(PatronId patronId) {
         Option<PatronBooks> loaded = patronBooksRepo.findBy(patronId)

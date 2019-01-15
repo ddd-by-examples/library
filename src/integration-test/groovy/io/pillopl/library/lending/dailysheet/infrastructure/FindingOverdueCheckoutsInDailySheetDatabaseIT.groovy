@@ -1,11 +1,11 @@
 package io.pillopl.library.lending.dailysheet.infrastructure
 
-import io.pillopl.library.lending.book.model.BookInformation
+import io.pillopl.library.lending.book.model.BookId
 import io.pillopl.library.lending.book.model.BookType
 import io.pillopl.library.lending.library.model.LibraryBranchId
 import io.pillopl.library.lending.patron.model.PatronBooksEvent
 import io.pillopl.library.lending.patron.model.PatronId
-import io.pillopl.library.lending.patron.model.PatronInformation
+import io.pillopl.library.lending.patron.model.PatronType
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.jdbc.core.JdbcTemplate
@@ -17,9 +17,9 @@ import java.time.Duration
 import java.time.Instant
 
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
+import static io.pillopl.library.lending.book.model.BookType.Restricted
 import static io.pillopl.library.lending.library.model.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
-import static io.pillopl.library.lending.patron.model.PatronInformation.PatronType.Regular
 import static java.time.Clock.fixed
 import static java.time.Instant.now
 import static java.time.ZoneId.systemDefault
@@ -29,9 +29,9 @@ import static java.time.ZoneId.systemDefault
 class FindingOverdueCheckoutsInDailySheetDatabaseIT extends Specification {
 
     PatronId patronId = anyPatronId()
-    PatronInformation.PatronType regular = Regular
+    PatronType regular = PatronType.Regular
     LibraryBranchId libraryBranchId = anyBranch()
-    BookInformation bookInformation = new BookInformation(anyBookId(), BookType.Restricted)
+    BookId bookId = anyBookId()
 
     static final Instant TIME_OF_EXPIRE_CHECK = now()
 
@@ -94,8 +94,8 @@ class FindingOverdueCheckoutsInDailySheetDatabaseIT extends Specification {
         return new PatronBooksEvent.BookPlacedOnHold(
                         now(),
                         patronId.getPatronId(),
-                        bookInformation.getBookId().getBookId(),
-                        bookInformation.bookType,
+                        bookId.getBookId(),
+                        Restricted,
                         libraryBranchId.getLibraryBranchId(),
                         TIME_OF_EXPIRE_CHECK.minusSeconds(60000),
                         till)
@@ -105,7 +105,7 @@ class FindingOverdueCheckoutsInDailySheetDatabaseIT extends Specification {
         return new PatronBooksEvent.BookHoldCanceled(
                 now(),
                 patronId.getPatronId(),
-                bookInformation.getBookId().getBookId(),
+                bookId.getBookId(),
                 libraryBranchId.getLibraryBranchId())
     }
 
@@ -113,7 +113,7 @@ class FindingOverdueCheckoutsInDailySheetDatabaseIT extends Specification {
         return new PatronBooksEvent.BookHoldExpired(
                 now(),
                 patronId.getPatronId(),
-                bookInformation.getBookId().getBookId(),
+                bookId.getBookId(),
                 libraryBranchId.getLibraryBranchId())
     }
 
@@ -121,8 +121,8 @@ class FindingOverdueCheckoutsInDailySheetDatabaseIT extends Specification {
         return new PatronBooksEvent.BookCollected(
                 now(),
                 patronId.getPatronId(),
-                bookInformation.getBookId().getBookId(),
-                BookType.Restricted,
+                bookId.getBookId(),
+                Restricted,
                 libraryBranchId.getLibraryBranchId(),
                 till)
     }
@@ -131,8 +131,8 @@ class FindingOverdueCheckoutsInDailySheetDatabaseIT extends Specification {
         return new PatronBooksEvent.BookReturned(
                 now(),
                 patronId.getPatronId(),
-                bookInformation.getBookId().getBookId(),
-                BookType.Restricted,
+                bookId.getBookId(),
+                Restricted,
                 libraryBranchId.getLibraryBranchId())
     }
 

@@ -22,7 +22,6 @@ import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlace
 import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHoldEvents.events;
 import static io.pillopl.library.lending.patron.model.PatronHolds.MAX_NUMBER_OF_HOLDS;
 import static io.pillopl.library.lending.patron.model.Rejection.withReason;
-import static io.vavr.control.Either.right;
 
 //TODO - rename to patron?
 @AllArgsConstructor
@@ -44,25 +43,25 @@ public class PatronBooks {
     public Either<BookHoldFailed, BookPlacedOnHoldEvents> placeOnHold(AvailableBook aBook, HoldDuration duration) {
         Option<Rejection> rejection = patronCanHold(aBook, duration);
         if (rejection.isEmpty()) {
-            BookPlacedOnHold bookPlacedOnHold = bookPlacedOnHoldNow(aBook.getBookInformation(), aBook.getLibraryBranch(), patron, duration);
+            BookPlacedOnHold bookPlacedOnHold = bookPlacedOnHoldNow(aBook.getBookId(), aBook.type(), aBook.getLibraryBranch(), patron.getPatronId(), duration);
             if (patronHolds.maximumHoldsAfterHolding(aBook)) {
                 return announceSuccess(events(bookPlacedOnHold, MaximumNumberOhHoldsReached.now(patron, MAX_NUMBER_OF_HOLDS)));
             }
-            return right(events(bookPlacedOnHold));
+            return announceSuccess(events(bookPlacedOnHold));
         }
         return announceFailure(bookHoldFailedNow(rejection.get(), aBook.getBookId(), aBook.getLibraryBranch(), patron));
     }
 
     public Either<BookHoldCancelingFailed, BookHoldCanceled> cancelHold(BookOnHold book) {
         if (patronHolds.a(book)) {
-            return announceSuccess(holdCanceledNow(book.getBookInformation(), book.getHoldPlacedAt(), patron));
+            return announceSuccess(holdCanceledNow(book.getBookId(), book.getHoldPlacedAt(), patron.getPatronId()));
         }
-        return announceFailure(holdCancelingFailedNow(book.getBookId(), book.getHoldPlacedAt(), patron));
+        return announceFailure(holdCancelingFailedNow(book.getBookId(), book.getHoldPlacedAt(), patron.getPatronId()));
     }
 
     public Either<BookCollectingFailed, BookCollected> collect(BookOnHold book, CheckoutDuration duration) {
         if (patronHolds.a(book)) {
-            return announceSuccess(bookCollectedNow(book.getBookInformation(), book.getHoldPlacedAt(), patron.getPatronId(), duration));
+            return announceSuccess(bookCollectedNow(book.getBookId(), book.type(), book.getHoldPlacedAt(), patron.getPatronId(), duration));
         }
         return announceFailure(bookCollectingFailedNow(withReason("book is not on hold by patron"), book.getBookId(), book.getHoldPlacedAt(), patron));
     }

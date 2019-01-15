@@ -2,10 +2,8 @@ package io.pillopl.library.lending.patron.model;
 
 import io.pillopl.library.commons.events.DomainEvent;
 import io.pillopl.library.lending.book.model.BookId;
-import io.pillopl.library.lending.book.model.BookInformation;
 import io.pillopl.library.lending.book.model.BookType;
 import io.pillopl.library.lending.library.model.LibraryBranchId;
-import io.pillopl.library.lending.patron.model.PatronInformation.PatronType;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import lombok.NonNull;
@@ -37,11 +35,8 @@ public interface PatronBooksEvent extends DomainEvent {
         @NonNull UUID patronId;
         @NonNull PatronType patronType;
 
-        public static PatronCreated now(PatronInformation patronInformation) {
-            return new PatronCreated(
-                    Instant.now(),
-                    patronInformation.getPatronId().getPatronId(),
-                    patronInformation.getType());
+        public static PatronCreated now(PatronId patronId, PatronType type) {
+            return new PatronCreated(Instant.now(), patronId.getPatronId(), type);
         }
     }
 
@@ -56,12 +51,12 @@ public interface PatronBooksEvent extends DomainEvent {
         @NonNull Instant holdFrom;
         Instant holdTill;
 
-        public static BookPlacedOnHold bookPlacedOnHoldNow(BookInformation book, LibraryBranchId libraryBranchId, PatronInformation patronInformation, HoldDuration holdDuration) {
+        public static BookPlacedOnHold bookPlacedOnHoldNow(BookId bookId, BookType bookType, LibraryBranchId libraryBranchId, PatronId patronId, HoldDuration holdDuration) {
             return new BookPlacedOnHold(
                     Instant.now(),
-                    patronInformation.getPatronId().getPatronId(),
-                    book.getBookId().getBookId(),
-                    book.getBookType(),
+                    patronId.getPatronId(),
+                    bookId.getBookId(),
+                    bookType,
                     libraryBranchId.getLibraryBranchId(),
                     holdDuration.getFrom(),
                     holdDuration.getTo().getOrNull());
@@ -118,12 +113,12 @@ public interface PatronBooksEvent extends DomainEvent {
         @NonNull UUID libraryBranchId;
         @NonNull Instant till;
 
-        public static BookCollected bookCollectedNow(BookInformation book, LibraryBranchId libraryBranchId, PatronId patronId, CheckoutDuration checkoutDuration) {
+        public static BookCollected bookCollectedNow(BookId bookId, BookType bookType, LibraryBranchId libraryBranchId, PatronId patronId, CheckoutDuration checkoutDuration) {
             return new BookCollected(
                     Instant.now(),
                     patronId.getPatronId(),
-                    book.getBookId().getBookId(),
-                    book.getBookType(),
+                    bookId.getBookId(),
+                    bookType,
                     libraryBranchId.getLibraryBranchId(),
                     checkoutDuration.to());
         }
@@ -185,11 +180,11 @@ public interface PatronBooksEvent extends DomainEvent {
         @NonNull UUID bookId;
         @NonNull UUID libraryBranchId;
 
-        public static BookHoldCanceled holdCanceledNow(BookInformation bookInformation, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
+        public static BookHoldCanceled holdCanceledNow(BookId bookId, LibraryBranchId libraryBranchId, PatronId patronId) {
             return new BookHoldCanceled(
                     Instant.now(),
-                    patronInformation.getPatronId().getPatronId(),
-                    bookInformation.getBookId().getBookId(),
+                    patronId.getPatronId(),
+                    bookId.getBookId(),
                     libraryBranchId.getLibraryBranchId());
         }
     }
@@ -202,10 +197,10 @@ public interface PatronBooksEvent extends DomainEvent {
         @NonNull UUID bookId;
         @NonNull UUID libraryBranchId;
 
-        static BookHoldCancelingFailed holdCancelingFailedNow(BookId bookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
+        static BookHoldCancelingFailed holdCancelingFailedNow(BookId bookId, LibraryBranchId libraryBranchId, PatronId patronId) {
             return new BookHoldCancelingFailed(
                     Instant.now(),
-                    patronInformation.getPatronId().getPatronId(),
+                    patronId.getPatronId(),
                     bookId.getBookId(),
                     libraryBranchId.getLibraryBranchId());
         }

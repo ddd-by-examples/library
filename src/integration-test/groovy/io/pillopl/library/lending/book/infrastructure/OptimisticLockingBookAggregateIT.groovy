@@ -5,12 +5,10 @@ import io.pillopl.library.commons.aggregates.Version
 import io.pillopl.library.lending.book.model.AvailableBook
 import io.pillopl.library.lending.book.model.Book
 import io.pillopl.library.lending.book.model.BookId
-import io.pillopl.library.lending.book.model.BookInformation
 import io.pillopl.library.lending.library.model.LibraryBranchId
 import io.pillopl.library.lending.patron.model.HoldDuration
 import io.pillopl.library.lending.patron.model.PatronBooksEvent
 import io.pillopl.library.lending.patron.model.PatronId
-import io.pillopl.library.lending.patron.model.PatronInformation
 import io.vavr.control.Option
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -24,7 +22,6 @@ import static io.pillopl.library.lending.library.model.LibraryBranchFixture.anyB
 import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHold.bookPlacedOnHoldNow
 import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHoldEvents.events
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
-import static io.pillopl.library.lending.patron.model.PatronInformation.PatronType.Regular
 
 @ContextConfiguration(classes = BookConfiguration.class)
 @SpringBootTest
@@ -72,9 +69,10 @@ class OptimisticLockingBookAggregateIT extends Specification {
 
     PatronBooksEvent.BookPlacedOnHold placedOnHoldBy(PatronId patronId) {
         return events(bookPlacedOnHoldNow(
-                new BookInformation(bookId, Circulating),
+                bookId,
+                Circulating,
                 libraryBranchId,
-                new PatronInformation(patronId, Regular),
+                patronId,
                 HoldDuration.closeEnded(5)))
                 .bookPlacedOnHold
     }

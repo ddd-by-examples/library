@@ -4,10 +4,12 @@ import io.pillopl.library.commons.aggregates.Version;
 import io.pillopl.library.lending.library.model.LibraryBranchId;
 import io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHold;
 import io.pillopl.library.lending.patron.model.PatronId;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
 
 @Value
+@AllArgsConstructor
 public class AvailableBook implements Book {
 
     @NonNull
@@ -18,6 +20,10 @@ public class AvailableBook implements Book {
 
     @NonNull
     Version version;
+
+    public AvailableBook(BookId bookId, BookType type, LibraryBranchId libraryBranchId, Version version) {
+        this(new BookInformation(bookId, type), libraryBranchId, version);
+    }
 
     public boolean isRestricted() {
         return bookInformation.getBookType().equals(BookType.Restricted);
