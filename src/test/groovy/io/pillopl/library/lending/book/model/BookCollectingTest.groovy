@@ -1,42 +1,33 @@
 package io.pillopl.library.lending.book.model
 
-
 import io.pillopl.library.lending.library.model.LibraryBranchId
-import io.pillopl.library.lending.patron.model.PatronId
 import spock.lang.Specification
 
-import java.time.Instant
-
-import static BookFixture.bookOnHold
+import static BookDSL.aCirculatingBook
+import static BookDSL.the
+import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
 import static io.pillopl.library.lending.library.model.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookCollected
-import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
+import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatron
 
 class BookCollectingTest extends Specification {
 
     def 'should collect book which is marked as placed on hold in the system'() {
         given:
-            BookOnHold onHold = bookOnHold()
+            BookDSL bookOnHold = aCirculatingBook() with anyBookId() locatedIn anyBranch() placedOnHoldBy anyPatron()
+
         and:
-            PatronId collectedBy = anyPatronId()
+            LibraryBranchId aBranch = anyBranch()
+
         and:
-            LibraryBranchId collectedAt = anyBranch()
+            BookCollected bookCollectedEvent = the bookOnHold isCollectedBy anyPatron() at aBranch
+
         when:
-            CollectedBook collectedBook = onHold.handle(bookCollected(onHold, collectedBy, collectedAt))
+            CollectedBook collectedBook = the bookOnHold reactsTo bookCollectedEvent
+
         then:
-            collectedBook.bookId == onHold.bookId
-            collectedBook.collectedAt == collectedAt
-            collectedBook.version == onHold.version
+            collectedBook.bookId == bookOnHold.bookId
+            collectedBook.collectedAt == aBranch
+            collectedBook.version == bookOnHold.version
     }
-
-    BookCollected bookCollected(BookOnHold bookOnHold, PatronId patronId, LibraryBranchId libraryBranchId) {
-        return new BookCollected(Instant.now(),
-                patronId.patronId,
-                bookOnHold.getBookId().bookId,
-                bookOnHold.bookInformation.bookType,
-                libraryBranchId.libraryBranchId,
-                Instant.now())
-    }
-
-
 }

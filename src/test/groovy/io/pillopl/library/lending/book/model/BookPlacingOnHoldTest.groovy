@@ -1,6 +1,5 @@
 package io.pillopl.library.lending.book.model
 
-
 import io.pillopl.library.lending.library.model.LibraryBranchId
 import io.pillopl.library.lending.patron.model.PatronBooksEvent
 import io.pillopl.library.lending.patron.model.PatronId
@@ -8,41 +7,38 @@ import spock.lang.Specification
 
 import java.time.Instant
 
-import static BookFixture.circulatingAvailableBook
+import static io.pillopl.library.lending.book.model.BookDSL.aCirculatingBook
+import static io.pillopl.library.lending.book.model.BookDSL.the
+import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
 import static io.pillopl.library.lending.library.model.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
+import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatron
 
 class BookPlacingOnHoldTest extends Specification {
 
+    private static Instant now = Instant.MIN
+    private static Instant oneHourLater = now.plusSeconds(3600)
+
     def 'should place on hold book which is marked as available in the system'() {
         given:
-            AvailableBook book = circulatingAvailableBook()
+            BookDSL availableBook = aCirculatingBook() with anyBookId() locatedIn anyBranch() stillAvailable()
+
         and:
-            Instant from = Instant.MIN
-            Instant till = from.plusSeconds(3600)
+            PatronId aPatron = anyPatron()
+
         and:
-            PatronId onHoldByPatron = anyPatronId()
+            LibraryBranchId aBranch = anyBranch()
+
         and:
-            LibraryBranchId libraryBranchId = anyBranch()
+            PatronBooksEvent.BookPlacedOnHold bookPlacedOnHoldEvent = the availableBook isPlacedOnHoldBy aPatron at aBranch from now till oneHourLater
+
         when:
-            BookOnHold onHold = book.handle(bookPlacedOnHold(book, onHoldByPatron, libraryBranchId, from, till))
+            BookOnHold onHold = the availableBook reactsTo bookPlacedOnHoldEvent
+
         then:
-            onHold.bookId == book.bookId
-            onHold.byPatron == onHoldByPatron
-            onHold.holdTill == till
-            onHold.holdPlacedAt == libraryBranchId
-            onHold.version == book.version
-
+            onHold.bookId == availableBook.bookId
+            onHold.byPatron == aPatron
+            onHold.holdTill == oneHourLater
+            onHold.holdPlacedAt == aBranch
+            onHold.version == availableBook.version
     }
-
-    PatronBooksEvent.BookPlacedOnHold bookPlacedOnHold(AvailableBook availableBook, PatronId byPatron, LibraryBranchId libraryBranchId, Instant from, Instant till) {
-        return new PatronBooksEvent.BookPlacedOnHold(Instant.now(),
-                        byPatron.patronId,
-                        availableBook.getBookId().bookId,
-                        availableBook.bookInformation.bookType,
-                        libraryBranchId.libraryBranchId,
-                        from,
-                        till)
-    }
-
 }
