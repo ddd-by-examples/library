@@ -1,16 +1,9 @@
 package io.pillopl.library.lending.patron.application.hold
 
-
 import io.pillopl.library.commons.commands.Result
 import io.pillopl.library.lending.book.model.BookOnHold
-import io.pillopl.library.lending.patron.application.hold.CancelHoldCommand
-import io.pillopl.library.lending.patron.application.hold.CancelingHold
-import io.pillopl.library.lending.patron.application.hold.FindBookOnHold
-import io.pillopl.library.lending.patron.model.PatronBooks
-import io.pillopl.library.lending.patron.model.PatronBooksEvent
-import io.pillopl.library.lending.patron.model.PatronBooksFixture
-import io.pillopl.library.lending.patron.model.PatronBooksRepository
-import io.pillopl.library.lending.patron.model.PatronId
+
+import io.pillopl.library.lending.patron.model.*
 import io.vavr.control.Option
 import io.vavr.control.Try
 import spock.lang.Specification
@@ -19,7 +12,6 @@ import java.time.Instant
 
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
 import static io.pillopl.library.lending.book.model.BookFixture.bookOnHold
-import static io.pillopl.library.lending.library.model.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
 
 class CancelingHoldTest extends Specification {
@@ -92,7 +84,7 @@ class CancelingHoldTest extends Specification {
     }
 
     CancelHoldCommand cmd() {
-        return new CancelHoldCommand(Instant.now(), patronId, anyBranch(), anyBookId())
+        return new CancelHoldCommand(Instant.now(), patronId, anyBookId())
     }
 
     PatronId persistedRegularPatronWithBookOnHold() {
@@ -111,7 +103,7 @@ class CancelingHoldTest extends Specification {
     PatronId persistedRegularPatronThatFailsOnSaving() {
         PatronBooks patron = PatronBooksFixture.regularPatronWithHold(bookOnHold)
         repository.findBy(patronId) >> Option.of(patron)
-        repository.publish(_ as PatronBooksEvent) >> {throw new IllegalStateException()}
+        repository.publish(_ as PatronBooksEvent) >> { throw new IllegalStateException() }
         return patronId
     }
 

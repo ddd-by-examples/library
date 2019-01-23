@@ -1,7 +1,7 @@
 package io.pillopl.library.lending.dailysheet.infrastructure;
 
 import io.pillopl.library.lending.DatabaseConfig;
-import io.pillopl.library.lending.dailysheet.infrastructure.SheetsReadModel;
+import io.pillopl.library.lending.dailysheet.model.DailySheet;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -15,7 +15,7 @@ import java.time.Clock;
 public class SheetReadModelDatabaseConfiguration {
 
     @Bean
-    SheetsReadModel sheetReadModel(DataSource dataSource) {
+    DailySheet sheetReadModel(DataSource dataSource) {
         return new SheetsReadModel(new JdbcTemplate(dataSource), Clock.systemDefaultZone());
     }
 

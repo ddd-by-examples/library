@@ -73,7 +73,7 @@ class DomainModelMapper {
     private final PatronBooksFactory patronBooksFactory;
 
     PatronBooks map(PatronBooksDatabaseEntity entity) {
-        return patronBooksFactory.recreateFrom(
+        return patronBooksFactory.create(
                 entity.patronType,
                 new PatronId(entity.patronId),
                 mapPatronHolds(entity),

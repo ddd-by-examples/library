@@ -7,18 +7,18 @@ import io.pillopl.library.lending.patron.model.PatronId;
 import io.vavr.Tuple3;
 import io.vavr.collection.List;
 import io.vavr.collection.Stream;
+import lombok.NonNull;
 import lombok.Value;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 
 @Value
 public class HoldsToExpireSheet {
 
+    @NonNull
     List<Tuple3<BookId, PatronId, LibraryBranchId>> expiredHolds;
 
     @EventListener
     public Stream<PatronBooksEvent.BookHoldExpired> toStreamOfEvents() {
-        ApplicationEventPublisher eventPublisher = null;
         return expiredHolds
                 .toStream()
                 .map(this::tupleToEvent);

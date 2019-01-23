@@ -9,7 +9,7 @@ public class NumberOfDays {
 
     private NumberOfDays(int days) {
         if(days <= 0) {
-            throw new IllegalArgumentException("Must pass positive integer as number of days");
+            throw new IllegalArgumentException("Cannot use negative integer or zero as number of days");
         }
         this.days = days;
     }

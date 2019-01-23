@@ -5,6 +5,6 @@ import lombok.Value;
 
 @Value
 public class Version {
-    @NonNull int version;
+    int version;
 
 }

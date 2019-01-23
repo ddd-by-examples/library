@@ -10,6 +10,7 @@ import io.vavr.control.Either;
 import io.vavr.control.Option;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 
 import static io.pillopl.library.commons.events.EitherResult.announceFailure;
 import static io.pillopl.library.commons.events.EitherResult.announceSuccess;
@@ -28,12 +29,16 @@ import static io.pillopl.library.lending.patron.model.Rejection.withReason;
 @EqualsAndHashCode(of = "patron")
 public class PatronBooks {
 
+    @NonNull
     private final PatronInformation patron;
 
+    @NonNull
     private final List<PlacingOnHoldPolicy> placingOnHoldPolicies;
 
+    @NonNull
     private final OverdueCheckouts overdueCheckouts;
 
+    @NonNull
     private final PatronHolds patronHolds;
 
     public Either<BookHoldFailed, BookPlacedOnHoldEvents> placeOnHold(AvailableBook book) {

@@ -17,7 +17,7 @@ class OverdueCheckouts {
 
     @NonNull Map<LibraryBranchId, Set<BookId>> overdueCheckouts;
 
-    int countAt(LibraryBranchId libraryBranchId) {
+    int countAt(@NonNull LibraryBranchId libraryBranchId) {
         return overdueCheckouts.getOrDefault(libraryBranchId, emptySet()).size();
     }
 

@@ -12,7 +12,7 @@ import static java.util.stream.Collectors.toSet;
 
 public class PatronBooksFactory {
 
-    public PatronBooks recreateFrom(PatronType patronType, PatronId patronId, Set<Tuple2<BookId, LibraryBranchId>> patronHolds, Map<LibraryBranchId, Set<BookId>> overdueCheckouts) {
+    public PatronBooks create(PatronType patronType, PatronId patronId, Set<Tuple2<BookId, LibraryBranchId>> patronHolds, Map<LibraryBranchId, Set<BookId>> overdueCheckouts) {
         return new PatronBooks(new PatronInformation(patronId, patronType),
                 allCurrentPolicies(),
                 new OverdueCheckouts(overdueCheckouts),

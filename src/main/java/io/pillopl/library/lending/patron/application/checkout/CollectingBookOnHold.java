@@ -31,7 +31,7 @@ class CollectingBookOnHold {
     private final FindBookOnHold findBookOnHold;
     private final PatronBooksRepository patronBooksRepository;
 
-    Try<Result> collect(CollectBookCommand command) {
+    Try<Result> collect(@NonNull CollectBookCommand command) {
         return Try.of(() -> {
             BookOnHold bookOnHold = find( command.getBookId(), command.getPatronId());
             PatronBooks patronBooks = find(command.getPatronId());

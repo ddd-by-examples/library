@@ -3,7 +3,6 @@ package io.pillopl.library.lending.patron.application.hold;
 import io.pillopl.library.commons.commands.Result;
 import io.pillopl.library.lending.book.model.BookId;
 import io.pillopl.library.lending.book.model.BookOnHold;
-import io.pillopl.library.lending.library.model.LibraryBranchId;
 import io.pillopl.library.lending.patron.model.PatronBooks;
 import io.pillopl.library.lending.patron.model.PatronBooksEvent.BookHoldCanceled;
 import io.pillopl.library.lending.patron.model.PatronBooksEvent.BookHoldCancelingFailed;
@@ -13,9 +12,6 @@ import io.vavr.control.Either;
 import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.Value;
-
-import java.time.Instant;
 
 import static io.pillopl.library.commons.commands.Result.Rejection;
 import static io.pillopl.library.commons.commands.Result.Success;
@@ -29,7 +25,7 @@ public class CancelingHold {
     private final FindBookOnHold findBookOnHold;
     private final PatronBooksRepository patronBooksRepository;
 
-    Try<Result> cancelHold(CancelHoldCommand command) {
+    public Try<Result> cancelHold(@NonNull CancelHoldCommand command) {
         return Try.of(() -> {
             BookOnHold bookOnHold = find(command.getBookId(), command.getPatronId());
             PatronBooks patronBooks = find(command.getPatronId());
@@ -64,11 +60,3 @@ public class CancelingHold {
     }
 }
 
-@Value
-class CancelHoldCommand {
-    @NonNull Instant timestamp;
-    @NonNull PatronId patronId;
-    @NonNull LibraryBranchId libraryId;
-    @NonNull BookId bookId;
-
-}

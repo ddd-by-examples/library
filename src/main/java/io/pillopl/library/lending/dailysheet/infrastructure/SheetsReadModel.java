@@ -22,11 +22,11 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static io.vavr.Tuple.of;
 import static io.vavr.collection.List.ofAll;
 import static java.sql.Timestamp.from;
+import static java.util.stream.Collectors.toList;
 
 @AllArgsConstructor
 class SheetsReadModel implements DailySheet {
@@ -40,7 +40,7 @@ class SheetsReadModel implements DailySheet {
                 findHoldsToExpire()
                         .stream()
                         .map(this::toExpiredHoldsTuple)
-                        .collect(Collectors.toList())));
+                        .collect(toList())));
     }
 
     private List<Map<String, Object>> findHoldsToExpire() {
@@ -63,7 +63,7 @@ class SheetsReadModel implements DailySheet {
                 findCheckoutsToOverdue()
                         .stream()
                         .map(this::toOverdueCheckoutsTuple)
-                        .collect(Collectors.toList())));
+                        .collect(toList())));
     }
 
     private List<Map<String, Object>> findCheckoutsToOverdue() {
@@ -176,5 +176,6 @@ class SheetsReadModel implements DailySheet {
                 event.getPatronId(),
                 from(event.getWhen()));
     }
+
 }
 

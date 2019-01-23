@@ -4,6 +4,7 @@ import io.pillopl.library.lending.book.model.AvailableBook;
 import io.vavr.Function3;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
+import lombok.NonNull;
 import lombok.Value;
 
 import static io.vavr.control.Either.left;
@@ -57,9 +58,11 @@ class Rejection {
 
     @Value
     static class Reason {
+        @NonNull
         String reason;
     }
 
+    @NonNull
     Reason reason;
 
     static Rejection withReason(String reason) {

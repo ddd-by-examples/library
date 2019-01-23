@@ -27,7 +27,7 @@ public class PlacingOnHold {
     private final FindAvailableBook findAvailableBook;
     private final PatronBooksRepository patronBooksRepository;
 
-    Try<Result> placeOnHold(PlaceOnHoldCommand command) {
+    Try<Result> placeOnHold(@NonNull PlaceOnHoldCommand command) {
         return Try.of(() -> {
             AvailableBook availableBook = find(command.getBookId());
             PatronBooks patronBooks = find(command.getPatronId());
