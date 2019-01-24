@@ -4,8 +4,8 @@ import io.pillopl.library.commons.aggregates.AggregateRootIsStale
 import io.pillopl.library.commons.aggregates.Version
 import io.pillopl.library.lending.book.model.AvailableBook
 import io.pillopl.library.lending.book.model.Book
-import io.pillopl.library.lending.book.model.BookId
-import io.pillopl.library.lending.library.model.LibraryBranchId
+import io.pillopl.library.catalogue.BookId
+import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
 import io.pillopl.library.lending.patron.model.HoldDuration
 import io.pillopl.library.lending.patron.model.PatronBooksEvent
 import io.pillopl.library.lending.patron.model.PatronId
@@ -17,8 +17,8 @@ import spock.lang.Specification
 
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
 import static io.pillopl.library.lending.book.model.BookFixture.circulatingAvailableBookAt
-import static io.pillopl.library.lending.book.model.BookType.Circulating
-import static io.pillopl.library.lending.library.model.LibraryBranchFixture.anyBranch
+import static io.pillopl.library.catalogue.BookType.Circulating
+import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHold.bookPlacedOnHoldNow
 import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHoldEvents.events
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId

@@ -2,9 +2,9 @@ package io.pillopl.library.lending.patron.application.checkout;
 
 import io.pillopl.library.commons.commands.Result;
 import io.pillopl.library.lending.patron.application.hold.FindBookOnHold;
-import io.pillopl.library.lending.book.model.BookId;
+import io.pillopl.library.catalogue.BookId;
 import io.pillopl.library.lending.book.model.BookOnHold;
-import io.pillopl.library.lending.library.model.LibraryBranchId;
+import io.pillopl.library.lending.librarybranch.model.LibraryBranchId;
 import io.pillopl.library.lending.patron.model.CheckoutDuration;
 import io.pillopl.library.lending.patron.model.PatronBooks;
 import io.pillopl.library.lending.patron.model.PatronBooksEvent.BookCollected;

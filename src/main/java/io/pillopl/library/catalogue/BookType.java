@@ -1,4 +1,4 @@
-package io.pillopl.library.lending.book.model;
+package io.pillopl.library.catalogue;
 
 public enum BookType {
     Restricted, Circulating

@@ -2,7 +2,7 @@ package io.pillopl.library.lending.book.infrastructure;
 
 import io.pillopl.library.common.events.publisher.DomainEventsConfig;
 import io.pillopl.library.commons.events.DomainEvents;
-import io.pillopl.library.lending.DatabaseConfig;
+import io.pillopl.library.lending.LendingDatabaseConfig;
 import io.pillopl.library.lending.book.application.PatronBookEventsHandler;
 import io.pillopl.library.lending.book.model.BookRepository;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +13,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import javax.sql.DataSource;
 
 @Configuration
-@Import({DatabaseConfig.class, DomainEventsConfig.class})
+@Import({LendingDatabaseConfig.class, DomainEventsConfig.class})
 public class BookConfiguration {
 
     @Bean

@@ -5,7 +5,7 @@ import io.pillopl.library.lending.book.model.AvailableBook
 import io.pillopl.library.lending.book.model.BookFixture
 import io.pillopl.library.lending.book.model.BookOnHold
 import io.pillopl.library.lending.book.model.BookRepository
-import io.pillopl.library.lending.library.model.LibraryBranchId
+import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
 import io.pillopl.library.lending.patron.model.*
 import io.vavr.control.Option
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,7 +18,7 @@ import spock.util.concurrent.PollingConditions
 
 import javax.sql.DataSource
 
-import static io.pillopl.library.lending.library.model.LibraryBranchFixture.anyBranch
+import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHold.bookPlacedOnHoldNow
 import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHoldEvents
 import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHoldEvents.events

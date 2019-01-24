@@ -2,11 +2,7 @@ package io.pillopl.library.lending.patron.infrastructure;
 
 import io.pillopl.library.common.events.publisher.DomainEventsConfig;
 import io.pillopl.library.commons.events.DomainEvents;
-import io.pillopl.library.lending.DatabaseConfig;
-import io.pillopl.library.lending.book.model.BookRepository;
-import io.pillopl.library.lending.patron.application.hold.CancelingHold;
-import io.pillopl.library.lending.patron.application.hold.FindBookOnHold;
-import io.pillopl.library.lending.patron.application.hold.HandleDuplicateHold;
+import io.pillopl.library.lending.LendingDatabaseConfig;
 import io.pillopl.library.lending.patron.model.PatronBooksFactory;
 import io.pillopl.library.lending.patron.model.PatronBooksRepository;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +14,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Configuration
 @EnableJdbcRepositories
 @EnableScheduling
-@Import({DatabaseConfig.class, DomainEventsConfig.class})
+@Import({LendingDatabaseConfig.class, DomainEventsConfig.class})
 public class PatronConfigurationWithPersistedEvents {
 
     @Bean

@@ -2,9 +2,6 @@ package io.pillopl.library.lending.patron.application.hold
 
 
 import io.pillopl.library.commons.commands.Result
-import io.pillopl.library.lending.patron.application.hold.FindAvailableBook
-import io.pillopl.library.lending.patron.application.hold.PlaceOnHoldCommand
-import io.pillopl.library.lending.patron.application.hold.PlacingOnHold
 import io.pillopl.library.lending.patron.model.PatronBooks
 import io.pillopl.library.lending.patron.model.PatronBooksEvent
 import io.pillopl.library.lending.patron.model.PatronBooksFixture
@@ -16,7 +13,7 @@ import spock.lang.Specification
 
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
 import static io.pillopl.library.lending.book.model.BookFixture.circulatingBook
-import static io.pillopl.library.lending.library.model.LibraryBranchFixture.anyBranch
+import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.regularPatron
 

@@ -1,8 +1,8 @@
 package io.pillopl.library.lending.patron.infrastructure
 
-import io.pillopl.library.lending.book.model.BookId
-import io.pillopl.library.lending.book.model.BookType
-import io.pillopl.library.lending.library.model.LibraryBranchId
+import io.pillopl.library.catalogue.BookId
+import io.pillopl.library.catalogue.BookType
+import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
 import io.pillopl.library.lending.patron.model.*
 import spock.lang.Specification
 
@@ -10,8 +10,8 @@ import java.time.Duration
 import java.time.Instant
 
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
-import static io.pillopl.library.lending.book.model.BookType.Restricted
-import static io.pillopl.library.lending.library.model.LibraryBranchFixture.anyBranch
+import static io.pillopl.library.catalogue.BookType.Restricted
+import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.patron.model.CheckoutDuration.forNoOfDays
 import static io.pillopl.library.lending.patron.model.HoldDuration.closeEnded
 import static io.pillopl.library.lending.patron.model.HoldDuration.openEnded

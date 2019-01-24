@@ -3,10 +3,10 @@ package io.pillopl.library.lending.book.infrastructure
 
 import io.pillopl.library.lending.book.model.AvailableBook
 import io.pillopl.library.lending.book.model.Book
-import io.pillopl.library.lending.book.model.BookId
+import io.pillopl.library.catalogue.BookId
 import io.pillopl.library.lending.book.model.BookOnHold
 import io.pillopl.library.lending.book.model.CollectedBook
-import io.pillopl.library.lending.library.model.LibraryBranchId
+import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
 import io.pillopl.library.lending.patron.model.PatronId
 import io.pillopl.library.lending.book.infrastructure.BookDatabaseEntity.BookState
 import spock.lang.Specification
@@ -14,8 +14,8 @@ import spock.lang.Specification
 import java.time.Instant
 
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
-import static io.pillopl.library.lending.book.model.BookType.Circulating
-import static io.pillopl.library.lending.library.model.LibraryBranchFixture.anyBranch
+import static io.pillopl.library.catalogue.BookType.Circulating
+import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
 import static io.pillopl.library.lending.book.infrastructure.BookDatabaseEntity.BookState.*
 

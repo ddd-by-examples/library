@@ -1,10 +1,10 @@
 package io.pillopl.library.lending.patronprofile.infrastructure
 
-import io.pillopl.library.lending.book.model.BookId
-import io.pillopl.library.lending.book.model.BookType
+import io.pillopl.library.catalogue.BookId
+import io.pillopl.library.catalogue.BookType
 import io.pillopl.library.lending.dailysheet.infrastructure.SheetReadModelDatabaseConfiguration
 import io.pillopl.library.lending.dailysheet.model.DailySheet
-import io.pillopl.library.lending.library.model.LibraryBranchId
+import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
 import io.pillopl.library.lending.patron.model.PatronBooksEvent
 import io.pillopl.library.lending.patron.model.PatronId
 import io.pillopl.library.lending.patron.model.PatronType
@@ -21,8 +21,8 @@ import java.time.Duration
 import java.time.Instant
 
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
-import static io.pillopl.library.lending.book.model.BookType.Restricted
-import static io.pillopl.library.lending.library.model.LibraryBranchFixture.anyBranch
+import static io.pillopl.library.catalogue.BookType.Restricted
+import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
 import static io.vavr.Tuple.of
 import static java.time.Instant.now

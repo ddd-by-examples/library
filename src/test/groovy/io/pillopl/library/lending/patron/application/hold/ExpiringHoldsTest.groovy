@@ -3,7 +3,6 @@ package io.pillopl.library.lending.patron.application.hold
 import io.pillopl.library.commons.commands.BatchResult
 import io.pillopl.library.lending.dailysheet.model.DailySheet
 import io.pillopl.library.lending.dailysheet.model.HoldsToExpireSheet
-import io.pillopl.library.lending.patron.application.hold.ExpiringHolds
 import io.pillopl.library.lending.patron.model.PatronBooksEvent
 import io.pillopl.library.lending.patron.model.PatronBooksRepository
 import io.pillopl.library.lending.patron.model.PatronId
@@ -11,7 +10,7 @@ import io.vavr.control.Try
 import spock.lang.Specification
 
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
-import static io.pillopl.library.lending.library.model.LibraryBranchFixture.anyBranch
+import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
 import static io.vavr.collection.List.of
 

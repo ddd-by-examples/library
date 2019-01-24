@@ -1,5 +1,7 @@
 package io.pillopl.library.lending.book.infrastructure;
 
+import io.pillopl.library.catalogue.BookId;
+import io.pillopl.library.catalogue.BookType;
 import io.pillopl.library.commons.aggregates.AggregateRootIsStale;
 import io.pillopl.library.lending.book.model.*;
 import io.pillopl.library.lending.patron.application.hold.FindAvailableBook;

@@ -1,8 +1,8 @@
-package io.pillopl.library.lending;
+package io.pillopl.library.catalogue;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jdbc.repository.config.JdbcConfiguration;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -13,7 +13,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import javax.sql.DataSource;
 
 @Configuration
-public class DatabaseConfig extends JdbcConfiguration {
+public class CatalogueDatabaseConfig {
 
     @Bean
     NamedParameterJdbcOperations operations() {
@@ -30,10 +30,13 @@ public class DatabaseConfig extends JdbcConfiguration {
         return new EmbeddedDatabaseBuilder()
                 .generateUniqueName(true)
                 .setType(EmbeddedDatabaseType.H2)
-                .addScript("create_patron_db.sql")
-                .addScript("create_book_db.sql")
-                .addScript("create_sheets_db.sql")
+                .addScript("create_catalogue_book.sql")
                 .build();
+    }
+
+    @Bean
+    CatalogueDatabase bookDatabaseRepository(DataSource dataSource) {
+        return new CatalogueDatabase(new JdbcTemplate(dataSource));
     }
 
 

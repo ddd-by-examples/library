@@ -3,8 +3,8 @@ package io.pillopl.library.lending.book.infrastructure
 
 import io.pillopl.library.lending.book.model.AvailableBook
 import io.pillopl.library.lending.book.model.Book
-import io.pillopl.library.lending.book.model.BookId
-import io.pillopl.library.lending.library.model.LibraryBranchId
+import io.pillopl.library.catalogue.BookId
+import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
 import io.pillopl.library.lending.patron.model.PatronId
 import io.vavr.control.Option
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,7 +14,7 @@ import spock.lang.Specification
 
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
 import static io.pillopl.library.lending.book.model.BookFixture.circulatingAvailableBookAt
-import static io.pillopl.library.lending.library.model.LibraryBranchFixture.anyBranch
+import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
 
 @ContextConfiguration(classes = BookConfiguration.class)

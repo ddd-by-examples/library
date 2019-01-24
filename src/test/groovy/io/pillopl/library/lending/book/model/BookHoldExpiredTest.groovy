@@ -6,7 +6,7 @@ import spock.lang.Specification
 import static BookDSL.aCirculatingBook
 import static BookDSL.the
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
-import static io.pillopl.library.lending.library.model.LibraryBranchFixture.anyBranch
+import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookHoldExpired
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatron
 

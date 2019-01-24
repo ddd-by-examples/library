@@ -1,14 +1,14 @@
 package io.pillopl.library.lending.patron.model;
 
-import io.pillopl.library.lending.book.model.BookId;
+import io.pillopl.library.catalogue.BookId;
 import io.pillopl.library.lending.book.model.BookOnHold;
-import io.pillopl.library.lending.library.model.LibraryBranchId;
+import io.pillopl.library.lending.librarybranch.model.LibraryBranchId;
 import io.vavr.collection.List;
 
 import java.util.*;
 
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId;
-import static io.pillopl.library.lending.library.model.LibraryBranchFixture.anyBranch;
+import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch;
 import static io.pillopl.library.lending.patron.model.PatronType.Regular;
 import static io.pillopl.library.lending.patron.model.PatronType.Researcher;
 import static io.pillopl.library.lending.patron.model.PlacingOnHoldPolicy.*;

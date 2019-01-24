@@ -1,5 +1,6 @@
 package io.pillopl.library.lending.book.application;
 
+import io.pillopl.library.catalogue.BookId;
 import io.pillopl.library.commons.events.DomainEvents;
 import io.pillopl.library.lending.book.model.*;
 import io.pillopl.library.lending.patron.model.PatronBooksEvent.*;
@@ -21,35 +22,35 @@ public class PatronBookEventsHandler {
     private final DomainEvents domainEvents;
 
     @EventListener
-    public void handle(BookPlacedOnHold bookPlacedOnHold) {
+    void handle(BookPlacedOnHold bookPlacedOnHold) {
         bookRepository.findBy(new BookId(bookPlacedOnHold.getBookId()))
                 .map(book -> handleBookPlacedOnHold(book, bookPlacedOnHold))
                 .map(this::saveBook);
     }
 
     @EventListener
-    public void handle(BookCollected bookCollected) {
+    void handle(BookCollected bookCollected) {
         bookRepository.findBy(new BookId(bookCollected.getBookId()))
                 .map(book -> handleBookCollected(book, bookCollected))
                 .map(this::saveBook);
     }
 
     @EventListener
-    public void handle(BookHoldExpired holdExpired) {
+    void handle(BookHoldExpired holdExpired) {
         bookRepository.findBy(new BookId(holdExpired.getBookId()))
                 .map(book -> handleBookHoldExpired(book, holdExpired))
                 .map(this::saveBook);
     }
 
     @EventListener
-    public void handle(BookHoldCanceled holdCanceled) {
+    void handle(BookHoldCanceled holdCanceled) {
         bookRepository.findBy(new BookId(holdCanceled.getBookId()))
                 .map(book -> handleBookHoldCanceled(book,  holdCanceled))
                 .map(this::saveBook);
     }
 
     @EventListener
-    public void handle(BookReturned bookReturned) {
+    void handle(BookReturned bookReturned) {
         bookRepository.findBy(new BookId(bookReturned.getBookId()))
                 .map(book -> handleBookReturned(book, bookReturned))
                 .map(this::saveBook);

@@ -1,6 +1,6 @@
 package io.pillopl.library.lending.patronprofile.model;
 
-import io.pillopl.library.lending.book.model.BookId;
+import io.pillopl.library.catalogue.BookId;
 import io.vavr.Tuple2;
 import io.vavr.collection.List;
 import lombok.NonNull;

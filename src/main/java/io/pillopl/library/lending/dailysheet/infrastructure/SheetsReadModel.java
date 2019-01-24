@@ -1,10 +1,10 @@
 package io.pillopl.library.lending.dailysheet.infrastructure;
 
-import io.pillopl.library.lending.book.model.BookId;
+import io.pillopl.library.catalogue.BookId;
 import io.pillopl.library.lending.dailysheet.model.CheckoutsToOverdueSheet;
 import io.pillopl.library.lending.dailysheet.model.DailySheet;
 import io.pillopl.library.lending.dailysheet.model.HoldsToExpireSheet;
-import io.pillopl.library.lending.library.model.LibraryBranchId;
+import io.pillopl.library.lending.librarybranch.model.LibraryBranchId;
 import io.pillopl.library.lending.patron.model.PatronBooksEvent.*;
 import io.pillopl.library.lending.patron.model.PatronId;
 import io.vavr.Tuple3;

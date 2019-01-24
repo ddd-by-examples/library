@@ -1,7 +1,7 @@
 package io.pillopl.library.lending.dailysheet.model
 
-import io.pillopl.library.lending.book.model.BookId
-import io.pillopl.library.lending.library.model.LibraryBranchId
+import io.pillopl.library.catalogue.BookId
+import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
 import io.pillopl.library.lending.patron.model.PatronBooksEvent
 import io.pillopl.library.lending.patron.model.PatronId
 import io.vavr.Tuple
@@ -9,7 +9,7 @@ import io.vavr.collection.List
 import spock.lang.Specification
 
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
-import static io.pillopl.library.lending.library.model.LibraryBranchFixture.anyBranch
+import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
 
 class CheckoutsToOverdueSheetTest extends Specification {

@@ -1,6 +1,6 @@
 package io.pillopl.library.lending.dailysheet.infrastructure;
 
-import io.pillopl.library.lending.DatabaseConfig;
+import io.pillopl.library.lending.LendingDatabaseConfig;
 import io.pillopl.library.lending.dailysheet.model.DailySheet;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +11,7 @@ import javax.sql.DataSource;
 import java.time.Clock;
 
 @Configuration
-@Import(DatabaseConfig.class)
+@Import(LendingDatabaseConfig.class)
 public class SheetReadModelDatabaseConfiguration {
 
     @Bean

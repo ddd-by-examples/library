@@ -1,4 +1,4 @@
-package io.pillopl.library.lending.library.model;
+package io.pillopl.library.lending.librarybranch.model;
 
 import lombok.NonNull;
 import lombok.Value;

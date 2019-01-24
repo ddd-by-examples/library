@@ -6,7 +6,7 @@ import io.pillopl.library.lending.book.model.BookDuplicateHoldFound
 import io.pillopl.library.lending.book.model.BookFixture
 import io.pillopl.library.lending.book.model.BookOnHold
 import io.pillopl.library.lending.book.model.BookRepository
-import io.pillopl.library.lending.library.model.LibraryBranchId
+import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
 import io.pillopl.library.lending.patron.model.PatronBooksEvent
 import io.pillopl.library.lending.patron.model.PatronId
 import io.vavr.control.Option
@@ -14,7 +14,7 @@ import spock.lang.Specification
 
 import java.time.Instant
 
-import static io.pillopl.library.lending.library.model.LibraryBranchFixture.anyBranch
+import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
 
 class DuplicateHoldFoundTest extends Specification {

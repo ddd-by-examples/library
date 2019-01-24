@@ -1,6 +1,6 @@
 package io.pillopl.library.lending.patronprofile.infrastructure;
 
-import io.pillopl.library.lending.book.model.BookId;
+import io.pillopl.library.catalogue.BookId;
 import io.pillopl.library.lending.patron.model.PatronId;
 import io.pillopl.library.lending.patronprofile.model.CheckoutsView;
 import io.pillopl.library.lending.patronprofile.model.HoldsView;

@@ -3,10 +3,11 @@ package io.pillopl.library.catalogue;
 import lombok.NonNull;
 import lombok.Value;
 
+import java.util.UUID;
+
 @Value
-public class Isbn {
+public class BookId {
 
     @NonNull
-    //TODO add regex check ^(97(8|9))?\d{9}(\d|X)$
-    String isbn;
+    UUID bookId;
 }

@@ -1,7 +1,7 @@
 package io.pillopl.library.lending.patron.infrastructure
 
 
-import io.pillopl.library.lending.library.model.LibraryBranchId
+import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
 import io.pillopl.library.lending.patron.model.*
 import io.vavr.control.Option
 import org.springframework.beans.factory.annotation.Autowired
@@ -10,8 +10,8 @@ import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification
 
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
-import static io.pillopl.library.lending.book.model.BookType.Circulating
-import static io.pillopl.library.lending.library.model.LibraryBranchFixture.anyBranch
+import static io.pillopl.library.catalogue.BookType.Circulating
+import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHold.bookPlacedOnHoldNow
 import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHoldEvents
 import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHoldEvents.events

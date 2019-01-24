@@ -3,7 +3,7 @@ package io.pillopl.library.lending.patron.model;
 
 import io.pillopl.library.lending.book.model.AvailableBook;
 import io.pillopl.library.lending.book.model.BookOnHold;
-import io.pillopl.library.lending.library.model.LibraryBranchId;
+import io.pillopl.library.lending.librarybranch.model.LibraryBranchId;
 import io.pillopl.library.lending.patron.model.PatronBooksEvent.*;
 import io.vavr.collection.List;
 import io.vavr.control.Either;

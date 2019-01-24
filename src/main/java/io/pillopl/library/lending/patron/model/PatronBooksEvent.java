@@ -1,9 +1,9 @@
 package io.pillopl.library.lending.patron.model;
 
 import io.pillopl.library.commons.events.DomainEvent;
-import io.pillopl.library.lending.book.model.BookId;
-import io.pillopl.library.lending.book.model.BookType;
-import io.pillopl.library.lending.library.model.LibraryBranchId;
+import io.pillopl.library.catalogue.BookId;
+import io.pillopl.library.catalogue.BookType;
+import io.pillopl.library.lending.librarybranch.model.LibraryBranchId;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import lombok.NonNull;

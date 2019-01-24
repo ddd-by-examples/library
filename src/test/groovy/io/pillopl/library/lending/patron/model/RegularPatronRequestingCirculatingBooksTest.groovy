@@ -1,12 +1,12 @@
 package io.pillopl.library.lending.patron.model
 
 import io.pillopl.library.lending.book.model.AvailableBook
-import io.pillopl.library.lending.library.model.LibraryBranchId
+import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
 import io.vavr.control.Either
 import spock.lang.Specification
 
 import static io.pillopl.library.lending.book.model.BookFixture.*
-import static io.pillopl.library.lending.library.model.LibraryBranchFixture.anyBranch
+import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.patron.model.HoldDuration.closeEnded
 import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookHoldFailed
 import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHoldEvents

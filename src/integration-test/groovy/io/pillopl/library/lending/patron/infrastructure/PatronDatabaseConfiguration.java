@@ -1,7 +1,7 @@
 package io.pillopl.library.lending.patron.infrastructure;
 
 import io.pillopl.library.commons.events.publisher.JustForwardDomainEventPublisher;
-import io.pillopl.library.lending.DatabaseConfig;
+import io.pillopl.library.lending.LendingDatabaseConfig;
 import io.pillopl.library.lending.patron.model.PatronBooksFactory;
 import io.pillopl.library.lending.patron.model.PatronBooksRepository;
 import org.springframework.context.ApplicationEventPublisher;
@@ -12,7 +12,7 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 @Configuration
 @EnableJdbcRepositories
-@Import(DatabaseConfig.class)
+@Import(LendingDatabaseConfig.class)
 public
 class PatronDatabaseConfiguration {
 

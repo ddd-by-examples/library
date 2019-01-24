@@ -12,8 +12,6 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 @AnalyzeClasses(packages = "io.pillopl")
 public class ModularArchitectureTest {
 
-    //with maven modules - this tests go to hell
-
     @ArchTest
     public static final ArchRule catalogue_should_not_depend_on_lending =
             noClasses()

@@ -2,8 +2,8 @@ package io.pillopl.library.lending.patron.application.hold;
 
 import io.pillopl.library.commons.commands.Result;
 import io.pillopl.library.lending.book.model.AvailableBook;
-import io.pillopl.library.lending.book.model.BookId;
-import io.pillopl.library.lending.library.model.LibraryBranchId;
+import io.pillopl.library.catalogue.BookId;
+import io.pillopl.library.lending.librarybranch.model.LibraryBranchId;
 import io.pillopl.library.lending.patron.model.*;
 import io.pillopl.library.lending.patron.model.PatronBooksEvent.BookHoldFailed;
 import io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHoldEvents;

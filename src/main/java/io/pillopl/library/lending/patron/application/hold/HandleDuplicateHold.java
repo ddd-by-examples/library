@@ -2,7 +2,7 @@ package io.pillopl.library.lending.patron.application.hold;
 
 import io.pillopl.library.commons.commands.Result;
 import io.pillopl.library.lending.book.model.BookDuplicateHoldFound;
-import io.pillopl.library.lending.book.model.BookId;
+import io.pillopl.library.catalogue.BookId;
 import io.pillopl.library.lending.patron.model.PatronId;
 import io.vavr.control.Try;
 import lombok.AllArgsConstructor;

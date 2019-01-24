@@ -1,15 +1,16 @@
 package io.pillopl.library.lending.book.model;
 
+import io.pillopl.library.catalogue.BookId;
 import io.pillopl.library.commons.aggregates.Version;
-import io.pillopl.library.lending.library.model.LibraryBranchId;
+import io.pillopl.library.lending.librarybranch.model.LibraryBranchId;
 import io.pillopl.library.lending.patron.model.PatronId;
 
 import java.time.Instant;
 import java.util.UUID;
 
-import static io.pillopl.library.lending.book.model.BookType.Circulating;
-import static io.pillopl.library.lending.book.model.BookType.Restricted;
-import static io.pillopl.library.lending.library.model.LibraryBranchFixture.anyBranch;
+import static io.pillopl.library.catalogue.BookType.Circulating;
+import static io.pillopl.library.catalogue.BookType.Restricted;
+import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch;
 
 public class BookFixture {
 
