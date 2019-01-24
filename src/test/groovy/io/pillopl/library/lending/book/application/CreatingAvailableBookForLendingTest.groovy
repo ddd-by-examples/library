@@ -14,7 +14,7 @@ class CreatingAvailableBookForLendingTest extends Specification {
 
     static final BookId bookId = BookFixture.anyBookId()
 
-    BookRepository bookRepository = new InMemoryBookRepo();
+    BookRepository bookRepository = new InMemoryBookRepo()
 
     CreateAvailableBookOnInstanceAddedEventHandler handler = new CreateAvailableBookOnInstanceAddedEventHandler(bookRepository)
 
