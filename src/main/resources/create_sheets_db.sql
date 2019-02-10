@@ -5,7 +5,7 @@ id INTEGER IDENTITY PRIMARY KEY,
   checkout_event_id UUID UNIQUE,
   collected_by_patron_id UUID,
   collected_at TIMESTAMP,
-  returned_at TIMESTAMP,
+  checked_out_at TIMESTAMP,
   collected_at_branch UUID,
   checkout_till TIMESTAMP);
 

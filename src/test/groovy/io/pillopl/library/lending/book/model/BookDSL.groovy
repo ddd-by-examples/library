@@ -71,10 +71,10 @@ class BookDSL {
         return this
     }
 
-    def isReturnedBy(PatronId aPatron) {
+    def isCheckedOutBy(PatronId aPatron) {
         return new BookDSL(this) {
-            PatronBooksEvent.BookReturned at(LibraryBranchId branchId) {
-                return bookReturned(bookProvider(), aPatron, branchId)
+            PatronBooksEvent.BookCheckedOut at(LibraryBranchId branchId) {
+                return bookCheckedOut(bookProvider(), aPatron, branchId)
             }
         }
     }
@@ -128,8 +128,8 @@ class BookDSL {
     }
 
 
-    private static PatronBooksEvent.BookReturned bookReturned(Book bookCollected, PatronId patronId, LibraryBranchId libraryBranchId) {
-        return new PatronBooksEvent.BookReturned(Instant.now(),
+    private static PatronBooksEvent.BookCheckedOut bookCheckedOut(Book bookCollected, PatronId patronId, LibraryBranchId libraryBranchId) {
+        return new PatronBooksEvent.BookCheckedOut(Instant.now(),
                 patronId.patronId,
                 bookCollected.getBookId().bookId,
                 bookCollected.bookInformation.bookType,

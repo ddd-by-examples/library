@@ -65,13 +65,13 @@ class FindingOverdueCheckoutsInDailySheetDatabaseIT extends Specification {
             readModel.queryForCheckoutsToOverdue().count() == currentNoOfOverdueCheckouts + 1
     }
 
-    def 'should never find returned books'() {
+    def 'should never find checked out books'() {
         given:
             int currentNoOfOverdueCheckouts = readModel.queryForCheckoutsToOverdue().count()
         and:
             readModel.handle(bookCollected(tillTomorrow()))
         when:
-            readModel.handle(bookReturned())
+            readModel.handle(bookCheckedOut())
         then:
             readModel.queryForCheckoutsToOverdue().count() == currentNoOfOverdueCheckouts
     }
@@ -126,8 +126,8 @@ class FindingOverdueCheckoutsInDailySheetDatabaseIT extends Specification {
                 till)
     }
 
-    PatronBooksEvent.BookReturned bookReturned() {
-        return new PatronBooksEvent.BookReturned(
+    PatronBooksEvent.BookCheckedOut bookCheckedOut() {
+        return new PatronBooksEvent.BookCheckedOut(
                 now(),
                 patronId.getPatronId(),
                 bookId.getBookId(),

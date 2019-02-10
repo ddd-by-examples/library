@@ -125,7 +125,7 @@ public interface PatronBooksEvent extends DomainEvent {
     }
 
     @Value
-    class BookReturned implements PatronBooksEvent {
+    class BookCheckedOut implements PatronBooksEvent {
         @NonNull UUID eventId = UUID.randomUUID();
         @NonNull Instant when;
         @NonNull UUID patronId;

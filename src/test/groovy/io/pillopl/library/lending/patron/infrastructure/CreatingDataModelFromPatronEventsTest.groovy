@@ -102,7 +102,7 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
             entity.checkouts.size() == 1
     }
 
-    def 'should remove overdue checkout on bookReturned event'() {
+    def 'should remove overdue checkout on bookCheckedOut event'() {
         given:
             PatronBooksDatabaseEntity entity = createPatron()
         when:
@@ -110,7 +110,7 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
         then:
             entity.checkouts.size() == 1
         when:
-            entity.handle(bookReturned())
+            entity.handle(bookCheckedOut())
         then:
             entity.checkouts.size() == 0
 
@@ -130,8 +130,8 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
                 forNoOfDays(1))
     }
 
-    PatronBooksEvent.BookReturned bookReturned() {
-        return new PatronBooksEvent.BookReturned(
+    PatronBooksEvent.BookCheckedOut bookCheckedOut() {
+        return new PatronBooksEvent.BookCheckedOut(
                 Instant.now(),
                 patronId.patronId,
                 bookId.bookId,

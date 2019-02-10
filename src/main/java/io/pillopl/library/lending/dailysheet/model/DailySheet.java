@@ -16,7 +16,7 @@ public interface DailySheet {
 
     void handle(BookCollected event);
 
-    void handle(BookReturned event);
+    void handle(BookCheckedOut event);
 
 
 }

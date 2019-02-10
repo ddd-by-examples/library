@@ -55,7 +55,7 @@ class PatronProfileReadModel implements PatronProfiles {
 
     private List<Map<String, Object>> findCurrentCheckoutsFor(PatronId patronId) {
         return sheets.query(
-                "SELECT h.book_id, h.checkout_till FROM checkouts_sheet h WHERE h.collected_by_patron_id = ? AND h.returned_at IS NULL",
+                "SELECT h.book_id, h.checkout_till FROM checkouts_sheet h WHERE h.collected_by_patron_id = ? AND h.checked_out_at IS NULL",
                 new Object[]{patronId.getPatronId()},
                 new ColumnMapRowMapper());
     }

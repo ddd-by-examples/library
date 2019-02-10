@@ -50,9 +50,9 @@ public class PatronBookEventsHandler {
     }
 
     @EventListener
-    void handle(BookReturned bookReturned) {
-        bookRepository.findBy(new BookId(bookReturned.getBookId()))
-                .map(book -> handleBookReturned(book, bookReturned))
+    void handle(BookCheckedOut bookCheckedOut) {
+        bookRepository.findBy(new BookId(bookCheckedOut.getBookId()))
+                .map(book -> handleBookCheckedOut(book, bookCheckedOut))
                 .map(this::saveBook);
     }
 
@@ -101,9 +101,9 @@ public class PatronBookEventsHandler {
         );
     }
 
-    private Book handleBookReturned(Book book, BookReturned bookReturned) {
+    private Book handleBookCheckedOut(Book book, BookCheckedOut bookCheckedOut) {
         return API.Match(book).of(
-                Case($(instanceOf(CollectedBook.class)), collected -> collected.handle(bookReturned)),
+                Case($(instanceOf(CollectedBook.class)), collected -> collected.handle(bookCheckedOut)),
                 Case($(), () -> book)
         );
     }

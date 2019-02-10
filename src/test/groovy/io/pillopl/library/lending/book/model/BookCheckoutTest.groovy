@@ -13,7 +13,7 @@ import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
 import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatron
 
-class BookReturningTest extends Specification {
+class BookCheckoutTest extends Specification {
 
     private static Instant now = Instant.MIN
     private static Instant oneHour = now.plusSeconds(3600)
@@ -26,10 +26,10 @@ class BookReturningTest extends Specification {
             LibraryBranchId aBranch = anyBranch()
 
         and:
-            PatronBooksEvent.BookReturned bookReturnedEvent = the bookOnHold isReturnedBy anyPatron() at aBranch
+            PatronBooksEvent.BookCheckedOut bookCheckedOutEvent = the bookOnHold isCheckedOutBy anyPatron() at aBranch
 
         when:
-            AvailableBook availableBook = the bookOnHold reactsTo bookReturnedEvent
+            AvailableBook availableBook = the bookOnHold reactsTo bookCheckedOutEvent
 
         then:
             availableBook.bookId == bookOnHold.bookId
@@ -65,10 +65,10 @@ class BookReturningTest extends Specification {
             BookDSL collectedBook = aCirculatingBook() with anyBookId() locatedIn anyBranch() collectedBy anyPatron()
 
         and:
-            PatronBooksEvent.BookReturned bookReturnedEvent = the collectedBook isReturnedBy anyPatron() at anyBranch()
+            PatronBooksEvent.BookCheckedOut bookCheckedOutEvent = the collectedBook isCheckedOutBy anyPatron() at anyBranch()
 
         when:
-            AvailableBook available = the collectedBook reactsTo bookReturnedEvent
+            AvailableBook available = the collectedBook reactsTo bookCheckedOutEvent
 
         then:
             available.bookId == collectedBook.bookId

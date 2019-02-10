@@ -7,7 +7,7 @@ import io.pillopl.library.lending.librarybranch.model.LibraryBranchId;
 import io.pillopl.library.lending.patron.model.PatronBooksEvent.BookCollected;
 import io.pillopl.library.lending.patron.model.PatronBooksEvent.BookHoldCanceled;
 import io.pillopl.library.lending.patron.model.PatronBooksEvent.BookHoldExpired;
-import io.pillopl.library.lending.patron.model.PatronBooksEvent.BookReturned;
+import io.pillopl.library.lending.patron.model.PatronBooksEvent.BookCheckedOut;
 import io.pillopl.library.lending.patron.model.PatronId;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -40,9 +40,9 @@ public class BookOnHold implements Book {
         this(new BookInformation(bookId, type), libraryBranchId, patronId, holdTill, version);
     }
 
-    public AvailableBook handle(BookReturned bookReturned) {
+    public AvailableBook handle(BookCheckedOut bookCheckedOut) {
         return new AvailableBook(
-                bookInformation, new LibraryBranchId(bookReturned.getLibraryBranchId()),
+                bookInformation, new LibraryBranchId(bookCheckedOut.getLibraryBranchId()),
                 version);
     }
 

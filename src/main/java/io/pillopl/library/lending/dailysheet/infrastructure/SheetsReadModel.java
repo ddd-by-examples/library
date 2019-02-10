@@ -134,7 +134,7 @@ class SheetsReadModel implements DailySheet {
 
     private void createNewCheckout(BookCollected event) {
         sheets.update("INSERT INTO checkouts_sheet " +
-                        "(id, book_id, status, checkout_event_id, collected_by_patron_id, collected_at, checkout_till, collected_at_branch, returned_at) VALUES " +
+                        "(id, book_id, status, checkout_event_id, collected_by_patron_id, collected_at, checkout_till, collected_at_branch, checked_out_at) VALUES " +
                         "(checkouts_sheet_seq.nextval, ?, ?, ?, ?, ?, ?, ?, null)",
                 event.getBookId(),
                 "COLLECTED",
@@ -151,24 +151,24 @@ class SheetsReadModel implements DailySheet {
 
     @Override
     @EventListener
-    public void handle(BookReturned event) {
-        int results = markAsReturned(event);
+    public void handle(BookCheckedOut event) {
+        int results = markAsCheckedOut(event);
         if (results == 0) {
-            insertAsReturnedWithCollectedEventMissing(event);
+            insertAsChecledOutWithCollectedEventMissing(event);
         }
 
     }
 
-    private int markAsReturned(BookReturned event) {
-        return sheets.update("UPDATE checkouts_sheet SET returned_at = ?, status = 'RETURNED' WHERE returned_at IS NULL AND book_id = ? AND collected_by_patron_id = ?",
+    private int markAsCheckedOut(BookCheckedOut event) {
+        return sheets.update("UPDATE checkouts_sheet SET checked_out_at = ?, status = 'CHECKED_OUT' WHERE checked_out_at IS NULL AND book_id = ? AND collected_by_patron_id = ?",
                 from(event.getWhen()),
                 event.getBookId(),
                 event.getPatronId());
     }
 
-    private void insertAsReturnedWithCollectedEventMissing(BookReturned event) {
+    private void insertAsChecledOutWithCollectedEventMissing(BookCheckedOut event) {
         sheets.update("INSERT INTO checkouts_sheet " +
-                        "(id, book_id, status, checkout_event_id, collected_by_patron_id, collected_at, collected_till, returned_at) VALUES " +
+                        "(id, book_id, status, checkout_event_id, collected_by_patron_id, collected_at, collected_till, checked_out_at) VALUES " +
                         "(checkouts_sheet_seq.nextval, ?, ?, ?, ?, null, null, ?)",
                 event.getBookId(),
                 "COLLECTED",

@@ -36,10 +36,10 @@ public class CollectedBook implements Book {
         return bookInformation.getBookId();
     }
 
-    public AvailableBook handle(PatronBooksEvent.BookReturned bookReturnedByPatron) {
+    public AvailableBook handle(PatronBooksEvent.BookCheckedOut bookCheckedOutByPatron) {
         return new AvailableBook(
                 bookInformation,
-                new LibraryBranchId(bookReturnedByPatron.getLibraryBranchId()),
+                new LibraryBranchId(bookCheckedOutByPatron.getLibraryBranchId()),
                 version);
     }
 
