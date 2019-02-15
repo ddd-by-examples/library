@@ -49,7 +49,14 @@ us to have book with same ISBN as circulated and restricted at the same time (fo
 there is a book signed by the author that we want to keep as Restricted)
 
 ## General assumptions
+
 ### Process discovery
+
+The first thing we started with was domain exploration with the help of Big Picture EventStorming.
+During the session we discovered following definitions:
+![Patron](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346371442075)
+
+
 ### Bounded Contexts
 ### ArchUnit
 ### Functional thinking
