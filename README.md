@@ -53,12 +53,87 @@ there is a book signed by the author that we want to keep as Restricted)
 ### Process discovery
 
 The first thing we started with was domain exploration with the help of Big Picture EventStorming.
-During the session we discovered following definitions:
-![Patron](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346371442075)
-
+During the session we discovered following [definitions](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346371442125):
+* [Patron](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346371442075)
+* [Available Book](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346399152354)
+* [Circulating Book](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346399152400)
+* [Restricted Book](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346399152464)
+* [Book On Hold](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346457917238)
+* [Collected Book](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346457964937)
+* [Catalogue](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346457973874)
+* [Hold Duration](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346457974002)
+* [Expired Hold](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346457974040)
+* [Checkout](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346457974057)
+* [Overdue Checkout](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346457983753)
+* [Daily Sheet With Expired Holds](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346457983847)
+* [Daily Sheet With Overdue Checkouts](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346457999229)
 
 ### Bounded Contexts
+In order to properly identify bounded contexts we conducted the Design Level Event Storming that
+was based on the results of Example Mapping, where each case (example) was modelled.
+
+Heuristics:
+* Linguistic boundaries
+* Data: flow, ownership, uniqueness
+* Domain expert boundaries
+* Existing organisational boundaries
+* Business process steps
+* Transaction boundaries
+
+TODO
+
+### Project structure
+At the very beginning, not to overcomplicate the project, we decided to assign each bounded context
+to a separate package, which means that the system is a modular monolith.  There are no obstacles, though,
+to put contexts into maven modules or finally to microservices.
+
+Bounded contexts should (amongst others) introduce autonomy in the sense of architecture. Thus, each module
+encapsulating the context has its own local architecture aligned to problem complexity.
+In the case of a context, where we identified true business logic (**lending**) we introduced a domain model
+that is a simplified (for the purpose of the project) abstraction of the reality.
+
+If we are talking about architecture, the hexagon lets us separate domain and application logic from
+frameworks (and infrastructure). What do we gain with this approach? Firstly, we can unit test most important
+part of the application - **business logic** - usually without the need to stub any dependency.
+
+Spring...
+
+CQRS...
+
+
 ### ArchUnit
+
+One of the main components of a successful project is technical leadership that lets the team go in the right
+direction. Nevertheless, there are tools that can support teams in keeping the code clean and protect the
+architecture, so that the project won't become a Big Ball of Mud, and thus will be pleasant to develop and
+to maintain. The first option, the one we proposed, is [ArchUnit](https://www.archunit.org/) - a Java architecture
+test tool. Maven modules could be an alternative. Let's focus on the former.
+
+In terms of hexagonal architecture, it is essential to ensure, that we do not mix different levels of
+abstraction (hexagon levels):
+```java 
+@ArchTest
+public static final ArchRule model_should_not_depend_on_infrastructure =
+    noClasses()
+        .that()
+        .resideInAPackage("..model..")
+        .should()
+        .dependOnClassesThat()
+        .resideInAPackage("..infrastructure..");
+```      
+and framewors do not affect the domain model  
+```java
+@ArchTest
+public static final ArchRule model_should_not_depend_on_spring =
+    noClasses()
+        .that()
+        .resideInAPackage("..io.pillopl.library.lending..model..")
+        .should()
+        .dependOnClassesThat()
+        .resideInAPackage("org.springframework..");
+```    
+  
+
 ### Functional thinking
 ### No ORM
 ### Architecture-code gap
@@ -73,7 +148,7 @@ We also made an effort to show how to create a DSL, that enables to write
 tests as if they were sentences taken from the domain descriptions. Please
 find an example below:
 
-```
+```groovy
 def 'should make book available when hold canceled'() {
     given:
         BookDSL bookOnHold = aCirculatingBook() with anyBookId() locatedIn anyBranch() placedOnHoldBy anyPatron()
