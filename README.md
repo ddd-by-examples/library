@@ -107,7 +107,8 @@ One of the main components of a successful project is technical leadership that 
 direction. Nevertheless, there are tools that can support teams in keeping the code clean and protect the
 architecture, so that the project won't become a Big Ball of Mud, and thus will be pleasant to develop and
 to maintain. The first option, the one we proposed, is [ArchUnit](https://www.archunit.org/) - a Java architecture
-test tool. Maven modules could be an alternative. Let's focus on the former.
+test tool. ArchUnit lets you write unit tests of your architecture, so that it is always consistent with initial
+vision. Maven modules could be an alternative as well, but let's focus on the former.
 
 In terms of hexagonal architecture, it is essential to ensure, that we do not mix different levels of
 abstraction (hexagon levels):
@@ -121,7 +122,7 @@ public static final ArchRule model_should_not_depend_on_infrastructure =
         .dependOnClassesThat()
         .resideInAPackage("..infrastructure..");
 ```      
-and framewors do not affect the domain model  
+and that frameworks do not affect the domain model  
 ```java
 @ArchTest
 public static final ArchRule model_should_not_depend_on_spring =
@@ -132,9 +133,132 @@ public static final ArchRule model_should_not_depend_on_spring =
         .dependOnClassesThat()
         .resideInAPackage("org.springframework..");
 ```    
-  
 
 ### Functional thinking
+When you look at the code you might find a scent of functional programming. Although we do not follow
+a _clean_ FP, we try to think of business processes as pipelines or workflows, utilizing functional style through
+following concepts.
+
+_Please note that this is not a reference project for FP._
+
+#### Immutable objects
+Each class that represents a business concept is immutable, thanks to which we:
+* provide full encapsulation and objects' states protection,
+* secure objects for multithreaded access,
+* control all side effects much clearer. 
+
+#### Pure functions
+Modelling domain operations, discovered in Design Level Event Storming, as pure functions, and declaring them in
+both domain and application layers in the form of Java's functional interfaces. Their implementations are placed
+in infrastructure layer as ordinary methods with side effects. Thanks to this approach we can follow the abstraction
+of ubiquitous language explicitly, and keep this abstraction implementation-agnostic. As an example, you could have
+a look at `FindAvailableBook` interface and its implementation:
+
+```java
+@FunctionalInterface
+public interface FindAvailableBook {
+
+    Option<AvailableBook> findAvailableBookBy(BookId bookId);
+}
+```
+
+```java
+@AllArgsConstructor
+class BookDatabaseRepository implements FindAvailableBook {
+
+    private final JdbcTemplate jdbcTemplate;
+
+    @Override
+    public Option<AvailableBook> findAvailableBookBy(BookId bookId) {
+        return Match(findBy(bookId)).of(
+                Case($Some($(instanceOf(AvailableBook.class))), Option::of),
+                Case($(), Option::none)
+        );
+    }  
+
+    Option<Book> findBy(BookId bookId) {
+        return findBookById(bookId)
+                .map(BookDatabaseEntity::toDomainModel);
+    }
+
+    private Option<BookDatabaseEntity> findBookById(BookId bookId) {
+        return Try
+                .ofSupplier(() -> of(jdbcTemplate.queryForObject("SELECT b.* FROM book_database_entity b WHERE b.book_id = ?",
+                                      new BeanPropertyRowMapper<>(BookDatabaseEntity.class), bookId.getBookId())))
+                .getOrElse(none());
+    }  
+} 
+```
+    
+#### Type system
+_Type system - like_ modelling - we modelled each domain object's state discovered during EventStorming as separate
+classes: `AvailableBook`, `BookOnHold`, `CollectedBook`. With this approach we provide much clearer abstraction than
+having a single `Book` class with an enum-based state management. Moving the logic to these specific classes brings
+Single Responsibility Principle to a different level. Moreover, instead of checking invariants in every business method
+we leave the role to the compiler. As an example, please consider following scenario: _you can place on hold only a book
+that is currently available_. We could have done it in a following way:
+```java
+public Either<BookHoldFailed, BookPlacedOnHoldEvents> placeOnHold(Book book) {
+  if (book.status == AVAILABLE) {  
+      ...
+  }
+}
+```
+but we use the _type system_ and declare method of following signature
+```java
+public Either<BookHoldFailed, BookPlacedOnHoldEvents> placeOnHold(AvailableBook book) {
+      ...
+}
+```  
+The more errors we discover at compile time the better.
+
+#### Monads
+Business methods might have different results. One might return a value or a `null`, throw an exception when something
+unexpected happens or just return different objects under different circumstances. All those situations are typical
+to object-oriented languages like Java, but do not fit into functional style. We are dealing with this issues
+with monads (monadic containers provided by [Vavr](https://www.vavr.io)):
+* When a method returns optional value, we use the `Option` monad:
+
+    ```java
+    Option<Book> findBy(BookId bookId) {
+        ...
+    }
+    ```
+
+* When a method might return one of two possible values, we use the `Either` monad:
+
+    ```java
+    Either<BookHoldFailed, BookPlacedOnHoldEvents> placeOnHold(AvailableBook book) {
+        ...
+    }
+    ```
+
+* When an exception might occur, we use `Try` monad:
+
+    ```java
+    Try<Result> placeOnHold(@NonNull PlaceOnHoldCommand command) {
+        ...
+    }
+    ```
+
+Thanks to this, we can follow the functional programming style, but we also enrich our domain language and
+make our code much more readable for the clients.
+
+#### Pattern Matching
+Depending on a type of a given book object we often need to perform different actions. Series of if/else or switch/case statements
+could be a choice, but it is the pattern matching that provides the most conciseness and flexibility. With the code
+like below we can check numerous patterns against objects and access their constituents, so our code has a minimal dose
+of language-construct noise:
+```java
+private Book handleBookPlacedOnHold(Book book, BookPlacedOnHold bookPlacedOnHold) {
+    return API.Match(book).of(
+        Case($(instanceOf(AvailableBook.class)), availableBook -> availableBook.handle(bookPlacedOnHold)),
+        Case($(instanceOf(BookOnHold.class)), bookOnHold -> raiseDuplicateHoldFoundEvent(bookOnHold, bookPlacedOnHold)),
+        Case($(), () -> book)
+    );
+}
+```
+
 ### No ORM
 ### Architecture-code gap
 ### Model-code gap
