@@ -259,7 +259,41 @@ private Book handleBookPlacedOnHold(Book book, BookPlacedOnHold bookPlacedOnHold
 }
 ```
 
-### No ORM
+### (No) ORM
+If you run `mvn dependency:tree` you won't find any JPA implementation. Although we think that ORM solutions (like Hibernate)
+are very powerful and useful, we decided not to use them, as we wouldn't utilize their features. What features are
+talking about? Lazy loading, caching, dirty checking. Why don't we need them? We want to have more control
+over SQL queries and minimize the object-relational impedance mismatch ourselves. Moreover, thanks to relatively
+small aggregates, containing as little data as it is required to protect the invariants, we don't need the
+lazy loading mechanism either.
+With Hexagonal Architecture we have the ability to separate domain and persistence models and test them independently.
+In the infrastructure layer we use new and very promising project called Spring Data JDBC, that is free from
+the JPA-related overhead mentioned before. Please find below an example of a repository using plain SQL queries
+and `JdbcTemplate`:
+
+```java
+@AllArgsConstructor
+class BookDatabaseRepository implements BookRepository, FindAvailableBook, FindBookOnHold {
+
+    private final JdbcTemplate jdbcTemplate;
+
+    @Override
+    public Option<Book> findBy(BookId bookId) {
+        return findBookById(bookId)
+                .map(BookDatabaseEntity::toDomainModel);
+    }
+
+    private Option<BookDatabaseEntity> findBookById(BookId bookId) {
+        return Try
+                .ofSupplier(() -> of(jdbcTemplate.queryForObject("SELECT b.* FROM book_database_entity b WHERE b.book_id = ?",
+                                     new BeanPropertyRowMapper<>(BookDatabaseEntity.class), bookId.getBookId())))
+                .getOrElse(none());
+    }
+    
+    ...
+}
+```  
+
 ### Architecture-code gap
 ### Model-code gap
 ### HATEOAS
