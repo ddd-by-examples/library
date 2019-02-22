@@ -295,7 +295,139 @@ class BookDatabaseRepository implements BookRepository, FindAvailableBook, FindB
 ```  
 
 ### Architecture-code gap
+
 ### Model-code gap
+In our project we do our best to reduce _model-code gap_ to bare minimum. It means we try to put equal attention
+to both the model and the code and keep them consistent. Below you will find some examples.
+
+#### Placing on hold
+![Placing on hold](docs/images/placing_on_hold.jpg)
+
+Starting with the easiest part, below you will find the model classes corresponding to depicted command and events:
+
+```java
+@Value
+class PlaceOnHoldCommand {
+    ...
+}
+```
+```java
+@Value
+class BookPlacedOnHold implements PatronBooksEvent {
+    ...
+}
+```
+```java
+@Value
+class MaximumNumberOhHoldsReached implements PatronBooksEvent {
+    ...    
+}
+```
+```java
+@Value
+class BookHoldFailed implements PatronBooksEvent {
+    ...
+}
+```
+
+We know it might not look impressive now, but if you have a look at the implementation of an aggregate,
+you will see that the code reflects not only the aggregate name, but also the whole scenario of `PlaceOnHold` 
+command handling. Let us uncover the details:
+
+```java
+public class PatronBooks {
+
+    public Either<BookHoldFailed, BookPlacedOnHoldEvents> placeOnHold(AvailableBook book) {
+        return placeOnHold(book, HoldDuration.openEnded());
+    }
+    
+    ...
+}    
+```
+
+The signature of `placeOnHold` method screams, that it is possible to place a book on hold only when it
+is available (more information about protecting invariants by compiler you will find in [Type system section](#type-system)).
+Moreover, if you try to place available book on hold it can **either** fail (`BookHoldFailed`) or produce some events -
+what events?
+
+```java
+@Value
+class BookPlacedOnHoldEvents implements PatronBooksEvent {
+    @NonNull UUID eventId = UUID.randomUUID();
+    @NonNull UUID patronId;
+    @NonNull BookPlacedOnHold bookPlacedOnHold;
+    @NonNull Option<MaximumNumberOhHoldsReached> maximumNumberOhHoldsReached;
+
+    @Override
+    public Instant getWhen() {
+        return bookPlacedOnHold.when;
+    }
+
+    public static BookPlacedOnHoldEvents events(BookPlacedOnHold bookPlacedOnHold) {
+        return new BookPlacedOnHoldEvents(bookPlacedOnHold.getPatronId(), bookPlacedOnHold, Option.none());
+    }
+
+    public static BookPlacedOnHoldEvents events(BookPlacedOnHold bookPlacedOnHold, MaximumNumberOhHoldsReached maximumNumberOhHoldsReached) {
+        return new BookPlacedOnHoldEvents(bookPlacedOnHold.patronId, bookPlacedOnHold, Option.of(maximumNumberOhHoldsReached));
+    }
+
+    public List<DomainEvent> normalize() {
+        return List.<DomainEvent>of(bookPlacedOnHold).appendAll(maximumNumberOhHoldsReached.toList());
+    }
+}
+```
+
+`BookPlacedOnHoldEvents` is a container for `BookPlacedOnHold` event, and - if patron has 5 book placed on hold already -
+`MaximumNumberOfHoldsReached` (please mind the `Option` monad). You can see now how perfectly the code reflects
+the model.
+
+It is not everything, though. In the picture above you can also see a big rectangular yellow card with rules (policies)
+that define the conditions that need to be fulfilled in order to get the given result. All those rules are implemented 
+as functions **either** allowing or rejecting the hold:
+
+![Restricted book policy](docs/images/placing-on-hold-policy-restricted.png)
+```java
+PlacingOnHoldPolicy onlyResearcherPatronsCanHoldRestrictedBooksPolicy = (AvailableBook toHold, PatronBooks patron, HoldDuration holdDuration) -> {
+    if (toHold.isRestricted() && patron.isRegular()) {
+        return left(Rejection.withReason("Regular patrons cannot hold restricted books"));
+    }
+    return right(new Allowance());
+};
+```
+
+![Overdue checkouts policy](docs/images/placing-on-hold-policy-overdue.png)
+
+```java
+PlacingOnHoldPolicy overdueCheckoutsRejectionPolicy = (AvailableBook toHold, PatronBooks patron, HoldDuration holdDuration) -> {
+    if (patron.overdueCheckoutsAt(toHold.getLibraryBranch()) >= OverdueCheckouts.MAX_COUNT_OF_OVERDUE_RESOURCES) {
+        return left(Rejection.withReason("cannot place on hold when there are overdue checkouts"));
+    }
+    return right(new Allowance());
+};
+```
+
+![Max number of holds policy](docs/images/placing-on-hold-policy-max.png)
+
+```java
+PlacingOnHoldPolicy regularPatronMaximumNumberOfHoldsPolicy = (AvailableBook toHold, PatronBooks patron, HoldDuration holdDuration) -> {
+    if (patron.isRegular() && patron.numberOfHolds() >= PatronHolds.MAX_NUMBER_OF_HOLDS) {
+        return left(Rejection.withReason("patron cannot hold more books"));
+    }
+    return right(new Allowance());
+};
+```
+
+![Open ended hold policy](docs/images/placing-on-hold-policy-open-ended.png)
+
+```java
+PlacingOnHoldPolicy onlyResearcherPatronsCanPlaceOpenEndedHolds = (AvailableBook toHold, PatronBooks patron, HoldDuration holdDuration) -> {
+    if (patron.isRegular() && holdDuration.isOpenEnded()) {
+        return left(Rejection.withReason("regular patron cannot place open ended holds"));
+    }
+    return right(new Allowance());
+};
+```
+
 ### HATEOAS
 
 ### Tests
