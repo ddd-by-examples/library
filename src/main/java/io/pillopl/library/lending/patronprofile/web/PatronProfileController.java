@@ -41,7 +41,7 @@ class PatronProfileController {
 
     @GetMapping("/profiles/{patronId}")
     ResponseEntity<Resource<ProfileResource>> patronProfile(@PathVariable UUID patronId) {
-        return ok(new Resource<>(new ProfileResource(patronProfiles.apply(new PatronId(patronId)), patronId)));
+        return ok(new Resource<>(new ProfileResource(patronId)));
     }
 
     @GetMapping("/profiles/{patronId}/holds/")
@@ -115,7 +115,7 @@ class ProfileResource extends ResourceSupport {
 
     UUID patronId;
 
-    ProfileResource(PatronProfile patronProfile, UUID patronId) {
+    ProfileResource(UUID patronId) {
         this.patronId = patronId;
         add(linkTo(methodOn(PatronProfileController.class).findHolds(patronId)).withRel("holds"));
         add(linkTo(methodOn(PatronProfileController.class).findCheckouts(patronId)).withRel("checkouts"));
