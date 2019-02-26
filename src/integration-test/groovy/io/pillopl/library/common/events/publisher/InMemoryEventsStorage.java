@@ -7,7 +7,6 @@ import io.vavr.collection.List;
 import java.util.ArrayList;
 import java.util.Collections;
 
-
 public class InMemoryEventsStorage implements EventsStorage {
 
     //it's not thread safe, enough for testing

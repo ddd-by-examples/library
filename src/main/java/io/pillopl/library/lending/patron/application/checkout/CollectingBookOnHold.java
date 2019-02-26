@@ -1,10 +1,10 @@
 package io.pillopl.library.lending.patron.application.checkout;
 
-import io.pillopl.library.commons.commands.Result;
-import io.pillopl.library.lending.patron.application.hold.FindBookOnHold;
 import io.pillopl.library.catalogue.BookId;
+import io.pillopl.library.commons.commands.Result;
 import io.pillopl.library.lending.book.model.BookOnHold;
 import io.pillopl.library.lending.librarybranch.model.LibraryBranchId;
+import io.pillopl.library.lending.patron.application.hold.FindBookOnHold;
 import io.pillopl.library.lending.patron.model.CheckoutDuration;
 import io.pillopl.library.lending.patron.model.PatronBooks;
 import io.pillopl.library.lending.patron.model.PatronBooksEvent.BookCollected;
@@ -21,19 +21,21 @@ import java.time.Instant;
 
 import static io.pillopl.library.commons.commands.Result.Rejection;
 import static io.pillopl.library.commons.commands.Result.Success;
-import static io.vavr.API.*;
+import static io.vavr.API.$;
+import static io.vavr.API.Case;
+import static io.vavr.API.Match;
 import static io.vavr.Patterns.$Left;
 import static io.vavr.Patterns.$Right;
 
 @AllArgsConstructor
-class CollectingBookOnHold {
+public class CollectingBookOnHold {
 
     private final FindBookOnHold findBookOnHold;
     private final PatronBooksRepository patronBooksRepository;
 
-    Try<Result> collect(@NonNull CollectBookCommand command) {
+    public Try<Result> collect(@NonNull CollectBookCommand command) {
         return Try.of(() -> {
-            BookOnHold bookOnHold = find( command.getBookId(), command.getPatronId());
+            BookOnHold bookOnHold = find(command.getBookId(), command.getPatronId());
             PatronBooks patronBooks = find(command.getPatronId());
             Either<BookCollectingFailed, BookCollected> result = patronBooks.collect(bookOnHold, command.getCheckoutDuration());
             return Match(result).of(

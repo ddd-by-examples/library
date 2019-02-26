@@ -1,15 +1,14 @@
 package io.pillopl.library.lending.book.infrastructure
 
-
+import io.pillopl.library.catalogue.BookId
+import io.pillopl.library.lending.LendingTestContext
 import io.pillopl.library.lending.book.model.AvailableBook
 import io.pillopl.library.lending.book.model.Book
-import io.pillopl.library.catalogue.BookId
 import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
 import io.pillopl.library.lending.patron.model.PatronId
 import io.vavr.control.Option
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification
 
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
@@ -17,8 +16,7 @@ import static io.pillopl.library.lending.book.model.BookFixture.circulatingAvail
 import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
 
-@ContextConfiguration(classes = BookConfiguration.class)
-@SpringBootTest
+@SpringBootTest(classes = LendingTestContext.class)
 class BookDatabaseRepositoryIT extends Specification {
 
     BookId bookId = anyBookId()

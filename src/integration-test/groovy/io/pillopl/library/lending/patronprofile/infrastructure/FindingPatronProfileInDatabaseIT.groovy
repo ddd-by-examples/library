@@ -2,7 +2,7 @@ package io.pillopl.library.lending.patronprofile.infrastructure
 
 import io.pillopl.library.catalogue.BookId
 import io.pillopl.library.catalogue.BookType
-import io.pillopl.library.lending.dailysheet.infrastructure.SheetReadModelDatabaseConfiguration
+import io.pillopl.library.lending.LendingTestContext
 import io.pillopl.library.lending.dailysheet.model.DailySheet
 import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
 import io.pillopl.library.lending.patron.model.PatronBooksEvent
@@ -13,22 +13,20 @@ import io.pillopl.library.lending.patronprofile.model.PatronProfiles
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification
 
 import javax.sql.DataSource
 import java.time.Duration
 import java.time.Instant
 
-import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
 import static io.pillopl.library.catalogue.BookType.Restricted
+import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
 import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
 import static io.vavr.Tuple.of
 import static java.time.Instant.now
 
-@ContextConfiguration(classes = SheetReadModelDatabaseConfiguration.class)
-@SpringBootTest
+@SpringBootTest(classes = LendingTestContext.class)
 class FindingPatronProfileInDatabaseIT extends Specification {
 
     PatronId patronId = anyPatronId()

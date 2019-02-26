@@ -1,16 +1,20 @@
 package io.pillopl.library.lending.patron.infrastructure
 
 
+import io.pillopl.library.lending.LendingTestContext
 import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
-import io.pillopl.library.lending.patron.model.*
+import io.pillopl.library.lending.patron.model.HoldDuration
+import io.pillopl.library.lending.patron.model.PatronBooks
+import io.pillopl.library.lending.patron.model.PatronBooksRepository
+import io.pillopl.library.lending.patron.model.PatronId
+import io.pillopl.library.lending.patron.model.PatronType
 import io.vavr.control.Option
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification
 
-import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
 import static io.pillopl.library.catalogue.BookType.Circulating
+import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
 import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHold.bookPlacedOnHoldNow
 import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHoldEvents
@@ -20,8 +24,7 @@ import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatr
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.regularPatron
 import static io.pillopl.library.lending.patron.model.PatronType.Regular
 
-@ContextConfiguration(classes = PatronDatabaseConfiguration.class)
-@SpringBootTest
+@SpringBootTest(classes = LendingTestContext.class)
 class PatronBooksDatabaseRepositoryIT extends Specification {
 
     PatronId patronId = anyPatronId()

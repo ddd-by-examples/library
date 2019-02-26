@@ -1,13 +1,11 @@
 package io.pillopl.library.lending.eventspropagation
 
-import io.pillopl.library.lending.book.infrastructure.BookConfiguration
+import io.pillopl.library.lending.LendingTestContext
 import io.pillopl.library.lending.book.model.AvailableBook
 import io.pillopl.library.lending.book.model.BookFixture
 import io.pillopl.library.lending.book.model.BookOnHold
 import io.pillopl.library.lending.book.model.BookRepository
-import io.pillopl.library.lending.dailysheet.infrastructure.SheetReadModelDatabaseConfiguration
 import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
-import io.pillopl.library.lending.patron.infrastructure.PatronDatabaseConfiguration
 import io.pillopl.library.lending.patron.model.HoldDuration
 import io.pillopl.library.lending.patron.model.PatronBooks
 import io.pillopl.library.lending.patron.model.PatronBooksRepository
@@ -17,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.jdbc.core.ColumnMapRowMapper
 import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification
 
 import javax.sql.DataSource
@@ -31,8 +28,7 @@ import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatr
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.regularPatron
 import static io.pillopl.library.lending.patron.model.PatronType.Regular
 
-@ContextConfiguration(classes = [PatronDatabaseConfiguration.class, BookConfiguration.class, SheetReadModelDatabaseConfiguration.class])
-@SpringBootTest
+@SpringBootTest(classes = LendingTestContext.class)
 class StrongConsistencyBetweenAggregatesAndReadModelsIT extends Specification {
 
     PatronId patronId = anyPatronId()

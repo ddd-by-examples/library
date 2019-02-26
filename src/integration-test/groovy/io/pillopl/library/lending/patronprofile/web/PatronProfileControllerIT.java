@@ -1,7 +1,8 @@
 package io.pillopl.library.lending.patronprofile.web;
 
-import io.pillopl.library.lending.book.model.BookFixture;
 import io.pillopl.library.catalogue.BookId;
+import io.pillopl.library.lending.LendingTestContext;
+import io.pillopl.library.lending.book.model.BookFixture;
 import io.pillopl.library.lending.patron.application.hold.CancelingHold;
 import io.pillopl.library.lending.patron.model.PatronBooksFixture;
 import io.pillopl.library.lending.patron.model.PatronId;
@@ -34,11 +35,13 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(PatronProfileController.class)
-@ContextConfiguration(classes = {WebConfiguration.class})
+@ContextConfiguration(classes = {LendingTestContext.class})
 public class PatronProfileControllerIT {
 
     PatronId patronId = PatronBooksFixture.anyPatronId();
@@ -191,6 +194,4 @@ public class PatronProfileControllerIT {
                 new HoldsView(of(Tuple.of(bookId, anyDate))),
                 new CheckoutsView(of(Tuple.of(anotherBook, anotherDate))));
     }
-
-
 }
