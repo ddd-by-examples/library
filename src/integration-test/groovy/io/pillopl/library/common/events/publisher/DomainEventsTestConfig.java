@@ -6,14 +6,15 @@ import io.pillopl.library.commons.events.publisher.StoreAndForwardDomainEventPub
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 @Configuration
-public class DomainEventsConfig {
+public class DomainEventsTestConfig {
 
     @Bean
-    DomainEvents domainEvents(ApplicationEventPublisher applicationEventPublisher) {
-        return new StoreAndForwardDomainEventPublisher(new JustForwardDomainEventPublisher(applicationEventPublisher), new InMemoryEventsStorage());
+    @Primary
+    DomainEvents domainEventsWithStorage(ApplicationEventPublisher applicationEventPublisher) {
+        return new StoreAndForwardDomainEventPublisher(new JustForwardDomainEventPublisher(applicationEventPublisher),
+                new InMemoryEventsStorage());
     }
-
-
 }

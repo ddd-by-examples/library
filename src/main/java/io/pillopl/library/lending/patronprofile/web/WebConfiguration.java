@@ -6,6 +6,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -15,9 +16,10 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import static org.springframework.hateoas.config.EnableHypermediaSupport.HypermediaType.HAL_FORMS;
 
 @Configuration
+@EnableAutoConfiguration
 @EnableHypermediaSupport(type = HAL_FORMS)
 @ComponentScan
-class WebConfiguration {
+public class WebConfiguration {
 
     @Bean
     static HalObjectMapperConfigurer halObjectMapperConfigurer() {

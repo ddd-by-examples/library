@@ -1,15 +1,18 @@
 package io.pillopl.library.lending.book.infrastructure
 
-import io.pillopl.library.lending.LendingContext
+import io.pillopl.library.common.events.publisher.DomainEventsTestConfig
+import io.pillopl.library.lending.LendingTestContext
 import io.pillopl.library.lending.book.model.AvailableBook
 import io.pillopl.library.lending.book.model.BookFixture
 import io.pillopl.library.lending.book.model.BookRepository
 import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
-import io.pillopl.library.lending.patron.model.*
+import io.pillopl.library.lending.patron.model.HoldDuration
+import io.pillopl.library.lending.patron.model.PatronBooks
+import io.pillopl.library.lending.patron.model.PatronBooksRepository
+import io.pillopl.library.lending.patron.model.PatronId
 import io.vavr.control.Option
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
 
@@ -23,8 +26,7 @@ import static io.pillopl.library.lending.patron.model.PatronBooksEvent.PatronCre
 import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
 import static io.pillopl.library.lending.patron.model.PatronType.Regular
 
-@ContextConfiguration(classes = [LendingContext.class])
-@SpringBootTest
+@SpringBootTest(classes = [LendingTestContext.class, DomainEventsTestConfig.class])
 class DuplicateHoldFoundIT extends Specification {
 
     PatronId patron = anyPatronId()

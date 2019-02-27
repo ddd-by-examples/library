@@ -35,10 +35,10 @@ class CatalogueDatabase {
         try {
             return Option.of(
                     jdbcTemplate.queryForObject(
-                    "SELECT b.* FROM catalogue_book b WHERE b.isbn = ?",
-                    new BeanPropertyRowMapper<>(BookDatabaseRow.class),
-                    isbn.getIsbn())
-                    .toBook());
+                            "SELECT b.* FROM catalogue_book b WHERE b.isbn = ?",
+                            new BeanPropertyRowMapper<>(BookDatabaseRow.class),
+                            isbn.getIsbn())
+                            .toBook());
         } catch (EmptyResultDataAccessException e) {
             return Option.none();
 
