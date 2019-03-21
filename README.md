@@ -295,6 +295,54 @@ class BookDatabaseRepository implements BookRepository, FindAvailableBook, FindB
 ```  
 
 ### Architecture-code gap
+We put a lot of attention to keep the consistency between the overall architecture (including diagrams)
+and the code structure. Having identified bounded contexts we could organize them in modules (packages, to
+be more specific). Thanks to this we gain the famous microservices' autonomy, while having a monolithic
+application. Each package has well defined public API, encapsulating all implementation details by using
+package-protected or private scopes.
+
+Just by looking at the package structure:
+
+```
+└── library
+    ├── catalogue
+    ├── commons
+    │   ├── aggregates
+    │   ├── commands
+    │   └── events
+    │       └── publisher
+    └── lending
+        ├── book
+        │   ├── application
+        │   ├── infrastructure
+        │   └── model
+        ├── dailysheet
+        │   ├── infrastructure
+        │   └── model
+        ├── librarybranch
+        │   └── model
+        ├── patron
+        │   ├── application
+        │   ├── infrastructure
+        │   └── model
+        └── patronprofile
+            ├── infrastructure
+            ├── model
+            └── web
+```
+you can see that the architecture is screaming that it has two bounded contexts: **catalogue**
+and **lending**. Moreover, the **lending context** is built around five business objects: **book**,
+**dailysheet**, **librarybranch**, **patron**, and **patronprofile**, while **catalogue** has no subpackages,
+which suggests that it might be a CRUD with no complex logic inside. Please find the architecture diagram
+below.
+
+![Component diagram](docs/images/component-diagram.png)
+
+Yet another advantage of this approach comparing to packaging by layer for example is that in order to 
+deliver a functionality you would usually need to do it in one package only, which is the aforementioned
+autonomy. This autonomy, then, could be transferred to the level of application as soon as we split our
+_context-packages_ into separate microservices. Following this considerations, autonomy can be given away
+to a product team that can take care of the whole business area end-to-end.
 
 ### Model-code gap
 In our project we do our best to reduce _model-code gap_ to bare minimum. It means we try to put equal attention
