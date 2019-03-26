@@ -10,8 +10,8 @@
     3.5 [No ORM](#no-orm)  
     3.6 [Architecture-code gap](#architecture-code-gap)  
     3.7 [Model-code gap](#model-code-gap) 
-    3.8 [Spring](#spring) 
-    3.9 [HATEOAS](#hateoas)  
+    3.8 [Spring](#spring)  
+    3.9 [HATEOAS](#hateoas)    
     3.10 [Test DSL](#test-dsl)  
 4. [How to contribute](#how-to-contribute)
 
@@ -342,7 +342,7 @@ and **lending**. Moreover, the **lending context** is built around five business
 which suggests that it might be a CRUD with no complex logic inside. Please find the architecture diagram
 below.
 
-![Component diagram](docs/images/component-diagram.png)
+![Component diagram](docs/c4/component-diagram.png)
 
 Yet another advantage of this approach comparing to packaging by layer for example is that in order to 
 deliver a functionality you would usually need to do it in one package only, which is the aforementioned
