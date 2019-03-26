@@ -11,7 +11,7 @@ import java.time.Clock;
 public class DailySheetConfiguration {
 
     @Bean
-    DailySheet sheetsReadModen(JdbcTemplate jdbcTemplate) {
+    DailySheet sheetsReadModel(JdbcTemplate jdbcTemplate) {
         return new SheetsReadModel(jdbcTemplate, Clock.systemDefaultZone());
     }
 }

@@ -9,9 +9,10 @@
     3.4 [Functional thinking](#functional-thinking)  
     3.5 [No ORM](#no-orm)  
     3.6 [Architecture-code gap](#architecture-code-gap)  
-    3.7 [Model-code gap](#model-code-gap)  
-    3.8 [HATEOAS](#hateoas)  
-    3.9 [Test DSL](#test-dsl)  
+    3.7 [Model-code gap](#model-code-gap) 
+    3.8 [Spring](#spring) 
+    3.9 [HATEOAS](#hateoas)  
+    3.10 [Test DSL](#test-dsl)  
 4. [How to contribute](#how-to-contribute)
 
 ## About
@@ -84,22 +85,27 @@ TODO
 
 ### Project structure
 At the very beginning, not to overcomplicate the project, we decided to assign each bounded context
-to a separate package, which means that the system is a modular monolith.  There are no obstacles, though,
-to put contexts into maven modules or finally to microservices.
+to a separate package, which means that the system is a modular monolith. There are no obstacles, though,
+to put contexts into maven modules or finally into microservices.
 
 Bounded contexts should (amongst others) introduce autonomy in the sense of architecture. Thus, each module
 encapsulating the context has its own local architecture aligned to problem complexity.
 In the case of a context, where we identified true business logic (**lending**) we introduced a domain model
-that is a simplified (for the purpose of the project) abstraction of the reality.
+that is a simplified (for the purpose of the project) abstraction of the reality and utilized
+hexagonal architecture. In the case of a context, that during Event Storming turned out to lack any complex
+domain logic, we applied CRUD-like local architecture.
 
-If we are talking about architecture, the hexagon lets us separate domain and application logic from
+If we are talking about hexagonal architecture, it lets us separate domain and application logic from
 frameworks (and infrastructure). What do we gain with this approach? Firstly, we can unit test most important
 part of the application - **business logic** - usually without the need to stub any dependency.
+Secondly, we create ourselves an opportunity to adjust infrastructure layer without the worry of
+breaking the core functionality. In the infrastructure layer we intensively use Spring Framework
+as probably the most mature and powerful application framework with an incredible test support.
+More information about how we use Spring you will find [here](#spring).
 
-Spring...
-
-CQRS...
-
+As we already mentioned, the architecture was driven by Event Storming sessions. Apart from identifying
+contexts and their complexity, we could also make a decision that we separate read and write models (CQRS).
+As an example you can have a look at **Patron Profiles** and *Daily Sheets*.
 
 ### ArchUnit
 
@@ -475,6 +481,33 @@ PlacingOnHoldPolicy onlyResearcherPatronsCanPlaceOpenEndedHolds = (AvailableBook
     return right(new Allowance());
 };
 ```
+
+#### Spring
+Spring Framework seems to be the most popular Java framework ever used. Unfortunately it is also quite common
+to overuse its features in the business code. What you find in this project is that the domain packages
+are fully focused on modelling business problems, and are free from any DI, which makes it easy to
+unit-test it which is invaluable in terms of code reliability and maintainability. It does not mean,
+though, that we do not use Spring Framework - we do. Below you will find some details:
+- Each bounded context has its own independent application context. It means that we removed the runtime
+coupling, which is a step towards extracting modules (and microservices). How did we do that? Let's have
+a look:
+    ```java
+    @SpringBootConfiguration
+    @EnableAutoConfiguration
+    public class LibraryApplication {
+    
+        public static void main(String[] args) {
+            new SpringApplicationBuilder()
+                    .parent(LibraryApplication.class)
+                    .child(LendingConfig.class).web(WebApplicationType.SERVLET)
+                    .sibling(CatalogueConfiguration.class).web(WebApplicationType.NONE)
+                    .run(args);
+        }
+    }
+    ```
+- As you could se above, we also try not to use component scan wherever possible. Instead we utilize
+`@Configuration` classes where we define module specific beans in the infrastracture layer. Those
+configuration classes are explicitly declared in the main application class.
 
 ### HATEOAS
 
