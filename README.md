@@ -9,7 +9,7 @@
     3.4 [Functional thinking](#functional-thinking)  
     3.5 [No ORM](#no-orm)  
     3.6 [Architecture-code gap](#architecture-code-gap)  
-    3.7 [Model-code gap](#model-code-gap) 
+    3.7 [Model-code gap](#model-code-gap)   
     3.8 [Spring](#spring)  
     3.9 [HATEOAS](#hateoas)    
     3.10 [Test DSL](#test-dsl)  
