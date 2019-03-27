@@ -4,18 +4,17 @@
 2. [Domain description](#domain)
 3. [General assumptions](#general-assumptions)  
     3.1 [Process discovery](#process-discovery)  
-    3.2 [Bounded Contexts](#bounded-contexts)  
-    3.3 [Project structure and architecture](#project-structure-and-architecture)  
-    3.4 [Aggregates](#aggregates)
-    3.5 [Events](#events)
-    3.6 [ArchUnit](#archunit)  
-    3.7 [Functional thinking](#functional-thinking)  
-    3.8 [No ORM](#no-orm)  
-    3.9 [Architecture-code gap](#architecture-code-gap)  
-    3.10 [Model-code gap](#model-code-gap)   
-    3.11 [Spring](#spring)  
-    3.12 [HATEOAS](#hateoas)    
-    3.13 [Test DSL](#test-dsl)  
+    3.2 [Project structure and architecture](#project-structure-and-architecture)  
+    3.3 [Aggregates](#aggregates)
+    3.4 [Events](#events)
+    3.5 [ArchUnit](#archunit)  
+    3.6 [Functional thinking](#functional-thinking)  
+    3.7 [No ORM](#no-orm)  
+    3.8 [Architecture-code gap](#architecture-code-gap)  
+    3.9 [Model-code gap](#model-code-gap)   
+    3.10 [Spring](#spring)  
+    3.11 [HATEOAS](#hateoas)    
+    3.12 [Test DSL](#test-dsl)  
 4. [How to contribute](#how-to-contribute)
 
 ## About
@@ -57,7 +56,14 @@ there is a book signed by the author that we want to keep as Restricted)
 ### Process discovery
 
 The first thing we started with was domain exploration with the help of Big Picture EventStorming.
-During the session we discovered following [definitions](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346371442125):
+The description you found in the previous chapter, landed on our virtual wall:  
+![Event Storming Domain description](docs/images/eventstorming-domain.jpg)   
+The EventStorming session led us to numerous discoveries, modeled with the sticky notes:
+![Event Storming Big Picture](docs/images/eventstorming-big-picture.jpg)   
+During the session we discovered following definitions:
+![Event Storming Definitions](docs/images/eventstorming-definitions.jpg)    
+
+Detailed view of each you will find below:
 * [Patron](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346371442075)
 * [Available Book](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346399152354)
 * [Circulating Book](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346399152400)
@@ -72,19 +78,15 @@ During the session we discovered following [definitions](https://realtimeboard.c
 * [Daily Sheet With Expired Holds](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346457983847)
 * [Daily Sheet With Overdue Checkouts](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346457999229)
 
-### Bounded Contexts
-In order to properly identify bounded contexts we conducted the Design Level Event Storming that
-was based on the results of Example Mapping, where each case (example) was modelled.
+This made us think of real life scenarios that might happen. We discovered them described with the help of
+the **Example mapping**:
+![Example mapping](docs/images/examplemapping.jpg)  
 
-Heuristics:
-* Linguistic boundaries
-* Data: flow, ownership, uniqueness
-* Domain expert boundaries
-* Existing organisational boundaries
-* Business process steps
-* Transaction boundaries
+This in turn became the base for our *Design Level* sessions, where we analyzed each example:
+![Example mapping](docs/images/eventstorming-design-level.jpg)  
 
-TODO
+More information about each of the above steps and details about how we discovered bounded contexts,
+aggregates, and all our conclusions will be added here soon. Stay tuned!
 
 ### Project structure and architecture
 At the very beginning, not to overcomplicate the project, we decided to assign each bounded context
