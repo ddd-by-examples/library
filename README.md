@@ -5,14 +5,15 @@
 3. [General assumptions](#general-assumptions)  
     3.1 [Process discovery](#process-discovery)  
     3.2 [Bounded Contexts](#bounded-contexts)  
-    3.3 [ArchUnit](#archunit)  
-    3.4 [Functional thinking](#functional-thinking)  
-    3.5 [No ORM](#no-orm)  
-    3.6 [Architecture-code gap](#architecture-code-gap)  
-    3.7 [Model-code gap](#model-code-gap)   
-    3.8 [Spring](#spring)  
-    3.9 [HATEOAS](#hateoas)    
-    3.10 [Test DSL](#test-dsl)  
+    3.3 [Project structure and architecture](#project-structure-and-architecture)
+    3.4 [ArchUnit](#archunit)  
+    3.5 [Functional thinking](#functional-thinking)  
+    3.6 [No ORM](#no-orm)  
+    3.7 [Architecture-code gap](#architecture-code-gap)  
+    3.8 [Model-code gap](#model-code-gap)   
+    3.9 [Spring](#spring)  
+    3.10 [HATEOAS](#hateoas)    
+    3.11 [Test DSL](#test-dsl)  
 4. [How to contribute](#how-to-contribute)
 
 ## About
@@ -83,7 +84,7 @@ Heuristics:
 
 TODO
 
-### Project structure
+### Project structure and architecture
 At the very beginning, not to overcomplicate the project, we decided to assign each bounded context
 to a separate package, which means that the system is a modular monolith. There are no obstacles, though,
 to put contexts into maven modules or finally into microservices.
@@ -106,6 +107,127 @@ More information about how we use Spring you will find [here](#spring).
 As we already mentioned, the architecture was driven by Event Storming sessions. Apart from identifying
 contexts and their complexity, we could also make a decision that we separate read and write models (CQRS).
 As an example you can have a look at **Patron Profiles** and *Daily Sheets*.
+
+### Aggregates
+Aggregates discovered during Event Storming sessions communicate with each other with events. There is
+a contention, though, should they be consistent immediately or eventually? As aggregates in general
+determine business boundaries, eventual consistency sounds like a better choice, but choices in software
+are never costless. Providing eventual consistency requires some infrastructural tools, like message broker
+or event store. That's why we could (and did) start with immediate consistency.
+
+> Good architecture is the one which postpones all important decisions
+
+... that's why we made it easy to change the consistency model, providing tests for each option, including
+basic implementations based on **DomainEvents** interface, which can be adjusted to our needs and
+toolset in future. Let's have a look at following examples:
+
+* Immediate consistency
+    ```groovy
+    def 'should synchronize PatronBooks, Book and DailySheet with events'() {
+            given:
+                bookRepository.save(book)
+            and:
+                patronBooksRepo.publish(patronCreated())
+            when:
+                patronBooksRepo.publish(placedOnHold(book))
+            then:
+                patronShouldBeFoundInDatabaseWithOneBookOnHold(patronId)
+            and:
+                bookReactedToPlacedOnHoldEvent()
+            and:
+                dailySheetIsUpdated()
+        }
+    
+        boolean bookReactedToPlacedOnHoldEvent() {
+            return bookRepository.findBy(book.bookId).get() instanceof BookOnHold
+        }
+    
+        boolean dailySheetIsUpdated() {
+            return new JdbcTemplate(datasource).query("select count(*) from holds_sheet s where s.hold_by_patron_id = ?",
+                    [patronId.patronId] as Object[],
+                    new ColumnMapRowMapper()).get(0)
+                    .get("COUNT(*)") == 1
+        }
+    ```
+   _Please note that here we are just reading from database right after events are being published_
+   
+   Simple implementation of the event bus is based on Spring application events:
+    ```java
+    @AllArgsConstructor
+    public class JustForwardDomainEventPublisher implements DomainEvents {
+    
+        private final ApplicationEventPublisher applicationEventPublisher;
+    
+        @Override
+        public void publish(DomainEvent event) {
+            applicationEventPublisher.publishEvent(event);
+        }
+    }
+    ```
+
+* Eventual consistency
+    ```groovy
+    def 'should synchronize PatronBooks, Book and DailySheet with events'() {
+        given:
+            bookRepository.save(book)
+        and:
+            patronBooksRepo.publish(patronCreated())
+        when:
+            patronBooksRepo.publish(placedOnHold(book))
+        then:
+            patronShouldBeFoundInDatabaseWithOneBookOnHold(patronId)
+        and:
+            bookReactedToPlacedOnHoldEvent()
+        and:
+            dailySheetIsUpdated()
+    }
+    
+    void bookReactedToPlacedOnHoldEvent() {
+        pollingConditions.eventually {
+            assert bookRepository.findBy(book.bookId).get() instanceof BookOnHold
+        }
+    }
+    
+    void dailySheetIsUpdated() {
+        pollingConditions.eventually {
+            assert countOfHoldsInDailySheet() == 1
+        }
+    }
+    ```
+    _Please note that the test looks exactly the same as previous one, but now we utilized Groovy's
+    **PollingConditions** to perform asynchronous functionality tests_
+
+    Sample implementation of event bus is following:
+    
+    ```java
+    @AllArgsConstructor
+    public class StoreAndForwardDomainEventPublisher implements DomainEvents {
+    
+        private final JustForwardDomainEventPublisher justForwardDomainEventPublisher;
+        private final EventsStorage eventsStorage;
+    
+        @Override
+        public void publish(DomainEvent event) {
+            eventsStorage.save(event);
+        }
+    
+        @Scheduled(fixedRate = 3000L)
+        @Transactional
+        public void publishAllPeriodically() {
+            List<DomainEvent> domainEvents = eventsStorage.toPublish();
+            domainEvents.forEach(justForwardDomainEventPublisher::publish);
+            eventsStorage.published(domainEvents);
+        }
+    }
+    ```
+    
+### Events
+Talking about inter-aggregate communication, we must remember that events reduce coupling, but don't remove
+it completely. Thus, it is very vital to share(publish) only those events, that are necessary for other
+aggregates to exist and function. Otherwise there is a threat that the level of coupling will increase
+introducing **feature envy**, because other aggregates might start using those events to perform actions
+they are not supposed to perform. A solution to this problem could be the distinction of domain events
+and integration events, which will be described here soon.  
 
 ### ArchUnit
 
