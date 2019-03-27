@@ -13,8 +13,7 @@
     3.8 [Architecture-code gap](#architecture-code-gap)  
     3.9 [Model-code gap](#model-code-gap)   
     3.10 [Spring](#spring)  
-    3.11 [HATEOAS](#hateoas)    
-    3.12 [Test DSL](#test-dsl)  
+    3.11 [Tests](#tests)  
 4. [How to contribute](#how-to-contribute)
 
 ## About
@@ -230,7 +229,6 @@ If there is a situation, where the logic that needs to be fulfilled does not fit
 of a single aggregate, then a *Domain Service* steps into action, and call (send commands) aggregates'
 methods explicitly.
 
-    
 ### Events
 Talking about inter-aggregate communication, we must remember that events reduce coupling, but don't remove
 it completely. Thus, it is very vital to share(publish) only those events, that are necessary for other
@@ -404,10 +402,22 @@ talking about? Lazy loading, caching, dirty checking. Why don't we need them? We
 over SQL queries and minimize the object-relational impedance mismatch ourselves. Moreover, thanks to relatively
 small aggregates, containing as little data as it is required to protect the invariants, we don't need the
 lazy loading mechanism either.
-With Hexagonal Architecture we have the ability to separate domain and persistence models and test them independently.
-In the infrastructure layer we use new and very promising project called Spring Data JDBC, that is free from
-the JPA-related overhead mentioned before. Please find below an example of a repository using plain SQL queries
-and `JdbcTemplate`:
+With Hexagonal Architecture we have the ability to separate domain and persistence models and test them
+independently. Moreover, we can also introduce different persistence strategies for different aggregates. 
+In this project, we utilize both plain SQL queries and `JdbcTemplate` and use new and very promising 
+project called Spring Data JDBC, that is free from the JPA-related overhead mentioned before.
+Please find below an example of a repository:
+
+```java
+interface PatronBooksEntityRepository extends CrudRepository<PatronBooksDatabaseEntity, Long> {
+
+    @Query("SELECT p.* FROM patron_books_database_entity p where p.patron_id = :patronId")
+    PatronBooksDatabaseEntity findByPatronId(@Param("patronId") UUID patronId);
+
+}
+```
+
+At the same time we propose other way of persisting aggregates, with plain SQL queries and `JdbcTemplate`:  
 
 ```java
 @AllArgsConstructor
@@ -430,8 +440,10 @@ class BookDatabaseRepository implements BookRepository, FindAvailableBook, FindB
     
     ...
 }
-```  
-
+```
+_Please note that despite having the ability to choose different persistence implementations for aggregates
+it is recommended to stick to one option within the app/team_ 
+    
 ### Architecture-code gap
 We put a lot of attention to keep the consistency between the overall architecture (including diagrams)
 and the code structure. Having identified bounded contexts we could organize them in modules (packages, to
@@ -640,8 +652,6 @@ a look:
 - As you could se above, we also try not to use component scan wherever possible. Instead we utilize
 `@Configuration` classes where we define module specific beans in the infrastracture layer. Those
 configuration classes are explicitly declared in the main application class.
-
-### HATEOAS
 
 ### Tests
 Tests are written in a BDD manner, expressing stories defined with Example Mapping.
