@@ -15,6 +15,7 @@
     3.10 [Spring](#spring)  
     3.11 [Tests](#tests)  
 4. [How to contribute](#how-to-contribute)
+5. [References](#references)
 
 ## About
 
@@ -685,3 +686,10 @@ cancellation event_
 
 The project is still under construction, so if you like it enough to collaborate, just let us
 know or simply create a Pull Request.
+
+## References
+
+1. _EventStorming_ by Alberto Brandolini
+2. _Functional Domain Modelling_ by Scott Wlaschin
+3. _Software Architecture for Developers_ by Simon Brown
+4. _Clean Architecture_ by Robert C. Martin
