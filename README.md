@@ -5,7 +5,7 @@
 3. [General assumptions](#general-assumptions)  
     3.1 [Process discovery](#process-discovery)  
     3.2 [Bounded Contexts](#bounded-contexts)  
-    3.3 [Project structure and architecture](#project-structure-and-architecture)
+    3.3 [Project structure and architecture](#project-structure-and-architecture)  
     3.4 [ArchUnit](#archunit)  
     3.5 [Functional thinking](#functional-thinking)  
     3.6 [No ORM](#no-orm)  
