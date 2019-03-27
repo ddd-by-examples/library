@@ -57,7 +57,7 @@ there is a book signed by the author that we want to keep as Restricted)
 
 The first thing we started with was domain exploration with the help of Big Picture EventStorming.
 The description you found in the previous chapter, landed on our virtual wall:    
-![Event Storming Domain description](docs/images/eventstorming-domain.jpg)   
+![Event Storming Domain description](docs/images/eventstorming-domain-desc.png)   
 The EventStorming session led us to numerous discoveries, modeled with the sticky notes:  
 ![Event Storming Big Picture](docs/images/eventstorming-big-picture.jpg)   
 During the session we discovered following definitions:  
