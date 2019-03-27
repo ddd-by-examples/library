@@ -126,30 +126,30 @@ toolset in future. Let's have a look at following examples:
 * Immediate consistency
     ```groovy
     def 'should synchronize PatronBooks, Book and DailySheet with events'() {
-            given:
-                bookRepository.save(book)
-            and:
-                patronBooksRepo.publish(patronCreated())
-            when:
-                patronBooksRepo.publish(placedOnHold(book))
-            then:
-                patronShouldBeFoundInDatabaseWithOneBookOnHold(patronId)
-            and:
-                bookReactedToPlacedOnHoldEvent()
-            and:
-                dailySheetIsUpdated()
-        }
+        given:
+            bookRepository.save(book)
+        and:
+            patronBooksRepo.publish(patronCreated())
+        when:
+            patronBooksRepo.publish(placedOnHold(book))
+        then:
+            patronShouldBeFoundInDatabaseWithOneBookOnHold(patronId)
+        and:
+            bookReactedToPlacedOnHoldEvent()
+        and:
+            dailySheetIsUpdated()
+    }
     
-        boolean bookReactedToPlacedOnHoldEvent() {
-            return bookRepository.findBy(book.bookId).get() instanceof BookOnHold
-        }
+    boolean bookReactedToPlacedOnHoldEvent() {
+        return bookRepository.findBy(book.bookId).get() instanceof BookOnHold
+    }
     
-        boolean dailySheetIsUpdated() {
-            return new JdbcTemplate(datasource).query("select count(*) from holds_sheet s where s.hold_by_patron_id = ?",
-                    [patronId.patronId] as Object[],
-                    new ColumnMapRowMapper()).get(0)
-                    .get("COUNT(*)") == 1
-        }
+    boolean dailySheetIsUpdated() {
+        return new JdbcTemplate(datasource).query("select count(*) from holds_sheet s where s.hold_by_patron_id = ?",
+                [patronId.patronId] as Object[],
+                new ColumnMapRowMapper()).get(0)
+                .get("COUNT(*)") == 1
+    }
     ```
    _Please note that here we are just reading from database right after events are being published_
    
