@@ -222,6 +222,12 @@ toolset in future. Let's have a look at following examples:
         }
     }
     ```
+
+Communication through events is not the only way of making two aggregates change at the same time.
+If there is a situation, where the logic that needs to be fulfilled does not fit into the boundries
+of a single aggregate, then a *Domain Service* steps into action, and call (send commands) aggregates'
+methods explicitly.
+
     
 ### Events
 Talking about inter-aggregate communication, we must remember that events reduce coupling, but don't remove
