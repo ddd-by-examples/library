@@ -56,11 +56,11 @@ there is a book signed by the author that we want to keep as Restricted)
 ### Process discovery
 
 The first thing we started with was domain exploration with the help of Big Picture EventStorming.
-The description you found in the previous chapter, landed on our virtual wall:  
+The description you found in the previous chapter, landed on our virtual wall:    
 ![Event Storming Domain description](docs/images/eventstorming-domain.jpg)   
-The EventStorming session led us to numerous discoveries, modeled with the sticky notes:
+The EventStorming session led us to numerous discoveries, modeled with the sticky notes:  
 ![Event Storming Big Picture](docs/images/eventstorming-big-picture.jpg)   
-During the session we discovered following definitions:
+During the session we discovered following definitions:  
 ![Event Storming Definitions](docs/images/eventstorming-definitions.jpg)    
 
 Detailed view of each you will find below:
@@ -79,10 +79,10 @@ Detailed view of each you will find below:
 * [Daily Sheet With Overdue Checkouts](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346457999229)
 
 This made us think of real life scenarios that might happen. We discovered them described with the help of
-the **Example mapping**:
+the **Example mapping**:  
 ![Example mapping](docs/images/examplemapping.jpg)  
 
-This in turn became the base for our *Design Level* sessions, where we analyzed each example:
+This in turn became the base for our *Design Level* sessions, where we analyzed each example:  
 ![Example mapping](docs/images/eventstorming-design-level.jpg)  
 
 More information about each of the above steps and details about how we discovered bounded contexts,
