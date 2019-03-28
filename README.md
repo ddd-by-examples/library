@@ -693,4 +693,4 @@ know or simply create a Pull Request.
 2. [Domain Modelling Made Functional](https://pragprog.com/book/swdddf/domain-modeling-made-functional) by Scott Wlaschin
 3. [Software Architecture for Developers](https://softwarearchitecturefordevelopers.com) by Simon Brown
 4. [Clean Architecture](https://www.amazon.com/Clean-Architecture-Craftsmans-Software-Structure/dp/0134494164) by Robert C. Martin
-5. [Domain-Driven Design: Tackling Complexity in the Heart of Software](Domain-Driven Design: Tackling Complexity in the Heart of Software) by Eric Evans
+5. [Domain-Driven Design: Tackling Complexity in the Heart of Software](https://www.amazon.com/Domain-Driven-Design-Tackling-Complexity-Software/dp/0321125215) by Eric Evans
