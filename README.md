@@ -689,7 +689,7 @@ know or simply create a Pull Request.
 
 ## References
 
-1. _EventStorming_ by Alberto Brandolini
-2. _Functional Domain Modelling_ by Scott Wlaschin
+1. ![Introducing EventStorming](https://leanpub.com/introducing_eventstorming) by Alberto Brandolini
+2. _Domain Modelling Made Functional_ by Scott Wlaschin
 3. _Software Architecture for Developers_ by Simon Brown
 4. _Clean Architecture_ by Robert C. Martin
