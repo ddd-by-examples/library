@@ -689,7 +689,8 @@ know or simply create a Pull Request.
 
 ## References
 
-1. ![Introducing EventStorming](https://leanpub.com/introducing_eventstorming) by Alberto Brandolini
-2. _Domain Modelling Made Functional_ by Scott Wlaschin
-3. _Software Architecture for Developers_ by Simon Brown
-4. _Clean Architecture_ by Robert C. Martin
+1. [Introducing EventStorming](https://leanpub.com/introducing_eventstorming) by Alberto Brandolini
+2. [Domain Modelling Made Functional](https://pragprog.com/book/swdddf/domain-modeling-made-functional) by Scott Wlaschin
+3. [Software Architecture for Developers](https://softwarearchitecturefordevelopers.com) by Simon Brown
+4. [Clean Architecture](https://www.amazon.com/Clean-Architecture-Craftsmans-Software-Structure/dp/0134494164) by Robert C. Martin
+5. [Domain-Driven Design: Tackling Complexity in the Heart of Software](Domain-Driven Design: Tackling Complexity in the Heart of Software) by Eric Evans
