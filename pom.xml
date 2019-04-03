@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.2.0.BUILD-SNAPSHOT</version>
+        <version>2.2.0.M1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>io.pillopl</groupId>
@@ -24,6 +24,11 @@
         <repository>
             <id>spring-libs-snapshot</id>
             <url>https://repo.spring.io/libs-snapshot</url>
+        </repository>
+        <repository>
+            <id>repository.spring.milestone</id>
+            <name>Spring Milestone Repository</name>
+            <url>http://repo.spring.io/milestone</url>
         </repository>
     </repositories>
 

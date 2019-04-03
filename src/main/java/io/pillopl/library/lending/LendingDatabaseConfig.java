@@ -2,6 +2,7 @@ package io.pillopl.library.lending;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
 import org.springframework.data.jdbc.repository.config.JdbcConfiguration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
@@ -14,7 +15,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import javax.sql.DataSource;
 
 @Configuration
-class LendingDatabaseConfig extends JdbcConfiguration {
+class LendingDatabaseConfig extends AbstractJdbcConfiguration {
 
     @Bean
     JdbcTemplate jdbcTemplate() {
