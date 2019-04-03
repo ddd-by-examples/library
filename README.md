@@ -15,8 +15,8 @@
     3.10 [Spring](#spring)
     3.11 [Tests](#tests)
 4. [How to contribute](#how-to-contribute)
-5. [References](#references)
-6. [How to build](#how-to-build)
+5. [How to build](#how-to-build)
+6. [References](#references)
 
 ## About
 
