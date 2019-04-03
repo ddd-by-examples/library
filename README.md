@@ -2,26 +2,27 @@
 
 1. [About](#about)
 2. [Domain description](#domain)
-3. [General assumptions](#general-assumptions)  
-    3.1 [Process discovery](#process-discovery)  
-    3.2 [Project structure and architecture](#project-structure-and-architecture)    
-    3.3 [Aggregates](#aggregates)  
-    3.4 [Events](#events)  
-    3.5 [ArchUnit](#archunit)  
-    3.6 [Functional thinking](#functional-thinking)  
-    3.7 [No ORM](#no-orm)  
-    3.8 [Architecture-code gap](#architecture-code-gap)  
-    3.9 [Model-code gap](#model-code-gap)   
-    3.10 [Spring](#spring)  
-    3.11 [Tests](#tests)  
+3. [General assumptions](#general-assumptions)
+    3.1 [Process discovery](#process-discovery)
+    3.2 [Project structure and architecture](#project-structure-and-architecture)
+    3.3 [Aggregates](#aggregates)
+    3.4 [Events](#events)
+    3.5 [ArchUnit](#archunit)
+    3.6 [Functional thinking](#functional-thinking)
+    3.7 [No ORM](#no-orm)
+    3.8 [Architecture-code gap](#architecture-code-gap)
+    3.9 [Model-code gap](#model-code-gap)
+    3.10 [Spring](#spring)
+    3.11 [Tests](#tests)
 4. [How to contribute](#how-to-contribute)
-5. [References](#references)
+5. [How to build](#how-to-build)
+6. [References](#references)
 
 ## About
 
 This is a project of a library, driven by real [business requirements](#domain-description).
 We use techniques strongly connected with Domain Driven Design, Behavior-Driven Development,
-Event Storming, User Story Mapping. 
+Event Storming, User Story Mapping.
 
 ## Domain description
 
@@ -31,8 +32,8 @@ Books are either circulating or restricted, and can have retrieval or usage fees
 A restricted book can only be held by a researcher patron. A regular patron is limited
 to five holds at any given moment, while a researcher patron is allowed an unlimited number
 of holds. An open-ended book hold is active until the patron collects the book, at which time it
-is completed. A closed-ended book hold that is not completed within a fixed number of 
-days after it was requested will expire. This check is done at the beginning of a day by 
+is completed. A closed-ended book hold that is not completed within a fixed number of
+days after it was requested will expire. This check is done at the beginning of a day by
 taking a look at daily sheet with expiring holds. Only a researcher patron can request
 an open-ended hold duration. Any patron with more than two overdue checkouts at a library
 branch will get a rejection if trying a hold at that same library branch. A book can be
@@ -56,19 +57,19 @@ there is a book signed by the author that we want to keep as Restricted)
 ### Process discovery
 
 The first thing we started with was domain exploration with the help of Big Picture EventStorming.
-The description you found in the previous chapter, landed on our virtual wall:    
-![Event Storming Domain description](docs/images/eventstorming-domain-desc.png)   
-The EventStorming session led us to numerous discoveries, modeled with the sticky notes:  
-![Event Storming Big Picture](docs/images/eventstorming-big-picture.jpg)   
-During the session we discovered following definitions:  
-![Event Storming Definitions](docs/images/eventstorming-definitions.jpg)    
+The description you found in the previous chapter, landed on our virtual wall:
+![Event Storming Domain description](docs/images/eventstorming-domain-desc.png)
+The EventStorming session led us to numerous discoveries, modeled with the sticky notes:
+![Event Storming Big Picture](docs/images/eventstorming-big-picture.jpg)
+During the session we discovered following definitions:
+![Event Storming Definitions](docs/images/eventstorming-definitions.jpg)
 
 This made us think of real life scenarios that might happen. We discovered them described with the help of
-the **Example mapping**:  
-![Example mapping](docs/images/examplemapping.jpg)  
+the **Example mapping**:
+![Example mapping](docs/images/examplemapping.jpg)
 
-This in turn became the base for our *Design Level* sessions, where we analyzed each example:  
-![Example mapping](docs/images/eventstorming-design-level.jpg)  
+This in turn became the base for our *Design Level* sessions, where we analyzed each example:
+![Example mapping](docs/images/eventstorming-design-level.jpg)
 
 More information about each of the above steps and details about how we discovered bounded contexts,
 aggregates, and all our conclusions will be added here soon. Stay tuned!
@@ -83,9 +84,9 @@ encapsulating the context has its own local architecture aligned to problem comp
 In the case of a context, where we identified true business logic (**lending**) we introduced a domain model
 that is a simplified (for the purpose of the project) abstraction of the reality and utilized
 hexagonal architecture. In the case of a context, that during Event Storming turned out to lack any complex
-domain logic, we applied CRUD-like local architecture.  
+domain logic, we applied CRUD-like local architecture.
 
-![Architecture](docs/images/arch-big-picture.png) 
+![Architecture](docs/images/arch-big-picture.png)
 
 If we are talking about hexagonal architecture, it lets us separate domain and application logic from
 frameworks (and infrastructure). What do we gain with this approach? Firstly, we can unit test most important
@@ -128,11 +129,11 @@ toolset in future. Let's have a look at following examples:
         and:
             dailySheetIsUpdated()
     }
-    
+
     boolean bookReactedToPlacedOnHoldEvent() {
         return bookRepository.findBy(book.bookId).get() instanceof BookOnHold
     }
-    
+
     boolean dailySheetIsUpdated() {
         return new JdbcTemplate(datasource).query("select count(*) from holds_sheet s where s.hold_by_patron_id = ?",
                 [patronId.patronId] as Object[],
@@ -141,14 +142,14 @@ toolset in future. Let's have a look at following examples:
     }
     ```
    _Please note that here we are just reading from database right after events are being published_
-   
+
    Simple implementation of the event bus is based on Spring application events:
     ```java
     @AllArgsConstructor
     public class JustForwardDomainEventPublisher implements DomainEvents {
-    
+
         private final ApplicationEventPublisher applicationEventPublisher;
-    
+
         @Override
         public void publish(DomainEvent event) {
             applicationEventPublisher.publishEvent(event);
@@ -172,13 +173,13 @@ toolset in future. Let's have a look at following examples:
         and:
             dailySheetIsUpdated()
     }
-    
+
     void bookReactedToPlacedOnHoldEvent() {
         pollingConditions.eventually {
             assert bookRepository.findBy(book.bookId).get() instanceof BookOnHold
         }
     }
-    
+
     void dailySheetIsUpdated() {
         pollingConditions.eventually {
             assert countOfHoldsInDailySheet() == 1
@@ -189,19 +190,19 @@ toolset in future. Let's have a look at following examples:
     **PollingConditions** to perform asynchronous functionality tests_
 
     Sample implementation of event bus is following:
-    
+
     ```java
     @AllArgsConstructor
     public class StoreAndForwardDomainEventPublisher implements DomainEvents {
-    
+
         private final JustForwardDomainEventPublisher justForwardDomainEventPublisher;
         private final EventsStorage eventsStorage;
-    
+
         @Override
         public void publish(DomainEvent event) {
             eventsStorage.save(event);
         }
-    
+
         @Scheduled(fixedRate = 3000L)
         @Transactional
         public void publishAllPeriodically() {
@@ -223,7 +224,7 @@ it completely. Thus, it is very vital to share(publish) only those events, that 
 aggregates to exist and function. Otherwise there is a threat that the level of coupling will increase
 introducing **feature envy**, because other aggregates might start using those events to perform actions
 they are not supposed to perform. A solution to this problem could be the distinction of domain events
-and integration events, which will be described here soon.  
+and integration events, which will be described here soon.
 
 ### ArchUnit
 
@@ -236,7 +237,7 @@ vision. Maven modules could be an alternative as well, but let's focus on the fo
 
 In terms of hexagonal architecture, it is essential to ensure, that we do not mix different levels of
 abstraction (hexagon levels):
-```java 
+```java
 @ArchTest
 public static final ArchRule model_should_not_depend_on_infrastructure =
     noClasses()
@@ -245,8 +246,8 @@ public static final ArchRule model_should_not_depend_on_infrastructure =
         .should()
         .dependOnClassesThat()
         .resideInAPackage("..infrastructure..");
-```      
-and that frameworks do not affect the domain model  
+```
+and that frameworks do not affect the domain model
 ```java
 @ArchTest
 public static final ArchRule model_should_not_depend_on_spring =
@@ -256,7 +257,7 @@ public static final ArchRule model_should_not_depend_on_spring =
         .should()
         .dependOnClassesThat()
         .resideInAPackage("org.springframework..");
-```    
+```
 
 ### Functional thinking
 When you look at the code you might find a scent of functional programming. Although we do not follow
@@ -269,7 +270,7 @@ _Please note that this is not a reference project for FP._
 Each class that represents a business concept is immutable, thanks to which we:
 * provide full encapsulation and objects' states protection,
 * secure objects for multithreaded access,
-* control all side effects much clearer. 
+* control all side effects much clearer.
 
 #### Pure functions
 Modelling domain operations, discovered in Design Level Event Storming, as pure functions, and declaring them in
@@ -298,7 +299,7 @@ class BookDatabaseRepository implements FindAvailableBook {
                 Case($Some($(instanceOf(AvailableBook.class))), Option::of),
                 Case($(), Option::none)
         );
-    }  
+    }
 
     Option<Book> findBy(BookId bookId) {
         return findBookById(bookId)
@@ -310,10 +311,10 @@ class BookDatabaseRepository implements FindAvailableBook {
                 .ofSupplier(() -> of(jdbcTemplate.queryForObject("SELECT b.* FROM book_database_entity b WHERE b.book_id = ?",
                                       new BeanPropertyRowMapper<>(BookDatabaseEntity.class), bookId.getBookId())))
                 .getOrElse(none());
-    }  
-} 
+    }
+}
 ```
-    
+
 #### Type system
 _Type system - like_ modelling - we modelled each domain object's state discovered during EventStorming as separate
 classes: `AvailableBook`, `BookOnHold`, `CollectedBook`. With this approach we provide much clearer abstraction than
@@ -323,7 +324,7 @@ we leave the role to the compiler. As an example, please consider following scen
 that is currently available_. We could have done it in a following way:
 ```java
 public Either<BookHoldFailed, BookPlacedOnHoldEvents> placeOnHold(Book book) {
-  if (book.status == AVAILABLE) {  
+  if (book.status == AVAILABLE) {
       ...
   }
 }
@@ -333,7 +334,7 @@ but we use the _type system_ and declare method of following signature
 public Either<BookHoldFailed, BookPlacedOnHoldEvents> placeOnHold(AvailableBook book) {
       ...
 }
-```  
+```
 The more errors we discover at compile time the better.
 
 #### Monads
@@ -391,8 +392,8 @@ over SQL queries and minimize the object-relational impedance mismatch ourselves
 small aggregates, containing as little data as it is required to protect the invariants, we don't need the
 lazy loading mechanism either.
 With Hexagonal Architecture we have the ability to separate domain and persistence models and test them
-independently. Moreover, we can also introduce different persistence strategies for different aggregates. 
-In this project, we utilize both plain SQL queries and `JdbcTemplate` and use new and very promising 
+independently. Moreover, we can also introduce different persistence strategies for different aggregates.
+In this project, we utilize both plain SQL queries and `JdbcTemplate` and use new and very promising
 project called Spring Data JDBC, that is free from the JPA-related overhead mentioned before.
 Please find below an example of a repository:
 
@@ -405,7 +406,7 @@ interface PatronBooksEntityRepository extends CrudRepository<PatronBooksDatabase
 }
 ```
 
-At the same time we propose other way of persisting aggregates, with plain SQL queries and `JdbcTemplate`:  
+At the same time we propose other way of persisting aggregates, with plain SQL queries and `JdbcTemplate`:
 
 ```java
 @AllArgsConstructor
@@ -425,13 +426,13 @@ class BookDatabaseRepository implements BookRepository, FindAvailableBook, FindB
                                      new BeanPropertyRowMapper<>(BookDatabaseEntity.class), bookId.getBookId())))
                 .getOrElse(none());
     }
-    
+
     ...
 }
 ```
 _Please note that despite having the ability to choose different persistence implementations for aggregates
-it is recommended to stick to one option within the app/team_ 
-    
+it is recommended to stick to one option within the app/team_
+
 ### Architecture-code gap
 We put a lot of attention to keep the consistency between the overall architecture (including diagrams)
 and the code structure. Having identified bounded contexts we could organize them in modules (packages, to
@@ -476,7 +477,7 @@ below.
 
 ![Component diagram](docs/c4/component-diagram.png)
 
-Yet another advantage of this approach comparing to packaging by layer for example is that in order to 
+Yet another advantage of this approach comparing to packaging by layer for example is that in order to
 deliver a functionality you would usually need to do it in one package only, which is the aforementioned
 autonomy. This autonomy, then, could be transferred to the level of application as soon as we split our
 _context-packages_ into separate microservices. Following this considerations, autonomy can be given away
@@ -506,7 +507,7 @@ class BookPlacedOnHold implements PatronBooksEvent {
 ```java
 @Value
 class MaximumNumberOhHoldsReached implements PatronBooksEvent {
-    ...    
+    ...
 }
 ```
 ```java
@@ -517,7 +518,7 @@ class BookHoldFailed implements PatronBooksEvent {
 ```
 
 We know it might not look impressive now, but if you have a look at the implementation of an aggregate,
-you will see that the code reflects not only the aggregate name, but also the whole scenario of `PlaceOnHold` 
+you will see that the code reflects not only the aggregate name, but also the whole scenario of `PlaceOnHold`
 command handling. Let us uncover the details:
 
 ```java
@@ -526,9 +527,9 @@ public class PatronBooks {
     public Either<BookHoldFailed, BookPlacedOnHoldEvents> placeOnHold(AvailableBook book) {
         return placeOnHold(book, HoldDuration.openEnded());
     }
-    
+
     ...
-}    
+}
 ```
 
 The signature of `placeOnHold` method screams, that it is possible to place a book on hold only when it
@@ -568,7 +569,7 @@ class BookPlacedOnHoldEvents implements PatronBooksEvent {
 the model.
 
 It is not everything, though. In the picture above you can also see a big rectangular yellow card with rules (policies)
-that define the conditions that need to be fulfilled in order to get the given result. All those rules are implemented 
+that define the conditions that need to be fulfilled in order to get the given result. All those rules are implemented
 as functions **either** allowing or rejecting the hold:
 
 ![Restricted book policy](docs/images/placing-on-hold-policy-restricted.png)
@@ -627,7 +628,7 @@ a look:
     @SpringBootConfiguration
     @EnableAutoConfiguration
     public class LibraryApplication {
-    
+
         public static void main(String[] args) {
             new SpringApplicationBuilder()
                     .parent(LibraryApplication.class)
@@ -643,7 +644,7 @@ configuration classes are explicitly declared in the main application class.
 
 ### Tests
 Tests are written in a BDD manner, expressing stories defined with Example Mapping.
-It means we utilize both TDD and Domain Language discovered with Event Storming. 
+It means we utilize both TDD and Domain Language discovered with Event Storming.
 
 We also made an effort to show how to create a DSL, that enables to write
 tests as if they were sentences taken from the domain descriptions. Please
@@ -663,14 +664,69 @@ def 'should make book available when hold canceled'() {
         availableBook.libraryBranch == bookOnHold.libraryBranchId
         availableBook.version == bookOnHold.version
 }
-``` 
-_Please also note the **when** block, where we manifest the fact that books react to 
+```
+_Please also note the **when** block, where we manifest the fact that books react to
 cancellation event_
 
 ## How to contribute
 
 The project is still under construction, so if you like it enough to collaborate, just let us
 know or simply create a Pull Request.
+
+## How to Build
+
+### Requirements
+
+* Java 11
+* Maven
+
+### Quickstart
+
+You can run the library app by simply typing the following:
+
+```console
+$ mvn spring-boot:run
+...
+...
+2019-04-03 15:55:39.162  INFO 18957 --- [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 2 endpoint(s) beneath base path '/actuator'
+2019-04-03 15:55:39.425  INFO 18957 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+2019-04-03 15:55:39.428  INFO 18957 --- [           main] io.pillopl.library.LibraryApplication    : Started LibraryApplication in 5.999 seconds (JVM running for 23.018)
+
+```
+
+### Build a Jar package
+
+You can build a jar with maven like so:
+
+```console
+$ mvn clean package -DskipTest
+...
+...
+[INFO] Building jar: /home/pczarkowski/development/spring/library/target/library-0.0.1-SNAPSHOT.jar
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+```
+
+### Build with Docker
+
+If you've already built the jar file you can run:
+
+```console
+docker build -t spring/library .
+```
+
+Otherwise you can build the jar file using the multistage dockerfile:
+
+```console
+docker build -t spring/library -f Dockerfile.build .
+```
+
+Either way once built you can run it like so:
+
+```console
+$ docker run -ti --rm --name spring-library -p 8080:8080 spring/library
+```
 
 ## References
 
