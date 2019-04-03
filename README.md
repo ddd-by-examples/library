@@ -16,6 +16,7 @@
     3.11 [Tests](#tests)
 4. [How to contribute](#how-to-contribute)
 5. [References](#references)
+6. [How to build](#how-to-build)
 
 ## About
 
@@ -686,6 +687,61 @@ cancellation event_
 
 The project is still under construction, so if you like it enough to collaborate, just let us
 know or simply create a Pull Request.
+
+## How to Build
+
+### Requirements
+
+* Java 11
+* Maven
+
+### Quickstart
+
+You can run the library app by simply typing the following:
+
+```console
+$ mvn spring-boot:run
+...
+...
+2019-04-03 15:55:39.162  INFO 18957 --- [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 2 endpoint(s) beneath base path '/actuator'
+2019-04-03 15:55:39.425  INFO 18957 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+2019-04-03 15:55:39.428  INFO 18957 --- [           main] io.pillopl.library.LibraryApplication    : Started LibraryApplication in 5.999 seconds (JVM running for 23.018)
+
+```
+
+### Build a Jar package
+
+You can build a jar with maven like so:
+
+```console
+$ mvn clean package -DskipTest
+...
+...
+[INFO] Building jar: /home/pczarkowski/development/spring/library/target/library-0.0.1-SNAPSHOT.jar
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+```
+
+### Build with Docker
+
+If you've already built the jar file you can run:
+
+```console
+docker build -t spring/library .
+```
+
+Otherwise you can build the jar file using the multistage dockerfile:
+
+```console
+docker build -t spring/library -f Dockerfile.build .
+```
+
+Either way once built you can run it like so:
+
+```console
+$ docker run -ti --rm --name spring-library -p 8080:8080 spring/library
+```
 
 ## References
 
