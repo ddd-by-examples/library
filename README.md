@@ -63,21 +63,6 @@ The EventStorming session led us to numerous discoveries, modeled with the stick
 During the session we discovered following definitions:  
 ![Event Storming Definitions](docs/images/eventstorming-definitions.jpg)    
 
-Detailed view of each you will find below:
-* [Patron](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346371442075)
-* [Available Book](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346399152354)
-* [Circulating Book](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346399152400)
-* [Restricted Book](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346399152464)
-* [Book On Hold](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346457917238)
-* [Collected Book](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346457964937)
-* [Catalogue](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346457973874)
-* [Hold Duration](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346457974002)
-* [Expired Hold](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346457974040)
-* [Checkout](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346457974057)
-* [Overdue Checkout](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346457983753)
-* [Daily Sheet With Expired Holds](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346457983847)
-* [Daily Sheet With Overdue Checkouts](https://realtimeboard.com/app/board/o9J_ky9pa54=/?moveToWidget=3074457346457999229)
-
 This made us think of real life scenarios that might happen. We discovered them described with the help of
 the **Example mapping**:  
 ![Example mapping](docs/images/examplemapping.jpg)  
