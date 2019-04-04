@@ -85,7 +85,7 @@ that is a simplified (for the purpose of the project) abstraction of the reality
 hexagonal architecture. In the case of a context, that during Event Storming turned out to lack any complex
 domain logic, we applied CRUD-like local architecture.  
 
-![Architecture](docs/images/arch-big-picture.png) 
+![Architecture](docs/images/architecture-big-picture.png) 
 
 If we are talking about hexagonal architecture, it lets us separate domain and application logic from
 frameworks (and infrastructure). What do we gain with this approach? Firstly, we can unit test most important
