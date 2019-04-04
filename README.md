@@ -699,7 +699,7 @@ $ mvn spring-boot:run
 You can build a jar with maven like so:
 
 ```console
-$ mvn clean package -DskipTest
+$ mvn clean package
 ...
 ...
 [INFO] Building jar: /home/pczarkowski/development/spring/library/target/library-0.0.1-SNAPSHOT.jar
