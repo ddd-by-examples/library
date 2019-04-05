@@ -5,10 +5,10 @@ import io.pillopl.library.lending.book.model.BookOnHold
 import io.vavr.control.Either
 import spock.lang.Specification
 
-import static PatronBooksFixture.regularPatron
-import static PatronBooksFixture.regularPatronWithHold
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookHoldCanceled
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookHoldCancelingFailed
+import static PatronFixture.regularPatron
+import static PatronFixture.regularPatronWithHold
+import static PatronEvent.BookHoldCanceled
+import static PatronEvent.BookHoldCancelingFailed
 
 
 class PatronCancelingHoldTest extends Specification {
@@ -17,7 +17,7 @@ class PatronCancelingHoldTest extends Specification {
         given:
             BookOnHold forBook = BookFixture.bookOnHold()
         and:
-            PatronBooks patron = regularPatronWithHold(forBook)
+            Patron patron = regularPatronWithHold(forBook)
         when:
             Either<BookHoldCancelingFailed, BookHoldCanceled> cancelHold = patron.cancelHold(forBook)
         then:
@@ -33,7 +33,7 @@ class PatronCancelingHoldTest extends Specification {
         given:
             BookOnHold forBook = BookFixture.bookOnHold()
         and:
-            PatronBooks patron = regularPatron()
+            Patron patron = regularPatron()
         when:
             Either<BookHoldCancelingFailed, BookHoldCanceled> cancelHold = patron.cancelHold(forBook)
         then:
@@ -45,9 +45,9 @@ class PatronCancelingHoldTest extends Specification {
         given:
             BookOnHold forBook = BookFixture.bookOnHold()
         and:
-            PatronBooks patron = regularPatron()
+            Patron patron = regularPatron()
         and:
-            PatronBooks differentPatron = regularPatronWithHold(forBook)
+            Patron differentPatron = regularPatronWithHold(forBook)
         when:
             Either<BookHoldCancelingFailed, BookHoldCanceled> cancelHold = patron.cancelHold(forBook)
         then:

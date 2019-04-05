@@ -3,21 +3,21 @@ package io.pillopl.library.lending.patron.application.checkout
 import io.pillopl.library.commons.commands.BatchResult
 import io.pillopl.library.lending.dailysheet.model.CheckoutsToOverdueSheet
 import io.pillopl.library.lending.dailysheet.model.DailySheet
-import io.pillopl.library.lending.patron.model.PatronBooksEvent
-import io.pillopl.library.lending.patron.model.PatronBooksRepository
+import io.pillopl.library.lending.patron.model.PatronEvent
+import io.pillopl.library.lending.patron.model.PatronRepository
 import io.pillopl.library.lending.patron.model.PatronId
 import io.vavr.control.Try
 import spock.lang.Specification
 
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
 import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
-import static io.pillopl.library.lending.patron.model.PatronBooksFixture.regularPatron
+import static io.pillopl.library.lending.patron.model.PatronFixture.anyPatronId
+import static io.pillopl.library.lending.patron.model.PatronFixture.regularPatron
 import static io.vavr.collection.List.of
 
 class RegisteringOverdueCheckoutsTest extends Specification {
 
-    PatronBooksRepository repository = Stub()
+    PatronRepository repository = Stub()
     DailySheet dailySheet = Stub()
     PatronId patronWithOverdueCheckouts = anyPatronId()
     PatronId anotherPatronWithOverdueCheckouts = anyPatronId()
@@ -53,11 +53,11 @@ class RegisteringOverdueCheckoutsTest extends Specification {
     }
 
     void registeringOverdueCheckoutWillFailForSecondPatron() {
-        repository.publish(_ as PatronBooksEvent) >>> [regularPatron(), { throw new IllegalStateException() }]
+        repository.publish(_ as PatronEvent) >>> [regularPatron(), { throw new IllegalStateException() }]
     }
 
     void checkoutsWillBeMarkedAsOverdueForBothPatrons() {
-        repository.publish(_ as PatronBooksEvent) >> regularPatron()
+        repository.publish(_ as PatronEvent) >> regularPatron()
     }
 
     CheckoutsToOverdueSheet overdueCheckoutsBy(PatronId patronId, PatronId anotherPatronId) {

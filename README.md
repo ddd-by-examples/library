@@ -114,13 +114,13 @@ toolset in future. Let's have a look at following examples:
 
 * Immediate consistency
     ```groovy
-    def 'should synchronize PatronBooks, Book and DailySheet with events'() {
+    def 'should synchronize Patron, Book and DailySheet with events'() {
         given:
             bookRepository.save(book)
         and:
-            patronBooksRepo.publish(patronCreated())
+            patronRepo.publish(patronCreated())
         when:
-            patronBooksRepo.publish(placedOnHold(book))
+            patronRepo.publish(placedOnHold(book))
         then:
             patronShouldBeFoundInDatabaseWithOneBookOnHold(patronId)
         and:
@@ -158,13 +158,13 @@ toolset in future. Let's have a look at following examples:
 
 * Eventual consistency
     ```groovy
-    def 'should synchronize PatronBooks, Book and DailySheet with events'() {
+    def 'should synchronize Patron, Book and DailySheet with events'() {
         given:
             bookRepository.save(book)
         and:
-            patronBooksRepo.publish(patronCreated())
+            patronRepo.publish(patronCreated())
         when:
-            patronBooksRepo.publish(placedOnHold(book))
+            patronRepo.publish(placedOnHold(book))
         then:
             patronShouldBeFoundInDatabaseWithOneBookOnHold(patronId)
         and:
@@ -397,10 +397,10 @@ project called Spring Data JDBC, that is free from the JPA-related overhead ment
 Please find below an example of a repository:
 
 ```java
-interface PatronBooksEntityRepository extends CrudRepository<PatronBooksDatabaseEntity, Long> {
+interface PatronEntityRepository extends CrudRepository<PatronDatabaseEntity, Long> {
 
-    @Query("SELECT p.* FROM patron_books_database_entity p where p.patron_id = :patronId")
-    PatronBooksDatabaseEntity findByPatronId(@Param("patronId") UUID patronId);
+    @Query("SELECT p.* FROM patron_database_entity p where p.patron_id = :patronId")
+    PatronDatabaseEntity findByPatronId(@Param("patronId") UUID patronId);
 
 }
 ```
@@ -499,19 +499,19 @@ class PlaceOnHoldCommand {
 ```
 ```java
 @Value
-class BookPlacedOnHold implements PatronBooksEvent {
+class BookPlacedOnHold implements PatronEvent {
     ...
 }
 ```
 ```java
 @Value
-class MaximumNumberOhHoldsReached implements PatronBooksEvent {
+class MaximumNumberOhHoldsReached implements PatronEvent {
     ...    
 }
 ```
 ```java
 @Value
-class BookHoldFailed implements PatronBooksEvent {
+class BookHoldFailed implements PatronEvent {
     ...
 }
 ```
@@ -521,7 +521,7 @@ you will see that the code reflects not only the aggregate name, but also the wh
 command handling. Let us uncover the details:
 
 ```java
-public class PatronBooks {
+public class Patron {
 
     public Either<BookHoldFailed, BookPlacedOnHoldEvents> placeOnHold(AvailableBook book) {
         return placeOnHold(book, HoldDuration.openEnded());
@@ -538,7 +538,7 @@ what events?
 
 ```java
 @Value
-class BookPlacedOnHoldEvents implements PatronBooksEvent {
+class BookPlacedOnHoldEvents implements PatronEvent {
     @NonNull UUID eventId = UUID.randomUUID();
     @NonNull UUID patronId;
     @NonNull BookPlacedOnHold bookPlacedOnHold;
@@ -573,7 +573,7 @@ as functions **either** allowing or rejecting the hold:
 
 ![Restricted book policy](docs/images/placing-on-hold-policy-restricted.png)
 ```java
-PlacingOnHoldPolicy onlyResearcherPatronsCanHoldRestrictedBooksPolicy = (AvailableBook toHold, PatronBooks patron, HoldDuration holdDuration) -> {
+PlacingOnHoldPolicy onlyResearcherPatronsCanHoldRestrictedBooksPolicy = (AvailableBook toHold, Patron patron, HoldDuration holdDuration) -> {
     if (toHold.isRestricted() && patron.isRegular()) {
         return left(Rejection.withReason("Regular patrons cannot hold restricted books"));
     }
@@ -584,7 +584,7 @@ PlacingOnHoldPolicy onlyResearcherPatronsCanHoldRestrictedBooksPolicy = (Availab
 ![Overdue checkouts policy](docs/images/placing-on-hold-policy-overdue.png)
 
 ```java
-PlacingOnHoldPolicy overdueCheckoutsRejectionPolicy = (AvailableBook toHold, PatronBooks patron, HoldDuration holdDuration) -> {
+PlacingOnHoldPolicy overdueCheckoutsRejectionPolicy = (AvailableBook toHold, Patron patron, HoldDuration holdDuration) -> {
     if (patron.overdueCheckoutsAt(toHold.getLibraryBranch()) >= OverdueCheckouts.MAX_COUNT_OF_OVERDUE_RESOURCES) {
         return left(Rejection.withReason("cannot place on hold when there are overdue checkouts"));
     }
@@ -595,7 +595,7 @@ PlacingOnHoldPolicy overdueCheckoutsRejectionPolicy = (AvailableBook toHold, Pat
 ![Max number of holds policy](docs/images/placing-on-hold-policy-max.png)
 
 ```java
-PlacingOnHoldPolicy regularPatronMaximumNumberOfHoldsPolicy = (AvailableBook toHold, PatronBooks patron, HoldDuration holdDuration) -> {
+PlacingOnHoldPolicy regularPatronMaximumNumberOfHoldsPolicy = (AvailableBook toHold, Patron patron, HoldDuration holdDuration) -> {
     if (patron.isRegular() && patron.numberOfHolds() >= PatronHolds.MAX_NUMBER_OF_HOLDS) {
         return left(Rejection.withReason("patron cannot hold more books"));
     }
@@ -606,7 +606,7 @@ PlacingOnHoldPolicy regularPatronMaximumNumberOfHoldsPolicy = (AvailableBook toH
 ![Open ended hold policy](docs/images/placing-on-hold-policy-open-ended.png)
 
 ```java
-PlacingOnHoldPolicy onlyResearcherPatronsCanPlaceOpenEndedHolds = (AvailableBook toHold, PatronBooks patron, HoldDuration holdDuration) -> {
+PlacingOnHoldPolicy onlyResearcherPatronsCanPlaceOpenEndedHolds = (AvailableBook toHold, Patron patron, HoldDuration holdDuration) -> {
     if (patron.isRegular() && holdDuration.isOpenEnded()) {
         return left(Rejection.withReason("regular patron cannot place open ended holds"));
     }
@@ -654,7 +654,7 @@ def 'should make book available when hold canceled'() {
     given:
         BookDSL bookOnHold = aCirculatingBook() with anyBookId() locatedIn anyBranch() placedOnHoldBy anyPatron()
     and:
-        PatronBooksEvent.BookHoldCanceled bookHoldCanceledEvent = the bookOnHold isCancelledBy anyPatron()
+        PatronEvent.BookHoldCanceled bookHoldCanceledEvent = the bookOnHold isCancelledBy anyPatron()
 
     when:
         AvailableBook availableBook = the bookOnHold reactsTo bookHoldCanceledEvent

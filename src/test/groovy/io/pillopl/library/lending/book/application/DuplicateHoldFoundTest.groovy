@@ -7,7 +7,7 @@ import io.pillopl.library.lending.book.model.BookFixture
 import io.pillopl.library.lending.book.model.BookOnHold
 import io.pillopl.library.lending.book.model.BookRepository
 import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
-import io.pillopl.library.lending.patron.model.PatronBooksEvent
+import io.pillopl.library.lending.patron.model.PatronEvent
 import io.pillopl.library.lending.patron.model.PatronId
 import io.vavr.control.Option
 import spock.lang.Specification
@@ -15,14 +15,14 @@ import spock.lang.Specification
 import java.time.Instant
 
 import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
+import static io.pillopl.library.lending.patron.model.PatronFixture.anyPatronId
 
 class DuplicateHoldFoundTest extends Specification {
 
     BookOnHold bookOnHold = BookFixture.bookOnHold()
     BookRepository bookRepository = Stub()
     DomainEvents domainEvents = Mock()
-    PatronBookEventsHandler patronBookEventsHandler = new PatronBookEventsHandler(bookRepository, domainEvents)
+    PatronEventsHandler patronBookEventsHandler = new PatronEventsHandler(bookRepository, domainEvents)
 
     PatronId patronId = anyPatronId()
     LibraryBranchId libraryBranchId = anyBranch()
@@ -50,8 +50,8 @@ class DuplicateHoldFoundTest extends Specification {
             0 * domainEvents.publish(_ as DomainEvent)
     }
 
-    PatronBooksEvent.BookPlacedOnHold placedOnHoldBy(PatronId patronId) {
-        return new PatronBooksEvent.BookPlacedOnHold(Instant.now(), patronId.patronId, bookOnHold.bookId.bookId, bookOnHold.bookInformation.bookType, libraryBranchId.libraryBranchId, Instant.now(), Instant.now())
+    PatronEvent.BookPlacedOnHold placedOnHoldBy(PatronId patronId) {
+        return new PatronEvent.BookPlacedOnHold(Instant.now(), patronId.patronId, bookOnHold.bookId.bookId, bookOnHold.bookInformation.bookType, libraryBranchId.libraryBranchId, Instant.now(), Instant.now())
     }
 
     void bookIsAlreadyOnHold() {

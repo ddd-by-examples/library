@@ -3,20 +3,20 @@ package io.pillopl.library.lending.patron.application.hold
 import io.pillopl.library.commons.commands.BatchResult
 import io.pillopl.library.lending.dailysheet.model.DailySheet
 import io.pillopl.library.lending.dailysheet.model.HoldsToExpireSheet
-import io.pillopl.library.lending.patron.model.PatronBooksEvent
-import io.pillopl.library.lending.patron.model.PatronBooksRepository
+import io.pillopl.library.lending.patron.model.PatronEvent
+import io.pillopl.library.lending.patron.model.PatronRepository
 import io.pillopl.library.lending.patron.model.PatronId
 import io.vavr.control.Try
 import spock.lang.Specification
 
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
 import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
+import static io.pillopl.library.lending.patron.model.PatronFixture.anyPatronId
 import static io.vavr.collection.List.of
 
 class ExpiringHoldsTest extends Specification {
 
-    PatronBooksRepository repository = Stub()
+    PatronRepository repository = Stub()
     DailySheet dailySheet = Stub()
 
     PatronId patronWithExpiringHolds = anyPatronId()
@@ -51,11 +51,11 @@ class ExpiringHoldsTest extends Specification {
     }
 
     void expiringHoldWillFailForSecondPatron() {
-        repository.publish(_ as PatronBooksEvent) >>> [null, { throw new IllegalStateException() }]
+        repository.publish(_ as PatronEvent) >>> [null, { throw new IllegalStateException() }]
     }
 
     void holdsWillBeExpiredSuccessfullyForBothPatrons() {
-        repository.publish(_ as PatronBooksEvent) >> null
+        repository.publish(_ as PatronEvent) >> null
     }
 
     HoldsToExpireSheet expiredHoldsBy(PatronId patronId, PatronId anotherPatronId) {

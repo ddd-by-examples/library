@@ -8,12 +8,12 @@ import java.time.Duration
 import java.time.Instant
 
 import static io.pillopl.library.lending.book.model.BookFixture.circulatingAvailableBook
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookHoldFailed
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHold
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHoldEvents
-import static PatronBooksFixture.regularPatron
-import static PatronBooksFixture.regularPatronWithPolicy
-import static PatronBooksFixture.researcherPatronWithPolicy
+import static PatronEvent.BookHoldFailed
+import static PatronEvent.BookPlacedOnHold
+import static PatronEvent.BookPlacedOnHoldEvents
+import static PatronFixture.regularPatron
+import static PatronFixture.regularPatronWithPolicy
+import static PatronFixture.researcherPatronWithPolicy
 
 import static io.pillopl.library.lending.patron.model.PlacingOnHoldPolicy.onlyResearcherPatronsCanPlaceOpenEndedHolds
 
@@ -46,7 +46,7 @@ class PatronRequestingCloseEndedHoldTest extends Specification {
         given:
             AvailableBook aBook = circulatingAvailableBook()
         and:
-            PatronBooks patron = regularPatron()
+            Patron patron = regularPatron()
         when:
             patron.placeOnHold(aBook, HoldDuration.closeEnded(from, NumberOfDays.of(days)))
         then:

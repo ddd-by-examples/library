@@ -2,8 +2,8 @@ package io.pillopl.library.lending.patron.application.hold;
 
 import io.pillopl.library.commons.commands.BatchResult;
 import io.pillopl.library.lending.dailysheet.model.DailySheet;
-import io.pillopl.library.lending.patron.model.PatronBooksEvent;
-import io.pillopl.library.lending.patron.model.PatronBooksRepository;
+import io.pillopl.library.lending.patron.model.PatronEvent;
+import io.pillopl.library.lending.patron.model.PatronRepository;
 import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
 
@@ -11,7 +11,7 @@ import lombok.AllArgsConstructor;
 public class ExpiringHolds {
 
     private final DailySheet find;
-    private final PatronBooksRepository patronBooksRepository;
+    private final PatronRepository patronRepository;
 
     public Try<BatchResult> expireHolds() {
         return Try.of(() ->
@@ -23,8 +23,8 @@ public class ExpiringHolds {
                 .getOrElse(BatchResult.FullSuccess));
     }
 
-    private Try<Void> publish(PatronBooksEvent.BookHoldExpired event) {
-        return Try.run(() -> patronBooksRepository.publish(event));
+    private Try<Void> publish(PatronEvent.BookHoldExpired event) {
+        return Try.run(() -> patronRepository.publish(event));
     }
 
 

@@ -4,10 +4,10 @@ package io.pillopl.library.lending.patron.model
 import io.vavr.control.Either
 import spock.lang.Specification
 
-import static PatronBooksFixture.researcherPatronWithHolds
+import static PatronFixture.researcherPatronWithHolds
 import static io.pillopl.library.lending.book.model.BookFixture.circulatingBook
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookHoldFailed
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHoldEvents
+import static PatronEvent.BookHoldFailed
+import static PatronEvent.BookPlacedOnHoldEvents
 
 class ResearcherPatronRequestingCirculatingBookTest extends Specification {
 

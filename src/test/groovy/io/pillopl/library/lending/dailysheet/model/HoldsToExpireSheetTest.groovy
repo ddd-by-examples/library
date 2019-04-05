@@ -2,7 +2,7 @@ package io.pillopl.library.lending.dailysheet.model
 
 import io.pillopl.library.catalogue.BookId
 import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
-import io.pillopl.library.lending.patron.model.PatronBooksEvent
+import io.pillopl.library.lending.patron.model.PatronEvent
 import io.pillopl.library.lending.patron.model.PatronId
 import io.vavr.Tuple
 import io.vavr.collection.List
@@ -10,7 +10,7 @@ import spock.lang.Specification
 
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
 import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
+import static io.pillopl.library.lending.patron.model.PatronFixture.anyPatronId
 
 class HoldsToExpireSheetTest extends Specification {
 
@@ -29,13 +29,13 @@ class HoldsToExpireSheetTest extends Specification {
         expect:
             sheet.toStreamOfEvents().with {
 
-                PatronBooksEvent.BookHoldExpired first = it.get(0) as PatronBooksEvent.BookHoldExpired
+                PatronEvent.BookHoldExpired first = it.get(0) as PatronEvent.BookHoldExpired
                 first.patronId == patronId.patronId
                 first.bookId == bookId.bookId
                 first.libraryBranchId == libraryBranchId.libraryBranchId
                 first.eventId != null
 
-                PatronBooksEvent.BookHoldExpired second = it.get(1) as PatronBooksEvent.BookHoldExpired
+                PatronEvent.BookHoldExpired second = it.get(1) as PatronEvent.BookHoldExpired
 
                 second.patronId == anotherPatronId.patronId
                 second.bookId == anotherBookId.bookId

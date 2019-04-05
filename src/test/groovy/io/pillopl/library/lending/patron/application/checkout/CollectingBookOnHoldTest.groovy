@@ -4,9 +4,9 @@ package io.pillopl.library.lending.patron.application.checkout
 import io.pillopl.library.commons.commands.Result
 import io.pillopl.library.lending.patron.application.hold.FindBookOnHold
 import io.pillopl.library.lending.book.model.BookOnHold
-import io.pillopl.library.lending.patron.model.PatronBooks
-import io.pillopl.library.lending.patron.model.PatronBooksEvent
-import io.pillopl.library.lending.patron.model.PatronBooksRepository
+import io.pillopl.library.lending.patron.model.Patron
+import io.pillopl.library.lending.patron.model.PatronEvent
+import io.pillopl.library.lending.patron.model.PatronRepository
 import io.pillopl.library.lending.patron.model.PatronId
 import io.vavr.control.Option
 import io.vavr.control.Try
@@ -15,7 +15,7 @@ import spock.lang.Specification
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
 import static io.pillopl.library.lending.book.model.BookFixture.bookOnHold
 import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.patron.model.PatronBooksFixture.*
+import static io.pillopl.library.lending.patron.model.PatronFixture.*
 
 class CollectingBookOnHoldTest extends Specification {
 
@@ -24,7 +24,7 @@ class CollectingBookOnHoldTest extends Specification {
 
     FindBookOnHold willFindBook = { bookId, patronId -> Option.of(bookOnHold) }
     FindBookOnHold willNotFindBook = { bookId, patronId -> Option.none() }
-    PatronBooksRepository repository = Stub()
+    PatronRepository repository = Stub()
 
     def 'should successfully collect book if patron and book exist'() {
         given:
@@ -92,17 +92,17 @@ class CollectingBookOnHoldTest extends Specification {
         return CollectBookCommand.create(patron, anyBranch(), anyBookId(), 4)
     }
 
-    PatronId persisted(PatronBooks patron) {
+    PatronId persisted(Patron patron) {
         repository.findBy(patronId) >> Option.of(patron)
-        repository.publish(_ as PatronBooksEvent) >> patron
+        repository.publish(_ as PatronEvent) >> patron
         return patronId
     }
 
 
     PatronId persistedRegularPatronThatFailsOnSaving(PatronId patronId) {
-        PatronBooks patron = regularPatron(patronId)
+        Patron patron = regularPatron(patronId)
         repository.findBy(patronId) >> Option.of(patron)
-        repository.publish(_ as PatronBooksEvent) >> {throw new IllegalStateException()}
+        repository.publish(_ as PatronEvent) >> {throw new IllegalStateException()}
         return patronId
     }
 

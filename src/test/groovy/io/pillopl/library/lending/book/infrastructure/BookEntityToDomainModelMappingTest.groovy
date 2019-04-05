@@ -16,7 +16,7 @@ import java.time.Instant
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
 import static io.pillopl.library.catalogue.BookType.Circulating
 import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
+import static io.pillopl.library.lending.patron.model.PatronFixture.anyPatronId
 import static io.pillopl.library.lending.book.infrastructure.BookDatabaseEntity.BookState.*
 
 class BookEntityToDomainModelMappingTest extends Specification {

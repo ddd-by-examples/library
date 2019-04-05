@@ -7,8 +7,8 @@ import static BookDSL.aCirculatingBook
 import static BookDSL.the
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
 import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookCollected
-import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatron
+import static io.pillopl.library.lending.patron.model.PatronEvent.BookCollected
+import static io.pillopl.library.lending.patron.model.PatronFixture.anyPatron
 
 class BookCollectingTest extends Specification {
 

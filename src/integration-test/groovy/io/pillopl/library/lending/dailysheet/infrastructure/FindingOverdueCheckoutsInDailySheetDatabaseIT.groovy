@@ -3,7 +3,7 @@ package io.pillopl.library.lending.dailysheet.infrastructure
 import io.pillopl.library.catalogue.BookId
 import io.pillopl.library.lending.LendingTestContext
 import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
-import io.pillopl.library.lending.patron.model.PatronBooksEvent
+import io.pillopl.library.lending.patron.model.PatronEvent
 import io.pillopl.library.lending.patron.model.PatronId
 import io.pillopl.library.lending.patron.model.PatronType
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,7 +18,7 @@ import java.time.Instant
 import static io.pillopl.library.catalogue.BookType.Restricted
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
 import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
+import static io.pillopl.library.lending.patron.model.PatronFixture.anyPatronId
 import static java.time.Clock.fixed
 import static java.time.Instant.now
 import static java.time.ZoneId.systemDefault
@@ -57,7 +57,7 @@ class FindingOverdueCheckoutsInDailySheetDatabaseIT extends Specification {
         given:
             int currentNoOfOverdueCheckouts = readModel.queryForCheckoutsToOverdue().count()
         and:
-            PatronBooksEvent.BookCollected event = bookCollected(tillYesterday())
+            PatronEvent.BookCollected event = bookCollected(tillYesterday())
         when:
             2.times { readModel.handle(event) }
         then:
@@ -88,8 +88,8 @@ class FindingOverdueCheckoutsInDailySheetDatabaseIT extends Specification {
         return null
     }
 
-    PatronBooksEvent.BookPlacedOnHold placedOnHold(Instant till) {
-        return new PatronBooksEvent.BookPlacedOnHold(
+    PatronEvent.BookPlacedOnHold placedOnHold(Instant till) {
+        return new PatronEvent.BookPlacedOnHold(
                 now(),
                 patronId.getPatronId(),
                 bookId.getBookId(),
@@ -99,24 +99,24 @@ class FindingOverdueCheckoutsInDailySheetDatabaseIT extends Specification {
                 till)
     }
 
-    PatronBooksEvent.BookHoldCanceled holdCanceled() {
-        return new PatronBooksEvent.BookHoldCanceled(
+    PatronEvent.BookHoldCanceled holdCanceled() {
+        return new PatronEvent.BookHoldCanceled(
                 now(),
                 patronId.getPatronId(),
                 bookId.getBookId(),
                 libraryBranchId.getLibraryBranchId())
     }
 
-    PatronBooksEvent.BookHoldExpired holdExpired() {
-        return new PatronBooksEvent.BookHoldExpired(
+    PatronEvent.BookHoldExpired holdExpired() {
+        return new PatronEvent.BookHoldExpired(
                 now(),
                 patronId.getPatronId(),
                 bookId.getBookId(),
                 libraryBranchId.getLibraryBranchId())
     }
 
-    PatronBooksEvent.BookCollected bookCollected(Instant till) {
-        return new PatronBooksEvent.BookCollected(
+    PatronEvent.BookCollected bookCollected(Instant till) {
+        return new PatronEvent.BookCollected(
                 now(),
                 patronId.getPatronId(),
                 bookId.getBookId(),
@@ -125,8 +125,8 @@ class FindingOverdueCheckoutsInDailySheetDatabaseIT extends Specification {
                 till)
     }
 
-    PatronBooksEvent.BookReturned bookReturned() {
-        return new PatronBooksEvent.BookReturned(
+    PatronEvent.BookReturned bookReturned() {
+        return new PatronEvent.BookReturned(
                 now(),
                 patronId.getPatronId(),
                 bookId.getBookId(),

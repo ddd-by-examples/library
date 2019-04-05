@@ -4,7 +4,7 @@ import io.pillopl.library.catalogue.BookId;
 import io.pillopl.library.lending.LendingTestContext;
 import io.pillopl.library.lending.book.model.BookFixture;
 import io.pillopl.library.lending.patron.application.hold.CancelingHold;
-import io.pillopl.library.lending.patron.model.PatronBooksFixture;
+import io.pillopl.library.lending.patron.model.PatronFixture;
 import io.pillopl.library.lending.patron.model.PatronId;
 import io.pillopl.library.lending.patronprofile.model.CheckoutsView;
 import io.pillopl.library.lending.patronprofile.model.HoldsView;
@@ -44,7 +44,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = {LendingTestContext.class})
 public class PatronProfileControllerIT {
 
-    PatronId patronId = PatronBooksFixture.anyPatronId();
+    PatronId patronId = PatronFixture.anyPatronId();
     BookId bookId = BookFixture.anyBookId();
     BookId anotherBook = BookFixture.anyBookId();
 

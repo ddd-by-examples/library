@@ -1,6 +1,6 @@
 package io.pillopl.library.lending.dailysheet.model;
 
-import io.pillopl.library.lending.patron.model.PatronBooksEvent.*;
+import io.pillopl.library.lending.patron.model.PatronEvent.*;
 
 public interface DailySheet {
 

@@ -4,7 +4,7 @@ import io.pillopl.library.commons.events.DomainEvents;
 import io.pillopl.library.catalogue.BookId;
 import io.pillopl.library.lending.librarybranch.model.LibraryBranchId;
 import io.pillopl.library.lending.patron.model.*;
-import io.pillopl.library.lending.patron.model.PatronBooksEvent.PatronCreated;
+import io.pillopl.library.lending.patron.model.PatronEvent.PatronCreated;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.control.Option;
@@ -23,57 +23,57 @@ import static io.vavr.Predicates.instanceOf;
 import static java.util.stream.Collectors.*;
 
 @AllArgsConstructor
-class PatronBooksDatabaseRepository implements PatronBooksRepository {
+class PatronDatabaseRepository implements PatronRepository {
 
-    private final PatronBooksEntityRepository patronBooksEntityRepository;
+    private final PatronEntityRepository patronEntityRepository;
     private final DomainModelMapper domainModelMapper;
     private final DomainEvents domainEvents;
 
     @Override
-    public Option<PatronBooks> findBy(PatronId patronId) {
-        return Option.of(patronBooksEntityRepository
+    public Option<Patron> findBy(PatronId patronId) {
+        return Option.of(patronEntityRepository
                 .findByPatronId(patronId.getPatronId()))
                 .map(domainModelMapper::map);
     }
 
     @Override
-    public PatronBooks publish(PatronBooksEvent domainEvent) {
-        PatronBooks result = Match(domainEvent).of(
+    public Patron publish(PatronEvent domainEvent) {
+        Patron result = Match(domainEvent).of(
                 Case($(instanceOf(PatronCreated.class)), this::createNewPatron),
                 Case($(), this::handleNextEvent));
         domainEvents.publish(domainEvent.normalize());
         return result;
     }
 
-    private PatronBooks createNewPatron(PatronCreated domainEvent) {
-        PatronBooksDatabaseEntity entity = patronBooksEntityRepository
-                .save(new PatronBooksDatabaseEntity(domainEvent.patronId(), domainEvent.getPatronType()));
+    private Patron createNewPatron(PatronCreated domainEvent) {
+        PatronDatabaseEntity entity = patronEntityRepository
+                .save(new PatronDatabaseEntity(domainEvent.patronId(), domainEvent.getPatronType()));
         return domainModelMapper.map(entity);
     }
 
-    private PatronBooks handleNextEvent(PatronBooksEvent domainEvent) {
-        PatronBooksDatabaseEntity entity = patronBooksEntityRepository.findByPatronId(domainEvent.patronId().getPatronId());
+    private Patron handleNextEvent(PatronEvent domainEvent) {
+        PatronDatabaseEntity entity = patronEntityRepository.findByPatronId(domainEvent.patronId().getPatronId());
         entity = entity.handle(domainEvent);
-        entity = patronBooksEntityRepository.save(entity);
+        entity = patronEntityRepository.save(entity);
         return domainModelMapper.map(entity);
     }
 
 }
 
-interface PatronBooksEntityRepository extends CrudRepository<PatronBooksDatabaseEntity, Long> {
+interface PatronEntityRepository extends CrudRepository<PatronDatabaseEntity, Long> {
 
-    @Query("SELECT p.* FROM patron_books_database_entity p where p.patron_id = :patronId")
-    PatronBooksDatabaseEntity findByPatronId(@Param("patronId") UUID patronId);
+    @Query("SELECT p.* FROM patron_database_entity p where p.patron_id = :patronId")
+    PatronDatabaseEntity findByPatronId(@Param("patronId") UUID patronId);
 
 }
 
 @AllArgsConstructor
 class DomainModelMapper {
 
-    private final PatronBooksFactory patronBooksFactory;
+    private final PatronFactory patronFactory;
 
-    PatronBooks map(PatronBooksDatabaseEntity entity) {
-        return patronBooksFactory.create(
+    Patron map(PatronDatabaseEntity entity) {
+        return patronFactory.create(
                 entity.patronType,
                 new PatronId(entity.patronId),
                 mapPatronHolds(entity),
@@ -81,9 +81,9 @@ class DomainModelMapper {
         );
     }
 
-    Map<LibraryBranchId, Set<BookId>> mapPatronOverdueCheckouts(PatronBooksDatabaseEntity patronBooksDatabaseEntity) {
+    Map<LibraryBranchId, Set<BookId>> mapPatronOverdueCheckouts(PatronDatabaseEntity patronDatabaseEntity) {
         return
-                patronBooksDatabaseEntity
+                patronDatabaseEntity
                         .checkouts
                         .stream()
                         .collect(groupingBy(OverdueCheckoutDatabaseEntity::getLibraryBranchId, toSet()))
@@ -97,8 +97,8 @@ class DomainModelMapper {
                                         .collect(toSet())));
     }
 
-    Set<Tuple2<BookId, LibraryBranchId>> mapPatronHolds(PatronBooksDatabaseEntity patronBooksDatabaseEntity) {
-        return patronBooksDatabaseEntity
+    Set<Tuple2<BookId, LibraryBranchId>> mapPatronHolds(PatronDatabaseEntity patronDatabaseEntity) {
+        return patronDatabaseEntity
                 .booksOnHold
                 .stream()
                 .map(entity -> Tuple.of((new BookId(entity.bookId)), new LibraryBranchId(entity.libraryBranchId)))

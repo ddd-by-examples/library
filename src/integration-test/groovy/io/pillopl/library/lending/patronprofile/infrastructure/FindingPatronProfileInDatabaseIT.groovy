@@ -5,7 +5,7 @@ import io.pillopl.library.catalogue.BookType
 import io.pillopl.library.lending.LendingTestContext
 import io.pillopl.library.lending.dailysheet.model.DailySheet
 import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
-import io.pillopl.library.lending.patron.model.PatronBooksEvent
+import io.pillopl.library.lending.patron.model.PatronEvent
 import io.pillopl.library.lending.patron.model.PatronId
 import io.pillopl.library.lending.patron.model.PatronType
 import io.pillopl.library.lending.patronprofile.model.PatronProfile
@@ -22,7 +22,7 @@ import java.time.Instant
 import static io.pillopl.library.catalogue.BookType.Restricted
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
 import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
+import static io.pillopl.library.lending.patron.model.PatronFixture.anyPatronId
 import static io.vavr.Tuple.of
 import static java.time.Instant.now
 
@@ -99,8 +99,8 @@ class FindingPatronProfileInDatabaseIT extends Specification {
 
     }
 
-    PatronBooksEvent.BookCollected bookCollectedTill(Instant till) {
-        return new PatronBooksEvent.BookCollected(
+    PatronEvent.BookCollected bookCollectedTill(Instant till) {
+        return new PatronEvent.BookCollected(
                 now(),
                 patronId.getPatronId(),
                 bookId.getBookId(),
@@ -110,8 +110,8 @@ class FindingPatronProfileInDatabaseIT extends Specification {
     }
 
 
-    PatronBooksEvent.BookPlacedOnHold placedOnHoldTill(Instant till) {
-        return new PatronBooksEvent.BookPlacedOnHold(
+    PatronEvent.BookPlacedOnHold placedOnHoldTill(Instant till) {
+        return new PatronEvent.BookPlacedOnHold(
                 now(),
                 patronId.getPatronId(),
                 bookId.getBookId(),
@@ -121,8 +121,8 @@ class FindingPatronProfileInDatabaseIT extends Specification {
                 till)
     }
 
-    PatronBooksEvent.BookReturned bookReturned() {
-        return new PatronBooksEvent.BookReturned(
+    PatronEvent.BookReturned bookReturned() {
+        return new PatronEvent.BookReturned(
                 now(),
                 patronId.getPatronId(),
                 bookId.getBookId(),
