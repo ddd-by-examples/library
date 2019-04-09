@@ -27,7 +27,7 @@ class PatronProfileReadModel implements PatronProfiles {
     private final JdbcTemplate sheets;
 
     @Override
-    public PatronProfile apply(PatronId patronId) {
+    public PatronProfile fetchFor(PatronId patronId) {
         HoldsView holdsView = new HoldsView(
                 ofAll(findCurrentHoldsFor(patronId)
                         .stream()

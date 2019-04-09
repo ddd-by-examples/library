@@ -77,7 +77,7 @@ class FindingPatronProfileInDatabaseIT extends Specification {
 
     private PatronProfile createProfile() {
         PatronProfile profile
-        profile = patronProfiles.apply(patronId)
+        profile = patronProfiles.fetchFor(patronId)
         profile
     }
 

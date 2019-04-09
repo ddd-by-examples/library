@@ -47,7 +47,7 @@ class PatronProfileController {
 
     @GetMapping("/profiles/{patronId}/holds/")
     ResponseEntity<CollectionModel<EntityModel<Hold>>> findHolds(@PathVariable UUID patronId) {
-        List<EntityModel<Hold>> holds = patronProfiles.apply(new PatronId(patronId))
+        List<EntityModel<Hold>> holds = patronProfiles.fetchFor(new PatronId(patronId))
                 .getHoldsView()
                 .getCurrentHolds()
                 .toStream()
@@ -59,7 +59,7 @@ class PatronProfileController {
 
     @GetMapping("/profiles/{patronId}/holds/{bookId}")
     ResponseEntity<EntityModel<Hold>> findHold(@PathVariable UUID patronId, @PathVariable UUID bookId) {
-        return patronProfiles.apply(new PatronId(patronId))
+        return patronProfiles.fetchFor(new PatronId(patronId))
                 .findHold(new BookId(bookId))
                 .map(hold -> ok(resourceWithLinkToHoldSelf(patronId, hold)))
                 .getOrElse(notFound().build());
@@ -68,7 +68,7 @@ class PatronProfileController {
 
     @GetMapping("/profiles/{patronId}/checkouts/")
     ResponseEntity<CollectionModel<EntityModel<Checkout>>> findCheckouts(@PathVariable UUID patronId) {
-        List<EntityModel<Checkout>> checkouts = patronProfiles.apply(new PatronId(patronId))
+        List<EntityModel<Checkout>> checkouts = patronProfiles.fetchFor(new PatronId(patronId))
                 .getCurrentCheckouts()
                 .getCurrentCheckouts()
                 .toStream()
@@ -79,7 +79,7 @@ class PatronProfileController {
 
     @GetMapping("/profiles/{patronId}/checkouts/{bookId}")
     ResponseEntity<EntityModel<Checkout>> findCheckout(@PathVariable UUID patronId, @PathVariable UUID bookId) {
-        return patronProfiles.apply(new PatronId(patronId))
+        return patronProfiles.fetchFor(new PatronId(patronId))
                 .findCheckout(new BookId(bookId))
                 .map(hold -> ok(resourceWithLinkToCheckoutSelf(patronId, hold)))
                 .getOrElse(notFound().build());

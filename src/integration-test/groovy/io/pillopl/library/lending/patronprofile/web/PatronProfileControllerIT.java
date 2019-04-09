@@ -63,7 +63,7 @@ public class PatronProfileControllerIT {
 
     @Test
     public void shouldContainPatronProfileResourceWithCorrectHeadersAndLinksToCheckoutsAndHolds() throws Exception {
-        given(patronProfiles.apply(patronId)).willReturn(profiles());
+        given(patronProfiles.fetchFor(patronId)).willReturn(profiles());
 
         //expect
         mvc.perform(get("/profiles/" + patronId.getPatronId())
@@ -78,7 +78,7 @@ public class PatronProfileControllerIT {
 
     @Test
     public void shouldCreateLinksForHolds() throws Exception {
-        given(patronProfiles.apply(patronId)).willReturn(profiles());
+        given(patronProfiles.fetchFor(patronId)).willReturn(profiles());
 
         //expect
         mvc.perform(get("/profiles/" + patronId.getPatronId() + "/holds/")
@@ -93,7 +93,7 @@ public class PatronProfileControllerIT {
 
     @Test
     public void shouldCreateLinksForCheckouts() throws Exception {
-        given(patronProfiles.apply(patronId)).willReturn(profiles());
+        given(patronProfiles.fetchFor(patronId)).willReturn(profiles());
 
         //expect
         mvc.perform(get("/profiles/" + patronId.getPatronId() + "/checkouts/")
@@ -108,7 +108,7 @@ public class PatronProfileControllerIT {
 
     @Test
     public void shouldReturn404WhenThereIsNoHold() throws Exception {
-        given(patronProfiles.apply(patronId)).willReturn(profiles());
+        given(patronProfiles.fetchFor(patronId)).willReturn(profiles());
 
         //expect
         mvc.perform(get("/profiles/" + patronId.getPatronId() + "/holds/" + UUID.randomUUID())
@@ -118,7 +118,7 @@ public class PatronProfileControllerIT {
 
     @Test
     public void shouldReturn404WhenThereIsNoCheckout() throws Exception {
-        given(patronProfiles.apply(patronId)).willReturn(profiles());
+        given(patronProfiles.fetchFor(patronId)).willReturn(profiles());
 
         //expect
         mvc.perform(get("/profiles/" + patronId.getPatronId() + "/checkouts/" + UUID.randomUUID())
@@ -128,7 +128,7 @@ public class PatronProfileControllerIT {
 
     @Test
     public void shouldReturnResourceForHold() throws Exception {
-        given(patronProfiles.apply(patronId)).willReturn(profiles());
+        given(patronProfiles.fetchFor(patronId)).willReturn(profiles());
 
         //expect
         mvc.perform(get("/profiles/" + patronId.getPatronId() + "/holds/" + bookId.getBookId())
@@ -143,7 +143,7 @@ public class PatronProfileControllerIT {
 
     @Test
     public void shouldReturnResourceForCheckout() throws Exception {
-        given(patronProfiles.apply(patronId)).willReturn(profiles());
+        given(patronProfiles.fetchFor(patronId)).willReturn(profiles());
 
         //expect
         mvc.perform(get("/profiles/" + patronId.getPatronId() + "/checkouts/" + anotherBook.getBookId())
@@ -157,7 +157,7 @@ public class PatronProfileControllerIT {
 
     @Test
     public void shouldCancelExistingHold() throws Exception {
-        given(patronProfiles.apply(patronId)).willReturn(profiles());
+        given(patronProfiles.fetchFor(patronId)).willReturn(profiles());
         given(cancelingHold.cancelHold(any())).willReturn(Try.success(Success));
 
         //expect
@@ -168,7 +168,7 @@ public class PatronProfileControllerIT {
 
     @Test
     public void shouldNotCancelNotExistingHold() throws Exception {
-        given(patronProfiles.apply(patronId)).willReturn(profiles());
+        given(patronProfiles.fetchFor(patronId)).willReturn(profiles());
         given(cancelingHold.cancelHold(any())).willReturn(Try.failure(new IllegalArgumentException()));
 
         //expect
@@ -179,7 +179,7 @@ public class PatronProfileControllerIT {
 
     @Test
     public void shouldReturn500IfSomethingFailedWhileCanceling() throws Exception {
-        given(patronProfiles.apply(patronId)).willReturn(profiles());
+        given(patronProfiles.fetchFor(patronId)).willReturn(profiles());
         given(cancelingHold.cancelHold(any())).willReturn(Try.failure(new IllegalStateException()));
 
         //expect
