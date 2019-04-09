@@ -22,7 +22,7 @@ class DuplicateHoldFoundTest extends Specification {
     BookOnHold bookOnHold = BookFixture.bookOnHold()
     BookRepository bookRepository = Stub()
     DomainEvents domainEvents = Mock()
-    PatronEventsHandler patronBookEventsHandler = new PatronEventsHandler(bookRepository, domainEvents)
+    PatronEventsHandler patronEventsHandler = new PatronEventsHandler(bookRepository, domainEvents)
 
     PatronId patronId = anyPatronId()
     LibraryBranchId libraryBranchId = anyBranch()
@@ -32,7 +32,7 @@ class DuplicateHoldFoundTest extends Specification {
         given:
             bookIsAlreadyOnHold()
         when:
-            patronBookEventsHandler.handle(placedOnHoldBy(patronId))
+            patronEventsHandler.handle(placedOnHoldBy(patronId))
         then:
             1 * domainEvents.publish({
                 it.firstPatronId == bookOnHold.byPatron.patronId &&
@@ -45,7 +45,7 @@ class DuplicateHoldFoundTest extends Specification {
         given:
             bookIsAlreadyOnHold()
         when:
-            patronBookEventsHandler.handle(placedOnHoldBy(bookOnHold.byPatron))
+            patronEventsHandler.handle(placedOnHoldBy(bookOnHold.byPatron))
         then:
             0 * domainEvents.publish(_ as DomainEvent)
     }
