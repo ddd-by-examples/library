@@ -14,7 +14,7 @@ import spock.lang.Specification
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
 import static io.pillopl.library.lending.book.model.BookFixture.circulatingAvailableBookAt
 import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
+import static io.pillopl.library.lending.patron.model.PatronFixture.anyPatronId
 
 @SpringBootTest(classes = LendingTestContext.class)
 class BookDatabaseRepositoryIT extends Specification {

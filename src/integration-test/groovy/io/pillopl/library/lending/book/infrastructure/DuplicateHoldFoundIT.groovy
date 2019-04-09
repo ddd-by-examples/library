@@ -7,8 +7,8 @@ import io.pillopl.library.lending.book.model.BookFixture
 import io.pillopl.library.lending.book.model.BookRepository
 import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
 import io.pillopl.library.lending.patron.model.HoldDuration
-import io.pillopl.library.lending.patron.model.PatronBooks
-import io.pillopl.library.lending.patron.model.PatronBooksRepository
+import io.pillopl.library.lending.patron.model.Patron
+import io.pillopl.library.lending.patron.model.PatronRepository
 import io.pillopl.library.lending.patron.model.PatronId
 import io.vavr.control.Option
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,11 +19,11 @@ import spock.util.concurrent.PollingConditions
 import javax.sql.DataSource
 
 import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHold.bookPlacedOnHoldNow
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHoldEvents
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHoldEvents.events
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.PatronCreated
-import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
+import static io.pillopl.library.lending.patron.model.PatronEvent.BookPlacedOnHold.bookPlacedOnHoldNow
+import static io.pillopl.library.lending.patron.model.PatronEvent.BookPlacedOnHoldEvents
+import static io.pillopl.library.lending.patron.model.PatronEvent.BookPlacedOnHoldEvents.events
+import static io.pillopl.library.lending.patron.model.PatronEvent.PatronCreated
+import static io.pillopl.library.lending.patron.model.PatronFixture.anyPatronId
 import static io.pillopl.library.lending.patron.model.PatronType.Regular
 
 @SpringBootTest(classes = [LendingTestContext.class, DomainEventsTestConfig.class])
@@ -36,7 +36,7 @@ class DuplicateHoldFoundIT extends Specification {
     AvailableBook book = BookFixture.circulatingBook()
 
     @Autowired
-    PatronBooksRepository patronBooksRepo
+    PatronRepository patronRepo
 
     @Autowired
     BookRepository bookRepository
@@ -50,13 +50,13 @@ class DuplicateHoldFoundIT extends Specification {
         given:
             bookRepository.save(book)
         and:
-            patronBooksRepo.publish(patronCreated(patron))
+            patronRepo.publish(patronCreated(patron))
         and:
-            patronBooksRepo.publish(patronCreated(anotherPatron))
+            patronRepo.publish(patronCreated(anotherPatron))
         when:
-            patronBooksRepo.publish(placedOnHold(book, patron))
+            patronRepo.publish(placedOnHold(book, patron))
         and:
-            patronBooksRepo.publish(placedOnHold(book, anotherPatron))
+            patronRepo.publish(placedOnHold(book, anotherPatron))
         then:
             patronShouldBeFoundInDatabaseWithZeroBookOnHold(anotherPatron)
 
@@ -77,16 +77,16 @@ class DuplicateHoldFoundIT extends Specification {
 
     void patronShouldBeFoundInDatabaseWithZeroBookOnHold(PatronId patronId) {
         pollingConditions.eventually {
-            PatronBooks patronBooks = loadPersistedPatron(patronId)
-            assert patronBooks.numberOfHolds() == 0
+            Patron patron = loadPersistedPatron(patronId)
+            assert patron.numberOfHolds() == 0
         }
     }
 
-    PatronBooks loadPersistedPatron(PatronId patronId) {
-        Option<PatronBooks> loaded = patronBooksRepo.findBy(patronId)
-        PatronBooks patronBooks = loaded.getOrElseThrow({
+    Patron loadPersistedPatron(PatronId patronId) {
+        Option<Patron> loaded = patronRepo.findBy(patronId)
+        Patron patron = loaded.getOrElseThrow({
             new IllegalStateException("should have been persisted")
         })
-        return patronBooks
+        return patron
     }
 }

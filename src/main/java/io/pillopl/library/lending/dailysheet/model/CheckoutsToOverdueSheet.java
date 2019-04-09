@@ -2,7 +2,7 @@ package io.pillopl.library.lending.dailysheet.model;
 
 import io.pillopl.library.catalogue.BookId;
 import io.pillopl.library.lending.librarybranch.model.LibraryBranchId;
-import io.pillopl.library.lending.patron.model.PatronBooksEvent.OverdueCheckoutRegistered;
+import io.pillopl.library.lending.patron.model.PatronEvent.OverdueCheckoutRegistered;
 import io.pillopl.library.lending.patron.model.PatronId;
 import io.vavr.Tuple3;
 import io.vavr.collection.List;

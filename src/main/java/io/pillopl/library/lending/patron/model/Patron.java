@@ -4,7 +4,7 @@ package io.pillopl.library.lending.patron.model;
 import io.pillopl.library.lending.book.model.AvailableBook;
 import io.pillopl.library.lending.book.model.BookOnHold;
 import io.pillopl.library.lending.librarybranch.model.LibraryBranchId;
-import io.pillopl.library.lending.patron.model.PatronBooksEvent.*;
+import io.pillopl.library.lending.patron.model.PatronEvent.*;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 import io.vavr.control.Option;
@@ -14,20 +14,19 @@ import lombok.NonNull;
 
 import static io.pillopl.library.commons.events.EitherResult.announceFailure;
 import static io.pillopl.library.commons.events.EitherResult.announceSuccess;
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookCollected.bookCollectedNow;
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookCollectingFailed.bookCollectingFailedNow;
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookHoldCanceled.holdCanceledNow;
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookHoldCancelingFailed.holdCancelingFailedNow;
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookHoldFailed.bookHoldFailedNow;
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHold.bookPlacedOnHoldNow;
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHoldEvents.events;
+import static io.pillopl.library.lending.patron.model.PatronEvent.BookCollected.bookCollectedNow;
+import static io.pillopl.library.lending.patron.model.PatronEvent.BookCollectingFailed.bookCollectingFailedNow;
+import static io.pillopl.library.lending.patron.model.PatronEvent.BookHoldCanceled.holdCanceledNow;
+import static io.pillopl.library.lending.patron.model.PatronEvent.BookHoldCancelingFailed.holdCancelingFailedNow;
+import static io.pillopl.library.lending.patron.model.PatronEvent.BookHoldFailed.bookHoldFailedNow;
+import static io.pillopl.library.lending.patron.model.PatronEvent.BookPlacedOnHold.bookPlacedOnHoldNow;
+import static io.pillopl.library.lending.patron.model.PatronEvent.BookPlacedOnHoldEvents.events;
 import static io.pillopl.library.lending.patron.model.PatronHolds.MAX_NUMBER_OF_HOLDS;
 import static io.pillopl.library.lending.patron.model.Rejection.withReason;
 
-//TODO - rename to patron?
 @AllArgsConstructor
 @EqualsAndHashCode(of = "patron")
-public class PatronBooks {
+public class Patron {
 
     @NonNull
     private final PatronInformation patron;

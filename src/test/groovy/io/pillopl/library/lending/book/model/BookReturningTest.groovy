@@ -1,7 +1,7 @@
 package io.pillopl.library.lending.book.model
 
 import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
-import io.pillopl.library.lending.patron.model.PatronBooksEvent
+import io.pillopl.library.lending.patron.model.PatronEvent
 import io.pillopl.library.lending.patron.model.PatronId
 import spock.lang.Specification
 
@@ -11,7 +11,7 @@ import static BookDSL.aCirculatingBook
 import static BookDSL.the
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
 import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatron
+import static io.pillopl.library.lending.patron.model.PatronFixture.anyPatron
 
 class BookReturningTest extends Specification {
 
@@ -26,7 +26,7 @@ class BookReturningTest extends Specification {
             LibraryBranchId aBranch = anyBranch()
 
         and:
-            PatronBooksEvent.BookReturned bookReturnedEvent = the bookOnHold isReturnedBy anyPatron() at aBranch
+            PatronEvent.BookReturned bookReturnedEvent = the bookOnHold isReturnedBy anyPatron() at aBranch
 
         when:
             AvailableBook availableBook = the bookOnHold reactsTo bookReturnedEvent
@@ -48,7 +48,7 @@ class BookReturningTest extends Specification {
             LibraryBranchId aBranch = anyBranch()
 
         and:
-            PatronBooksEvent.BookPlacedOnHold bookPlacedOnHoldEvent = the availableBook isPlacedOnHoldBy aPatron at aBranch from now till oneHour
+            PatronEvent.BookPlacedOnHold bookPlacedOnHoldEvent = the availableBook isPlacedOnHoldBy aPatron at aBranch from now till oneHour
 
         when:
             BookOnHold onHold = the availableBook reactsTo bookPlacedOnHoldEvent
@@ -65,7 +65,7 @@ class BookReturningTest extends Specification {
             BookDSL collectedBook = aCirculatingBook() with anyBookId() locatedIn anyBranch() collectedBy anyPatron()
 
         and:
-            PatronBooksEvent.BookReturned bookReturnedEvent = the collectedBook isReturnedBy anyPatron() at anyBranch()
+            PatronEvent.BookReturned bookReturnedEvent = the collectedBook isReturnedBy anyPatron() at anyBranch()
 
         when:
             AvailableBook available = the collectedBook reactsTo bookReturnedEvent
@@ -82,7 +82,7 @@ class BookReturningTest extends Specification {
             LibraryBranchId aBranch = anyBranch()
 
         and:
-            PatronBooksEvent.BookCollected bookCollectedEvent = the onHoldBook isCollectedBy anyPatron() at aBranch
+            PatronEvent.BookCollected bookCollectedEvent = the onHoldBook isCollectedBy anyPatron() at aBranch
 
         when:
             CollectedBook collectedBook = the onHoldBook reactsTo bookCollectedEvent

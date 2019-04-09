@@ -4,8 +4,8 @@ package io.pillopl.library.lending.patron.infrastructure
 import io.pillopl.library.lending.LendingTestContext
 import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
 import io.pillopl.library.lending.patron.model.HoldDuration
-import io.pillopl.library.lending.patron.model.PatronBooks
-import io.pillopl.library.lending.patron.model.PatronBooksRepository
+import io.pillopl.library.lending.patron.model.Patron
+import io.pillopl.library.lending.patron.model.PatronRepository
 import io.pillopl.library.lending.patron.model.PatronId
 import io.pillopl.library.lending.patron.model.PatronType
 import io.vavr.control.Option
@@ -16,31 +16,31 @@ import spock.lang.Specification
 import static io.pillopl.library.catalogue.BookType.Circulating
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
 import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHold.bookPlacedOnHoldNow
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHoldEvents
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHoldEvents.events
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.PatronCreated
-import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
-import static io.pillopl.library.lending.patron.model.PatronBooksFixture.regularPatron
+import static io.pillopl.library.lending.patron.model.PatronEvent.BookPlacedOnHold.bookPlacedOnHoldNow
+import static io.pillopl.library.lending.patron.model.PatronEvent.BookPlacedOnHoldEvents
+import static io.pillopl.library.lending.patron.model.PatronEvent.BookPlacedOnHoldEvents.events
+import static io.pillopl.library.lending.patron.model.PatronEvent.PatronCreated
+import static io.pillopl.library.lending.patron.model.PatronFixture.anyPatronId
+import static io.pillopl.library.lending.patron.model.PatronFixture.regularPatron
 import static io.pillopl.library.lending.patron.model.PatronType.Regular
 
 @SpringBootTest(classes = LendingTestContext.class)
-class PatronBooksDatabaseRepositoryIT extends Specification {
+class PatronDatabaseRepositoryIT extends Specification {
 
     PatronId patronId = anyPatronId()
     PatronType regular = Regular
     LibraryBranchId libraryBranchId = anyBranch()
 
     @Autowired
-    PatronBooksRepository patronBooksRepo
+    PatronRepository patronRepo
 
     def 'persistence in real database should work'() {
         when:
-            patronBooksRepo.publish(patronCreated())
+            patronRepo.publish(patronCreated())
         then:
             patronShouldBeFoundInDatabaseWithZeroBooksOnHold(patronId)
         when:
-            patronBooksRepo.publish(placedOnHold())
+            patronRepo.publish(placedOnHold())
         then:
             patronShouldBeFoundInDatabaseWithOneBookOnHold(patronId)
     }
@@ -59,27 +59,27 @@ class PatronBooksDatabaseRepositoryIT extends Specification {
     }
 
     void patronShouldBeFoundInDatabaseWithOneBookOnHold(PatronId patronId) {
-        PatronBooks patronBooks = loadPersistedPatron(patronId)
-        assert patronBooks.numberOfHolds() == 1
-        assertPatronInformation(patronBooks, patronId)
+        Patron patron = loadPersistedPatron(patronId)
+        assert patron.numberOfHolds() == 1
+        assertPatronInformation(patron, patronId)
     }
 
     void patronShouldBeFoundInDatabaseWithZeroBooksOnHold(PatronId patronId) {
-        PatronBooks patronBooks = loadPersistedPatron(patronId)
-        assert patronBooks.numberOfHolds() == 0
-        assertPatronInformation(patronBooks, patronId)
+        Patron patron = loadPersistedPatron(patronId)
+        assert patron.numberOfHolds() == 0
+        assertPatronInformation(patron, patronId)
 
     }
 
-    void assertPatronInformation(PatronBooks patronBooks, PatronId patronId) {
-        assert patronBooks.equals(regularPatron(patronId))
+    void assertPatronInformation(Patron patron, PatronId patronId) {
+        assert patron.equals(regularPatron(patronId))
     }
 
-    PatronBooks loadPersistedPatron(PatronId patronId) {
-        Option<PatronBooks> loaded = patronBooksRepo.findBy(patronId)
-        PatronBooks patronBooks = loaded.getOrElseThrow({
+    Patron loadPersistedPatron(PatronId patronId) {
+        Option<Patron> loaded = patronRepo.findBy(patronId)
+        Patron patron = loaded.getOrElseThrow({
             new IllegalStateException("should have been persisted")
         })
-        return patronBooks
+        return patron
     }
 }

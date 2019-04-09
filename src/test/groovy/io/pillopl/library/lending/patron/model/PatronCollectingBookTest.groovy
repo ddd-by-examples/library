@@ -7,15 +7,15 @@ import spock.lang.Specification
 import java.time.Duration
 import java.time.Instant
 
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookCollectingFailed
-import static PatronBooksFixture.regularPatron
-import static PatronBooksFixture.regularPatronWith
+import static PatronEvent.BookCollectingFailed
+import static PatronFixture.regularPatron
+import static PatronFixture.regularPatronWith
 import static io.pillopl.library.lending.book.model.BookFixture.bookOnHold
 import static io.pillopl.library.lending.patron.model.CheckoutDuration.MAX_CHECKOUT_DURATION
 import static io.pillopl.library.lending.patron.model.CheckoutDuration.maxDuration
 import static io.pillopl.library.lending.patron.model.CheckoutDuration.forNoOfDays
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookCollected
-import static PatronBooksFixture.onHold
+import static PatronEvent.BookCollected
+import static PatronFixture.onHold
 
 class PatronCollectingBookTest extends Specification {
 
@@ -33,7 +33,7 @@ class PatronCollectingBookTest extends Specification {
         given:
             Hold onHold = onHold()
         and:
-            PatronBooks patron = regularPatronWith(onHold)
+            Patron patron = regularPatronWith(onHold)
         when:
             Either<BookCollectingFailed, BookCollected> collect = patron.collect(bookOnHold(onHold.bookId, onHold.libraryBranchId), maxDuration())
         then:
@@ -46,7 +46,7 @@ class PatronCollectingBookTest extends Specification {
         and:
             Instant checkoutTime = Instant.now()
         and:
-            PatronBooks patron = regularPatronWith(onHold)
+            Patron patron = regularPatronWith(onHold)
         and:
             BookOnHold bookOnHold = bookOnHold(onHold.bookId, onHold.libraryBranchId)
         when:
@@ -67,7 +67,7 @@ class PatronCollectingBookTest extends Specification {
         given:
             Hold onHold = onHold()
         and:
-            PatronBooks patron = regularPatronWith(onHold)
+            Patron patron = regularPatronWith(onHold)
         when:
             patron.collect(bookOnHold(onHold.bookId, onHold.libraryBranchId), forNoOfDays(checkoutDays))
         then:

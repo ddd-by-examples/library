@@ -3,10 +3,10 @@ package io.pillopl.library.lending.patron.application.hold;
 import io.pillopl.library.commons.commands.Result;
 import io.pillopl.library.catalogue.BookId;
 import io.pillopl.library.lending.book.model.BookOnHold;
-import io.pillopl.library.lending.patron.model.PatronBooks;
-import io.pillopl.library.lending.patron.model.PatronBooksEvent.BookHoldCanceled;
-import io.pillopl.library.lending.patron.model.PatronBooksEvent.BookHoldCancelingFailed;
-import io.pillopl.library.lending.patron.model.PatronBooksRepository;
+import io.pillopl.library.lending.patron.model.Patron;
+import io.pillopl.library.lending.patron.model.PatronEvent.BookHoldCanceled;
+import io.pillopl.library.lending.patron.model.PatronEvent.BookHoldCancelingFailed;
+import io.pillopl.library.lending.patron.model.PatronRepository;
 import io.pillopl.library.lending.patron.model.PatronId;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
@@ -23,13 +23,13 @@ import static io.vavr.Patterns.$Right;
 public class CancelingHold {
 
     private final FindBookOnHold findBookOnHold;
-    private final PatronBooksRepository patronBooksRepository;
+    private final PatronRepository patronRepository;
 
     public Try<Result> cancelHold(@NonNull CancelHoldCommand command) {
         return Try.of(() -> {
             BookOnHold bookOnHold = find(command.getBookId(), command.getPatronId());
-            PatronBooks patronBooks = find(command.getPatronId());
-            Either<BookHoldCancelingFailed, BookHoldCanceled> result = patronBooks.cancelHold(bookOnHold);
+            Patron patron = find(command.getPatronId());
+            Either<BookHoldCancelingFailed, BookHoldCanceled> result = patron.cancelHold(bookOnHold);
             return Match(result).of(
                     Case($Left($()), this::publishEvents),
                     Case($Right($()), this::publishEvents)
@@ -38,12 +38,12 @@ public class CancelingHold {
     }
 
     private Result publishEvents(BookHoldCanceled bookHoldCanceled) {
-        patronBooksRepository.publish(bookHoldCanceled);
+        patronRepository.publish(bookHoldCanceled);
         return Success;
     }
 
     private Result publishEvents(BookHoldCancelingFailed bookHoldCancelingFailed) {
-        patronBooksRepository.publish(bookHoldCancelingFailed);
+        patronRepository.publish(bookHoldCancelingFailed);
         return Rejection;
     }
 
@@ -53,8 +53,8 @@ public class CancelingHold {
                 .getOrElseThrow(() -> new IllegalArgumentException("Cannot find book on hold with Id: " + bookId.getBookId()));
     }
 
-    private PatronBooks find(PatronId patronId) {
-        return patronBooksRepository
+    private Patron find(PatronId patronId) {
+        return patronRepository
                 .findBy(patronId)
                 .getOrElseThrow(() -> new IllegalArgumentException("Patron with given Id does not exists: " + patronId.getPatronId()));
     }

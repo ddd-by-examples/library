@@ -6,8 +6,8 @@ import spock.lang.Specification
 
 import static io.pillopl.library.lending.book.model.BookFixture.circulatingBook
 import static io.pillopl.library.lending.patron.model.HoldDuration.closeEnded
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.*
-import static PatronBooksFixture.regularPatronWithHolds
+import static PatronEvent.*
+import static PatronFixture.regularPatronWithHolds
 
 class PatronRequestingLastPossibleHoldTest extends Specification {
 

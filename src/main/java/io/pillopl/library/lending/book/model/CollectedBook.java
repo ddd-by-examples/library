@@ -4,7 +4,7 @@ import io.pillopl.library.catalogue.BookId;
 import io.pillopl.library.catalogue.BookType;
 import io.pillopl.library.commons.aggregates.Version;
 import io.pillopl.library.lending.librarybranch.model.LibraryBranchId;
-import io.pillopl.library.lending.patron.model.PatronBooksEvent;
+import io.pillopl.library.lending.patron.model.PatronEvent;
 import io.pillopl.library.lending.patron.model.PatronId;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -36,7 +36,7 @@ public class CollectedBook implements Book {
         return bookInformation.getBookId();
     }
 
-    public AvailableBook handle(PatronBooksEvent.BookReturned bookReturnedByPatron) {
+    public AvailableBook handle(PatronEvent.BookReturned bookReturnedByPatron) {
         return new AvailableBook(
                 bookInformation,
                 new LibraryBranchId(bookReturnedByPatron.getLibraryBranchId()),

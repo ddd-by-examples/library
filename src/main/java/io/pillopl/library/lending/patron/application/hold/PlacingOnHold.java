@@ -5,8 +5,8 @@ import io.pillopl.library.lending.book.model.AvailableBook;
 import io.pillopl.library.catalogue.BookId;
 import io.pillopl.library.lending.librarybranch.model.LibraryBranchId;
 import io.pillopl.library.lending.patron.model.*;
-import io.pillopl.library.lending.patron.model.PatronBooksEvent.BookHoldFailed;
-import io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHoldEvents;
+import io.pillopl.library.lending.patron.model.PatronEvent.BookHoldFailed;
+import io.pillopl.library.lending.patron.model.PatronEvent.BookPlacedOnHoldEvents;
 import io.vavr.control.Either;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
@@ -25,13 +25,13 @@ import static io.vavr.Patterns.$Right;
 public class PlacingOnHold {
 
     private final FindAvailableBook findAvailableBook;
-    private final PatronBooksRepository patronBooksRepository;
+    private final PatronRepository patronRepository;
 
     Try<Result> placeOnHold(@NonNull PlaceOnHoldCommand command) {
         return Try.of(() -> {
             AvailableBook availableBook = find(command.getBookId());
-            PatronBooks patronBooks = find(command.getPatronId());
-            Either<BookHoldFailed, BookPlacedOnHoldEvents> result = patronBooks.placeOnHold(availableBook, command.getHoldDuration());
+            Patron patron = find(command.getPatronId());
+            Either<BookHoldFailed, BookPlacedOnHoldEvents> result = patron.placeOnHold(availableBook, command.getHoldDuration());
             return Match(result).of(
                     Case($Left($()), this::publishEvents),
                     Case($Right($()), this::publishEvents)
@@ -40,12 +40,12 @@ public class PlacingOnHold {
     }
 
     private Result publishEvents(BookPlacedOnHoldEvents placedOnHold) {
-        patronBooksRepository.publish(placedOnHold);
+        patronRepository.publish(placedOnHold);
         return Success;
     }
 
     private Result publishEvents(BookHoldFailed bookHoldFailed) {
-        patronBooksRepository.publish(bookHoldFailed);
+        patronRepository.publish(bookHoldFailed);
         return Result.Rejection;
     }
 
@@ -55,8 +55,8 @@ public class PlacingOnHold {
                 .getOrElseThrow(() -> new IllegalArgumentException("Cannot find available book with Id: " + id.getBookId()));
     }
 
-    private PatronBooks find(PatronId patronId) {
-        return patronBooksRepository
+    private Patron find(PatronId patronId) {
+        return patronRepository
                 .findBy(patronId)
                 .getOrElseThrow(() -> new IllegalArgumentException("Patron with given Id does not exists: " + patronId.getPatronId()));
     }

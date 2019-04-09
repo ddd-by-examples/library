@@ -2,8 +2,8 @@ package io.pillopl.library.lending.patron.application.checkout;
 
 import io.pillopl.library.commons.commands.BatchResult;
 import io.pillopl.library.lending.dailysheet.model.DailySheet;
-import io.pillopl.library.lending.patron.model.PatronBooksEvent.OverdueCheckoutRegistered;
-import io.pillopl.library.lending.patron.model.PatronBooksRepository;
+import io.pillopl.library.lending.patron.model.PatronEvent.OverdueCheckoutRegistered;
+import io.pillopl.library.lending.patron.model.PatronRepository;
 import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
 
@@ -11,7 +11,7 @@ import lombok.AllArgsConstructor;
 public class RegisteringOverdueCheckout {
 
     private final DailySheet find;
-    private final PatronBooksRepository patronBooksRepository;
+    private final PatronRepository patronRepository;
 
     public Try<BatchResult> registerOverdueCheckouts() {
         return Try.of(() ->
@@ -24,7 +24,7 @@ public class RegisteringOverdueCheckout {
     }
 
     private Try<Void> publish(OverdueCheckoutRegistered event) {
-        return Try.run(() -> patronBooksRepository.publish(event));
+        return Try.run(() -> patronRepository.publish(event));
     }
 
 }

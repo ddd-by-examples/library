@@ -12,7 +12,7 @@ import lombok.Value;
 import java.time.Instant;
 import java.util.UUID;
 
-public interface PatronBooksEvent extends DomainEvent {
+public interface PatronEvent extends DomainEvent {
 
     default PatronId patronId() {
         return new PatronId(getPatronId());
@@ -29,7 +29,7 @@ public interface PatronBooksEvent extends DomainEvent {
     }
 
     @Value
-    class PatronCreated implements PatronBooksEvent {
+    class PatronCreated implements PatronEvent {
         @NonNull UUID eventId = UUID.randomUUID();
         @NonNull Instant when;
         @NonNull UUID patronId;
@@ -41,7 +41,7 @@ public interface PatronBooksEvent extends DomainEvent {
     }
 
     @Value
-    class BookPlacedOnHold implements PatronBooksEvent {
+    class BookPlacedOnHold implements PatronEvent {
         @NonNull UUID eventId = UUID.randomUUID();
         @NonNull Instant when;
         @NonNull UUID patronId;
@@ -64,7 +64,7 @@ public interface PatronBooksEvent extends DomainEvent {
     }
 
     @Value
-    class BookPlacedOnHoldEvents implements PatronBooksEvent {
+    class BookPlacedOnHoldEvents implements PatronEvent {
         @NonNull UUID eventId = UUID.randomUUID();
         @NonNull UUID patronId;
         @NonNull BookPlacedOnHold bookPlacedOnHold;
@@ -89,7 +89,7 @@ public interface PatronBooksEvent extends DomainEvent {
     }
 
     @Value
-    class MaximumNumberOhHoldsReached implements PatronBooksEvent {
+    class MaximumNumberOhHoldsReached implements PatronEvent {
         @NonNull UUID eventId = UUID.randomUUID();
         @NonNull Instant when;
         @NonNull UUID patronId;
@@ -104,7 +104,7 @@ public interface PatronBooksEvent extends DomainEvent {
     }
 
     @Value
-    class BookCollected implements PatronBooksEvent {
+    class BookCollected implements PatronEvent {
         @NonNull UUID eventId = UUID.randomUUID();
         @NonNull Instant when;
         @NonNull UUID patronId;
@@ -125,7 +125,7 @@ public interface PatronBooksEvent extends DomainEvent {
     }
 
     @Value
-    class BookReturned implements PatronBooksEvent {
+    class BookReturned implements PatronEvent {
         @NonNull UUID eventId = UUID.randomUUID();
         @NonNull Instant when;
         @NonNull UUID patronId;
@@ -135,7 +135,7 @@ public interface PatronBooksEvent extends DomainEvent {
     }
 
     @Value
-    class BookHoldFailed implements PatronBooksEvent {
+    class BookHoldFailed implements PatronEvent {
         @NonNull UUID eventId = UUID.randomUUID();
         @NonNull String reason;
         @NonNull Instant when;
@@ -154,7 +154,7 @@ public interface PatronBooksEvent extends DomainEvent {
     }
 
     @Value
-    class BookCollectingFailed implements PatronBooksEvent {
+    class BookCollectingFailed implements PatronEvent {
         @NonNull UUID eventId = UUID.randomUUID();
         @NonNull String reason;
         @NonNull Instant when;
@@ -173,7 +173,7 @@ public interface PatronBooksEvent extends DomainEvent {
     }
 
     @Value
-    class BookHoldCanceled implements PatronBooksEvent {
+    class BookHoldCanceled implements PatronEvent {
         @NonNull UUID eventId = UUID.randomUUID();
         @NonNull Instant when;
         @NonNull UUID patronId;
@@ -190,7 +190,7 @@ public interface PatronBooksEvent extends DomainEvent {
     }
 
     @Value
-    class BookHoldCancelingFailed implements PatronBooksEvent {
+    class BookHoldCancelingFailed implements PatronEvent {
         @NonNull UUID eventId = UUID.randomUUID();
         @NonNull Instant when;
         @NonNull UUID patronId;
@@ -207,7 +207,7 @@ public interface PatronBooksEvent extends DomainEvent {
     }
 
     @Value
-    class BookHoldExpired implements PatronBooksEvent {
+    class BookHoldExpired implements PatronEvent {
         @NonNull UUID eventId = UUID.randomUUID();
         @NonNull Instant when;
         @NonNull UUID patronId;
@@ -224,7 +224,7 @@ public interface PatronBooksEvent extends DomainEvent {
     }
 
     @Value
-    class OverdueCheckoutRegistered implements PatronBooksEvent {
+    class OverdueCheckoutRegistered implements PatronEvent {
         @NonNull UUID eventId = UUID.randomUUID();
         @NonNull Instant when;
         @NonNull UUID patronId;

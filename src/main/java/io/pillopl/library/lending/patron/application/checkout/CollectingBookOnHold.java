@@ -6,10 +6,10 @@ import io.pillopl.library.lending.book.model.BookOnHold;
 import io.pillopl.library.lending.librarybranch.model.LibraryBranchId;
 import io.pillopl.library.lending.patron.application.hold.FindBookOnHold;
 import io.pillopl.library.lending.patron.model.CheckoutDuration;
-import io.pillopl.library.lending.patron.model.PatronBooks;
-import io.pillopl.library.lending.patron.model.PatronBooksEvent.BookCollected;
-import io.pillopl.library.lending.patron.model.PatronBooksEvent.BookCollectingFailed;
-import io.pillopl.library.lending.patron.model.PatronBooksRepository;
+import io.pillopl.library.lending.patron.model.Patron;
+import io.pillopl.library.lending.patron.model.PatronEvent.BookCollected;
+import io.pillopl.library.lending.patron.model.PatronEvent.BookCollectingFailed;
+import io.pillopl.library.lending.patron.model.PatronRepository;
 import io.pillopl.library.lending.patron.model.PatronId;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
@@ -31,13 +31,13 @@ import static io.vavr.Patterns.$Right;
 public class CollectingBookOnHold {
 
     private final FindBookOnHold findBookOnHold;
-    private final PatronBooksRepository patronBooksRepository;
+    private final PatronRepository patronRepository;
 
     public Try<Result> collect(@NonNull CollectBookCommand command) {
         return Try.of(() -> {
             BookOnHold bookOnHold = find(command.getBookId(), command.getPatronId());
-            PatronBooks patronBooks = find(command.getPatronId());
-            Either<BookCollectingFailed, BookCollected> result = patronBooks.collect(bookOnHold, command.getCheckoutDuration());
+            Patron patron = find(command.getPatronId());
+            Either<BookCollectingFailed, BookCollected> result = patron.collect(bookOnHold, command.getCheckoutDuration());
             return Match(result).of(
                     Case($Left($()), this::publishEvents),
                     Case($Right($()), this::publishEvents));
@@ -45,13 +45,13 @@ public class CollectingBookOnHold {
     }
 
     private Result publishEvents(BookCollected bookCollected) {
-        patronBooksRepository
+        patronRepository
                 .publish(bookCollected);
         return Success;
     }
 
     private Result publishEvents(BookCollectingFailed bookCollectingFailed) {
-        patronBooksRepository
+        patronRepository
                 .publish(bookCollectingFailed);
         return Rejection;
     }
@@ -62,8 +62,8 @@ public class CollectingBookOnHold {
                 .getOrElseThrow(() -> new IllegalArgumentException("Cannot find book on hold with Id: " + id.getBookId()));
     }
 
-    private PatronBooks find(PatronId patronId) {
-        return patronBooksRepository
+    private Patron find(PatronId patronId) {
+        return patronRepository
                 .findBy(patronId)
                 .getOrElseThrow(() -> new IllegalArgumentException("Patron with given Id does not exists: " + patronId.getPatronId()));
     }

@@ -15,10 +15,10 @@ import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixtur
 import static io.pillopl.library.lending.patron.model.CheckoutDuration.forNoOfDays
 import static io.pillopl.library.lending.patron.model.HoldDuration.closeEnded
 import static io.pillopl.library.lending.patron.model.HoldDuration.openEnded
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookHoldCanceled.holdCanceledNow
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHold.bookPlacedOnHoldNow
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHoldEvents.events
-import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
+import static io.pillopl.library.lending.patron.model.PatronEvent.BookHoldCanceled.holdCanceledNow
+import static io.pillopl.library.lending.patron.model.PatronEvent.BookPlacedOnHold.bookPlacedOnHoldNow
+import static io.pillopl.library.lending.patron.model.PatronEvent.BookPlacedOnHoldEvents.events
+import static io.pillopl.library.lending.patron.model.PatronFixture.anyPatronId
 import static io.pillopl.library.lending.patron.model.PatronType.Regular
 
 class CreatingDataModelFromPatronEventsTest extends Specification {
@@ -32,7 +32,7 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
 
     def 'should add hold on placedOnHold event with close ended duration'() {
         given:
-            PatronBooksDatabaseEntity entity = createPatron()
+            PatronDatabaseEntity entity = createPatron()
         when:
             entity.handle(placedOnHold(closeEnded(holdFrom, NumberOfDays.of(1))))
         then:
@@ -43,7 +43,7 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
 
     def 'should add hold on placedOnHold event with open ended duration '() {
         given:
-            PatronBooksDatabaseEntity entity = createPatron()
+            PatronDatabaseEntity entity = createPatron()
         when:
             entity.handle(placedOnHold(openEnded()))
         then:
@@ -54,7 +54,7 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
 
     def 'should remove hold on patronCollected event'() {
         given:
-            PatronBooksDatabaseEntity entity = createPatron()
+            PatronDatabaseEntity entity = createPatron()
         when:
             entity.handle(placedOnHold())
         then:
@@ -68,7 +68,7 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
 
     def 'should remove hold on holdCancelled event'() {
         given:
-            PatronBooksDatabaseEntity entity = createPatron()
+            PatronDatabaseEntity entity = createPatron()
         when:
             entity.handle(placedOnHold())
         then:
@@ -81,7 +81,7 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
 
     def 'should remove hold on holdExpired event'() {
         given:
-            PatronBooksDatabaseEntity entity = createPatron()
+            PatronDatabaseEntity entity = createPatron()
         when:
             entity.handle(placedOnHold())
         then:
@@ -95,7 +95,7 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
 
     def 'should add overdue checkout on overdueCheckoutRegistered'() {
         given:
-            PatronBooksDatabaseEntity entity = createPatron()
+            PatronDatabaseEntity entity = createPatron()
         when:
             entity.handle(overdueCheckoutRegistered())
         then:
@@ -104,7 +104,7 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
 
     def 'should remove overdue checkout on bookReturned event'() {
         given:
-            PatronBooksDatabaseEntity entity = createPatron()
+            PatronDatabaseEntity entity = createPatron()
         when:
             entity.handle(overdueCheckoutRegistered())
         then:
@@ -117,12 +117,12 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
 
     }
 
-    PatronBooksDatabaseEntity createPatron() {
-        return new PatronBooksDatabaseEntity(patronId, Regular)
+    PatronDatabaseEntity createPatron() {
+        return new PatronDatabaseEntity(patronId, Regular)
     }
 
-    PatronBooksEvent.BookCollected bookCollected() {
-        return PatronBooksEvent.BookCollected.bookCollectedNow(
+    PatronEvent.BookCollected bookCollected() {
+        return PatronEvent.BookCollected.bookCollectedNow(
                 bookId,
                 type,
                 libraryBranchId,
@@ -130,8 +130,8 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
                 forNoOfDays(1))
     }
 
-    PatronBooksEvent.BookReturned bookReturned() {
-        return new PatronBooksEvent.BookReturned(
+    PatronEvent.BookReturned bookReturned() {
+        return new PatronEvent.BookReturned(
                 Instant.now(),
                 patronId.patronId,
                 bookId.bookId,
@@ -139,14 +139,14 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
                 libraryBranchId.libraryBranchId)
     }
 
-    PatronBooksEvent.BookHoldCanceled holdCanceled() {
+    PatronEvent.BookHoldCanceled holdCanceled() {
         return holdCanceledNow(
                 bookId,
                 libraryBranchId,
                 patronId)
     }
 
-    PatronBooksEvent.BookPlacedOnHoldEvents placedOnHold(HoldDuration duration = closeEnded(5)) {
+    PatronEvent.BookPlacedOnHoldEvents placedOnHold(HoldDuration duration = closeEnded(5)) {
         return events(bookPlacedOnHoldNow(
                 bookId,
                 type,
@@ -155,16 +155,16 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
                 duration))
     }
 
-    PatronBooksEvent.BookHoldExpired bookHoldExpired() {
-        return PatronBooksEvent.BookHoldExpired.now(
+    PatronEvent.BookHoldExpired bookHoldExpired() {
+        return PatronEvent.BookHoldExpired.now(
                 bookId,
                 patronId,
                 libraryBranchId
         )
     }
 
-    PatronBooksEvent.OverdueCheckoutRegistered overdueCheckoutRegistered() {
-        return PatronBooksEvent.OverdueCheckoutRegistered.now(patronId, bookId, libraryBranchId)
+    PatronEvent.OverdueCheckoutRegistered overdueCheckoutRegistered() {
+        return PatronEvent.OverdueCheckoutRegistered.now(patronId, bookId, libraryBranchId)
     }
 
 }

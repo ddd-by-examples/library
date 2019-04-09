@@ -12,7 +12,7 @@ import java.time.Instant
 
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
 import static io.pillopl.library.lending.book.model.BookFixture.bookOnHold
-import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
+import static io.pillopl.library.lending.patron.model.PatronFixture.anyPatronId
 
 class CancelingHoldTest extends Specification {
 
@@ -21,7 +21,7 @@ class CancelingHoldTest extends Specification {
 
     FindBookOnHold willFindBook = { bookId, patronId -> Option.of(bookOnHold) }
     FindBookOnHold willNotFindBook = { bookId, patronId -> Option.none() }
-    PatronBooksRepository repository = Stub()
+    PatronRepository repository = Stub()
 
     def 'should successfully cancel hold if book was placed on hold by patron and patron and book exist'() {
         given:
@@ -88,22 +88,22 @@ class CancelingHoldTest extends Specification {
     }
 
     PatronId persistedRegularPatronWithBookOnHold() {
-        PatronBooks patron = PatronBooksFixture.regularPatronWithHold(bookOnHold)
+        Patron patron = PatronFixture.regularPatronWithHold(bookOnHold)
         repository.findBy(patronId) >> Option.of(patron)
-        repository.publish(_ as PatronBooksEvent) >> patron
+        repository.publish(_ as PatronEvent) >> patron
         return patronId
     }
 
     PatronId persistedRegularPatronWithoutBookOnHold() {
-        PatronBooks patron = PatronBooksFixture.regularPatronWithHolds(10)
+        Patron patron = PatronFixture.regularPatronWithHolds(10)
         repository.findBy(patronId) >> Option.of(patron)
         return patronId
     }
 
     PatronId persistedRegularPatronThatFailsOnSaving() {
-        PatronBooks patron = PatronBooksFixture.regularPatronWithHold(bookOnHold)
+        Patron patron = PatronFixture.regularPatronWithHold(bookOnHold)
         repository.findBy(patronId) >> Option.of(patron)
-        repository.publish(_ as PatronBooksEvent) >> { throw new IllegalStateException() }
+        repository.publish(_ as PatronEvent) >> { throw new IllegalStateException() }
         return patronId
     }
 

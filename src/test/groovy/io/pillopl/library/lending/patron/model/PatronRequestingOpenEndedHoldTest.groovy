@@ -7,10 +7,10 @@ import spock.lang.Specification
 import java.time.Instant
 
 import static io.pillopl.library.lending.book.model.BookFixture.circulatingAvailableBook
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookHoldFailed
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHold
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHoldEvents
-import static PatronBooksFixture.*
+import static PatronEvent.BookHoldFailed
+import static PatronEvent.BookPlacedOnHold
+import static PatronEvent.BookPlacedOnHoldEvents
+import static PatronFixture.*
 import static io.pillopl.library.lending.patron.model.PlacingOnHoldPolicy.onlyResearcherPatronsCanPlaceOpenEndedHolds
 
 class PatronRequestingOpenEndedHoldTest extends Specification {
@@ -23,7 +23,7 @@ class PatronRequestingOpenEndedHoldTest extends Specification {
         and:
             PatronId patronId = anyPatronId()
         and:
-            PatronBooks researcherPatron = researcherPatronWithPolicy(patronId, onlyResearcherPatronsCanPlaceOpenEndedHolds)
+            Patron researcherPatron = researcherPatronWithPolicy(patronId, onlyResearcherPatronsCanPlaceOpenEndedHolds)
         when:
             Either<BookHoldFailed, BookPlacedOnHoldEvents> hold = researcherPatron.placeOnHold(aBook, HoldDuration.openEnded(from))
         then:
@@ -45,7 +45,7 @@ class PatronRequestingOpenEndedHoldTest extends Specification {
         and:
             PatronId patronId = anyPatronId()
         and:
-            PatronBooks regularPatron = regularPatronWithPolicy(patronId, onlyResearcherPatronsCanPlaceOpenEndedHolds)
+            Patron regularPatron = regularPatronWithPolicy(patronId, onlyResearcherPatronsCanPlaceOpenEndedHolds)
         when:
             Either<BookHoldFailed, BookPlacedOnHoldEvents> hold = regularPatron.placeOnHold(aBook, HoldDuration.openEnded(from))
         then:

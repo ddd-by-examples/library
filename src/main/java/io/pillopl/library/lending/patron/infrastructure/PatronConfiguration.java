@@ -10,8 +10,8 @@ import io.pillopl.library.lending.patron.application.hold.FindAvailableBook;
 import io.pillopl.library.lending.patron.application.hold.FindBookOnHold;
 import io.pillopl.library.lending.patron.application.hold.HandleDuplicateHold;
 import io.pillopl.library.lending.patron.application.hold.PlacingOnHold;
-import io.pillopl.library.lending.patron.model.PatronBooksFactory;
-import io.pillopl.library.lending.patron.model.PatronBooksRepository;
+import io.pillopl.library.lending.patron.model.PatronFactory;
+import io.pillopl.library.lending.patron.model.PatronRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
@@ -21,23 +21,23 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 public class PatronConfiguration {
 
     @Bean
-    CollectingBookOnHold collectingBookOnHold(FindBookOnHold findBookOnHold, PatronBooksRepository patronBooksRepository) {
-        return new CollectingBookOnHold(findBookOnHold, patronBooksRepository);
+    CollectingBookOnHold collectingBookOnHold(FindBookOnHold findBookOnHold, PatronRepository patronRepository) {
+        return new CollectingBookOnHold(findBookOnHold, patronRepository);
     }
 
     @Bean
-    RegisteringOverdueCheckout registeringOverdueCheckout(DailySheet dailySheet, PatronBooksRepository patronBooksRepository) {
-        return new RegisteringOverdueCheckout(dailySheet, patronBooksRepository);
+    RegisteringOverdueCheckout registeringOverdueCheckout(DailySheet dailySheet, PatronRepository patronRepository) {
+        return new RegisteringOverdueCheckout(dailySheet, patronRepository);
     }
 
     @Bean
-    CancelingHold cancelingHold(FindBookOnHold findBookOnHold, PatronBooksRepository patronBooksRepository) {
-        return new CancelingHold(findBookOnHold, patronBooksRepository);
+    CancelingHold cancelingHold(FindBookOnHold findBookOnHold, PatronRepository patronRepository) {
+        return new CancelingHold(findBookOnHold, patronRepository);
     }
 
     @Bean
-    ExpiringHolds expiringHolds(DailySheet dailySheet, PatronBooksRepository patronBooksRepository) {
-        return new ExpiringHolds(dailySheet, patronBooksRepository);
+    ExpiringHolds expiringHolds(DailySheet dailySheet, PatronRepository patronRepository) {
+        return new ExpiringHolds(dailySheet, patronRepository);
     }
 
     @Bean
@@ -46,16 +46,16 @@ public class PatronConfiguration {
     }
 
     @Bean
-    PlacingOnHold placingOnHold(FindAvailableBook findAvailableBook, PatronBooksRepository patronBooksRepository) {
-        return new PlacingOnHold(findAvailableBook, patronBooksRepository);
+    PlacingOnHold placingOnHold(FindAvailableBook findAvailableBook, PatronRepository patronRepository) {
+        return new PlacingOnHold(findAvailableBook, patronRepository);
     }
 
     @Bean
-    PatronBooksRepository patronBooksRepository(PatronBooksEntityRepository patronBooksEntityRepository,
+    PatronRepository patronRepository(PatronEntityRepository patronEntityRepository,
                                                 DomainEvents domainEvents) {
-        return new PatronBooksDatabaseRepository(
-                patronBooksEntityRepository,
-                new DomainModelMapper(new PatronBooksFactory()),
+        return new PatronDatabaseRepository(
+                patronEntityRepository,
+                new DomainModelMapper(new PatronFactory()),
                 domainEvents);
     }
 }

@@ -8,9 +8,9 @@ import spock.lang.Specification
 import static io.pillopl.library.lending.book.model.BookFixture.*
 import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.patron.model.HoldDuration.closeEnded
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookHoldFailed
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHoldEvents
-import static PatronBooksFixture.*
+import static PatronEvent.BookHoldFailed
+import static PatronEvent.BookPlacedOnHoldEvents
+import static PatronFixture.*
 import static java.util.Collections.emptySet
 
 class RegularPatronRequestingCirculatingBooksTest extends Specification {

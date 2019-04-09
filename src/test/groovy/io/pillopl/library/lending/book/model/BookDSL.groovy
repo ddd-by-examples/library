@@ -4,7 +4,7 @@ import io.pillopl.library.catalogue.BookId
 import io.pillopl.library.catalogue.BookType
 import io.pillopl.library.commons.aggregates.Version
 import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
-import io.pillopl.library.lending.patron.model.PatronBooksEvent
+import io.pillopl.library.lending.patron.model.PatronEvent
 import io.pillopl.library.lending.patron.model.PatronId
 
 import java.time.Instant
@@ -73,7 +73,7 @@ class BookDSL {
 
     def isReturnedBy(PatronId aPatron) {
         return new BookDSL(this) {
-            PatronBooksEvent.BookReturned at(LibraryBranchId branchId) {
+            PatronEvent.BookReturned at(LibraryBranchId branchId) {
                 return bookReturned(bookProvider(), aPatron, branchId)
             }
         }
@@ -101,7 +101,7 @@ class BookDSL {
                 return this
             }
 
-            PatronBooksEvent.BookPlacedOnHold till(Instant till) {
+            PatronEvent.BookPlacedOnHold till(Instant till) {
                 return bookPlacedOnHold(bookProvider(), onHoldPatronId, placeOnHoldBranchId, onHoldFrom, till)
             }
         }
@@ -109,35 +109,35 @@ class BookDSL {
 
     def isCollectedBy(PatronId aPatron) {
         new BookDSL(this) {
-            PatronBooksEvent.BookCollected at(LibraryBranchId branchId) {
+            PatronEvent.BookCollected at(LibraryBranchId branchId) {
                 return bookCollected(bookProvider(), aPatron, branchId)
             }
         }
     }
 
-    PatronBooksEvent.BookHoldCanceled isCancelledBy(PatronId aPatron) {
+    PatronEvent.BookHoldCanceled isCancelledBy(PatronId aPatron) {
         return bookHoldCanceled(bookProvider(), aPatron, libraryBranchId)
     }
 
-    PatronBooksEvent.BookHoldExpired expired() {
+    PatronEvent.BookHoldExpired expired() {
         return bookHoldExpired(bookProvider(), patronId, libraryBranchId)
     }
 
-    Book reactsTo(PatronBooksEvent event) {
+    Book reactsTo(PatronEvent event) {
         return bookProvider().handle(event)
     }
 
 
-    private static PatronBooksEvent.BookReturned bookReturned(Book bookCollected, PatronId patronId, LibraryBranchId libraryBranchId) {
-        return new PatronBooksEvent.BookReturned(Instant.now(),
+    private static PatronEvent.BookReturned bookReturned(Book bookCollected, PatronId patronId, LibraryBranchId libraryBranchId) {
+        return new PatronEvent.BookReturned(Instant.now(),
                 patronId.patronId,
                 bookCollected.getBookId().bookId,
                 bookCollected.bookInformation.bookType,
                 libraryBranchId.libraryBranchId)
     }
 
-    private static PatronBooksEvent.BookCollected bookCollected(Book bookOnHold, PatronId patronId, LibraryBranchId libraryBranchId) {
-        return new PatronBooksEvent.BookCollected(Instant.now(),
+    private static PatronEvent.BookCollected bookCollected(Book bookOnHold, PatronId patronId, LibraryBranchId libraryBranchId) {
+        return new PatronEvent.BookCollected(Instant.now(),
                 patronId.patronId,
                 bookOnHold.getBookId().bookId,
                 bookOnHold.bookInformation.bookType,
@@ -145,8 +145,8 @@ class BookDSL {
                 Instant.now())
     }
 
-    private static PatronBooksEvent.BookPlacedOnHold bookPlacedOnHold(Book availableBook, PatronId byPatron, LibraryBranchId libraryBranchId, Instant from, Instant till) {
-        return new PatronBooksEvent.BookPlacedOnHold(Instant.now(),
+    private static PatronEvent.BookPlacedOnHold bookPlacedOnHold(Book availableBook, PatronId byPatron, LibraryBranchId libraryBranchId, Instant from, Instant till) {
+        return new PatronEvent.BookPlacedOnHold(Instant.now(),
                 byPatron.patronId,
                 availableBook.getBookId().bookId,
                 availableBook.bookInformation.bookType,
@@ -156,15 +156,15 @@ class BookDSL {
     }
 
 
-    private static PatronBooksEvent.BookHoldExpired bookHoldExpired(Book bookOnHold, PatronId patronId, LibraryBranchId libraryBranchId) {
-        return new PatronBooksEvent.BookHoldExpired(Instant.now(),
+    private static PatronEvent.BookHoldExpired bookHoldExpired(Book bookOnHold, PatronId patronId, LibraryBranchId libraryBranchId) {
+        return new PatronEvent.BookHoldExpired(Instant.now(),
                 bookOnHold.getBookId().bookId,
                 patronId.patronId,
                 libraryBranchId.libraryBranchId)
     }
 
-    private static PatronBooksEvent.BookHoldCanceled bookHoldCanceled(Book bookOnHold, PatronId patronId, LibraryBranchId libraryBranchId) {
-        return new PatronBooksEvent.BookHoldCanceled(Instant.now(),
+    private static PatronEvent.BookHoldCanceled bookHoldCanceled(Book bookOnHold, PatronId patronId, LibraryBranchId libraryBranchId) {
+        return new PatronEvent.BookHoldCanceled(Instant.now(),
                 bookOnHold.getBookId().bookId,
                 patronId.patronId,
                 libraryBranchId.libraryBranchId)

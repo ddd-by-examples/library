@@ -4,7 +4,7 @@ import io.pillopl.library.catalogue.BookId;
 import io.pillopl.library.catalogue.BookType;
 import io.pillopl.library.commons.aggregates.Version;
 import io.pillopl.library.lending.librarybranch.model.LibraryBranchId;
-import io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHold;
+import io.pillopl.library.lending.patron.model.PatronEvent.BookPlacedOnHold;
 import io.pillopl.library.lending.patron.model.PatronId;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;

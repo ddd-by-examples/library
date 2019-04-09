@@ -1,7 +1,7 @@
 package io.pillopl.library.lending.book.model
 
 import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
-import io.pillopl.library.lending.patron.model.PatronBooksEvent
+import io.pillopl.library.lending.patron.model.PatronEvent
 import io.pillopl.library.lending.patron.model.PatronId
 import spock.lang.Specification
 
@@ -11,7 +11,7 @@ import static io.pillopl.library.lending.book.model.BookDSL.aCirculatingBook
 import static io.pillopl.library.lending.book.model.BookDSL.the
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
 import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatron
+import static io.pillopl.library.lending.patron.model.PatronFixture.anyPatron
 
 class BookPlacingOnHoldTest extends Specification {
 
@@ -29,7 +29,7 @@ class BookPlacingOnHoldTest extends Specification {
             LibraryBranchId aBranch = anyBranch()
 
         and:
-            PatronBooksEvent.BookPlacedOnHold bookPlacedOnHoldEvent = the availableBook isPlacedOnHoldBy aPatron at aBranch from now till oneHourLater
+            PatronEvent.BookPlacedOnHold bookPlacedOnHoldEvent = the availableBook isPlacedOnHoldBy aPatron at aBranch from now till oneHourLater
 
         when:
             BookOnHold onHold = the availableBook reactsTo bookPlacedOnHoldEvent

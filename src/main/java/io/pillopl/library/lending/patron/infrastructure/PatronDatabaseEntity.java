@@ -1,8 +1,8 @@
 package io.pillopl.library.lending.patron.infrastructure;
 
 
-import io.pillopl.library.lending.patron.model.PatronBooksEvent;
-import io.pillopl.library.lending.patron.model.PatronBooksEvent.*;
+import io.pillopl.library.lending.patron.model.PatronEvent;
+import io.pillopl.library.lending.patron.model.PatronEvent.*;
 import io.pillopl.library.lending.patron.model.PatronId;
 import io.pillopl.library.lending.patron.model.PatronType;
 import io.vavr.API;
@@ -18,7 +18,7 @@ import static io.vavr.API.Case;
 import static io.vavr.Predicates.instanceOf;
 
 @NoArgsConstructor
-class PatronBooksDatabaseEntity {
+class PatronDatabaseEntity {
 
     @Id
     Long id;
@@ -27,14 +27,14 @@ class PatronBooksDatabaseEntity {
     Set<HoldDatabaseEntity> booksOnHold;
     Set<OverdueCheckoutDatabaseEntity> checkouts;
 
-     PatronBooksDatabaseEntity(PatronId patronId, PatronType patronType) {
+     PatronDatabaseEntity(PatronId patronId, PatronType patronType) {
         this.patronId = patronId.getPatronId();
         this.patronType = patronType;
         this.booksOnHold = new HashSet<>();
         this.checkouts = new HashSet<>();
     }
 
-    PatronBooksDatabaseEntity handle(PatronBooksEvent event) {
+    PatronDatabaseEntity handle(PatronEvent event) {
         return API.Match(event).of(
                 Case($(instanceOf(BookPlacedOnHoldEvents.class)), this::handle),
                 Case($(instanceOf(BookPlacedOnHold.class)), this::handle),
@@ -47,39 +47,39 @@ class PatronBooksDatabaseEntity {
         );
     }
 
-    private PatronBooksDatabaseEntity handle(BookPlacedOnHoldEvents placedOnHoldEvents) {
+    private PatronDatabaseEntity handle(BookPlacedOnHoldEvents placedOnHoldEvents) {
         BookPlacedOnHold event = placedOnHoldEvents.getBookPlacedOnHold();
         return handle(event);
     }
 
-    private PatronBooksDatabaseEntity handle(BookPlacedOnHold event) {
+    private PatronDatabaseEntity handle(BookPlacedOnHold event) {
         booksOnHold.add(new HoldDatabaseEntity(event.getBookId(), event.getPatronId(), event.getLibraryBranchId(), event.getHoldTill()));
         return this;
     }
 
-    private PatronBooksDatabaseEntity handle(BookHoldCanceled event) {
+    private PatronDatabaseEntity handle(BookHoldCanceled event) {
         return removeHoldIfPresent(event.getPatronId(), event.getBookId(), event.getLibraryBranchId());
     }
 
 
-    private PatronBooksDatabaseEntity handle(BookCollected event) {
+    private PatronDatabaseEntity handle(BookCollected event) {
         return removeHoldIfPresent(event.getPatronId(), event.getBookId(), event.getLibraryBranchId());
     }
 
-    private PatronBooksDatabaseEntity handle(BookHoldExpired event) {
+    private PatronDatabaseEntity handle(BookHoldExpired event) {
         return removeHoldIfPresent(event.getPatronId(), event.getBookId(), event.getLibraryBranchId());
     }
 
-    private PatronBooksDatabaseEntity handle(OverdueCheckoutRegistered event) {
+    private PatronDatabaseEntity handle(OverdueCheckoutRegistered event) {
         checkouts.add(new OverdueCheckoutDatabaseEntity(event.getBookId(), event.getPatronId(), event.getLibraryBranchId()));
         return this;
     }
 
-    private PatronBooksDatabaseEntity handle(BookReturned event) {
+    private PatronDatabaseEntity handle(BookReturned event) {
         return removeOverdueCheckoutIfPresent(event.getPatronId(), event.getBookId(), event.getLibraryBranchId());
     }
 
-    private PatronBooksDatabaseEntity removeHoldIfPresent(UUID patronId, UUID bookId, UUID libraryBranchId) {
+    private PatronDatabaseEntity removeHoldIfPresent(UUID patronId, UUID bookId, UUID libraryBranchId) {
         booksOnHold
                 .stream()
                 .filter(entity -> entity.is(patronId, bookId, libraryBranchId))
@@ -88,7 +88,7 @@ class PatronBooksDatabaseEntity {
         return this;
     }
 
-    private PatronBooksDatabaseEntity removeOverdueCheckoutIfPresent(UUID patronId, UUID bookId, UUID libraryBranchId) {
+    private PatronDatabaseEntity removeOverdueCheckoutIfPresent(UUID patronId, UUID bookId, UUID libraryBranchId) {
         checkouts
                 .stream()
                 .filter(entity -> entity.is(patronId, bookId, libraryBranchId))

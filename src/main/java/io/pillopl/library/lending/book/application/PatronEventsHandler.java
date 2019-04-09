@@ -3,7 +3,7 @@ package io.pillopl.library.lending.book.application;
 import io.pillopl.library.catalogue.BookId;
 import io.pillopl.library.commons.events.DomainEvents;
 import io.pillopl.library.lending.book.model.*;
-import io.pillopl.library.lending.patron.model.PatronBooksEvent.*;
+import io.pillopl.library.lending.patron.model.PatronEvent.*;
 import io.pillopl.library.lending.patron.model.PatronId;
 import io.vavr.API;
 import lombok.AllArgsConstructor;
@@ -16,7 +16,7 @@ import static io.vavr.API.Case;
 import static io.vavr.Predicates.instanceOf;
 
 @AllArgsConstructor
-public class PatronBookEventsHandler {
+public class PatronEventsHandler {
 
     private final BookRepository bookRepository;
     private final DomainEvents domainEvents;

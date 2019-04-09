@@ -4,9 +4,9 @@ package io.pillopl.library.lending.patron.model
 import io.vavr.control.Either
 import spock.lang.Specification
 
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookHoldFailed
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHoldEvents
-import static PatronBooksFixture.regularPatron
+import static PatronEvent.BookHoldFailed
+import static PatronEvent.BookPlacedOnHoldEvents
+import static PatronFixture.regularPatron
 import static io.pillopl.library.lending.book.model.BookFixture.restrictedBook
 
 class RegularPatronRequestingRestrictedBooksTest extends Specification {

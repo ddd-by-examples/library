@@ -7,8 +7,8 @@ import io.pillopl.library.lending.book.model.BookOnHold
 import io.pillopl.library.lending.book.model.BookRepository
 import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
 import io.pillopl.library.lending.patron.model.HoldDuration
-import io.pillopl.library.lending.patron.model.PatronBooks
-import io.pillopl.library.lending.patron.model.PatronBooksRepository
+import io.pillopl.library.lending.patron.model.Patron
+import io.pillopl.library.lending.patron.model.PatronRepository
 import io.pillopl.library.lending.patron.model.PatronId
 import io.vavr.control.Option
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,12 +20,12 @@ import spock.lang.Specification
 import javax.sql.DataSource
 
 import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHold.bookPlacedOnHoldNow
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHoldEvents
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.BookPlacedOnHoldEvents.events
-import static io.pillopl.library.lending.patron.model.PatronBooksEvent.PatronCreated
-import static io.pillopl.library.lending.patron.model.PatronBooksFixture.anyPatronId
-import static io.pillopl.library.lending.patron.model.PatronBooksFixture.regularPatron
+import static io.pillopl.library.lending.patron.model.PatronEvent.BookPlacedOnHold.bookPlacedOnHoldNow
+import static io.pillopl.library.lending.patron.model.PatronEvent.BookPlacedOnHoldEvents
+import static io.pillopl.library.lending.patron.model.PatronEvent.BookPlacedOnHoldEvents.events
+import static io.pillopl.library.lending.patron.model.PatronEvent.PatronCreated
+import static io.pillopl.library.lending.patron.model.PatronFixture.anyPatronId
+import static io.pillopl.library.lending.patron.model.PatronFixture.regularPatron
 import static io.pillopl.library.lending.patron.model.PatronType.Regular
 
 @SpringBootTest(classes = LendingTestContext.class)
@@ -36,7 +36,7 @@ class StrongConsistencyBetweenAggregatesAndReadModelsIT extends Specification {
     AvailableBook book = BookFixture.circulatingBook()
 
     @Autowired
-    PatronBooksRepository patronBooksRepo
+    PatronRepository patronRepo
 
     @Autowired
     BookRepository bookRepository
@@ -44,13 +44,13 @@ class StrongConsistencyBetweenAggregatesAndReadModelsIT extends Specification {
     @Autowired
     DataSource datasource
 
-    def 'should synchronize PatronBooks, Book and DailySheet with events'() {
+    def 'should synchronize Patron, Book and DailySheet with events'() {
         given:
             bookRepository.save(book)
         and:
-            patronBooksRepo.publish(patronCreated())
+            patronRepo.publish(patronCreated())
         when:
-            patronBooksRepo.publish(placedOnHold(book))
+            patronRepo.publish(placedOnHold(book))
         then:
             patronShouldBeFoundInDatabaseWithOneBookOnHold(patronId)
         and:
@@ -84,17 +84,17 @@ class StrongConsistencyBetweenAggregatesAndReadModelsIT extends Specification {
     }
 
     void patronShouldBeFoundInDatabaseWithOneBookOnHold(PatronId patronId) {
-        PatronBooks patronBooks = loadPersistedPatron(patronId)
-        assert patronBooks.numberOfHolds() == 1
-        assert patronBooks.equals(regularPatron(patronId))
+        Patron patron = loadPersistedPatron(patronId)
+        assert patron.numberOfHolds() == 1
+        assert patron.equals(regularPatron(patronId))
     }
 
 
-    PatronBooks loadPersistedPatron(PatronId patronId) {
-        Option<PatronBooks> loaded = patronBooksRepo.findBy(patronId)
-        PatronBooks patronBooks = loaded.getOrElseThrow({
+    Patron loadPersistedPatron(PatronId patronId) {
+        Option<Patron> loaded = patronRepo.findBy(patronId)
+        Patron patron = loaded.getOrElseThrow({
             new IllegalStateException("should have been persisted")
         })
-        return patronBooks
+        return patron
     }
 }
