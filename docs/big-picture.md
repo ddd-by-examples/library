@@ -3,7 +3,7 @@
 We started the domain exploration with sticky notes and a pen. What turned out to be the first discovery,
 was the **close-ended book holding** process:
   
-![Close ended book holding](docs/images/es/bigpicture/close-ended-book-holding-process.png)  
+![Close ended book holding](images/es/bigpicture/close-ended-book-holding-process.png)  
   
 Let's briefly walk through it:
 - A **Regular Patron** can **place a book on a close-ended hold**  
@@ -15,11 +15,11 @@ Let's briefly walk through it:
 On the high level, the process looks clear now, but it does not work the way, that all of us
 interpreted each word written no the sticky note similarly. That's why we established some definitions:  
 
-![Definitions](docs/images/es/bigpicture/definitions-1.png)  
+![Definitions](images/es/bigpicture/definitions-1.png)  
 
 Similar discoveries were made around **open-ened book holding** process:  
 
-![Open ended book holding](docs/images/es/bigpicture/open-ended-book-holding-process.png)  
+![Open ended book holding](images/es/bigpicture/open-ended-book-holding-process.png)  
 
 - A **Researcher Patron** can **place a book on an open-ended hold**
 - A **Researcher Patron** can either **cancel the hold** or **collect a book**
@@ -29,7 +29,7 @@ Similar discoveries were made around **open-ened book holding** process:
 All right. These two processes are very similar. The part that they have in common, and we know nothing about
 it yet is called the **book checkout process**:
 
-![Book checkout process](docs/images/es/bigpicture/book-checkout-process.png)  
+![Book checkout process](images/es/bigpicture/book-checkout-process.png)  
 
 Here's what you see there described with words:
 - **Any Patron** can **return a book**
@@ -40,7 +40,7 @@ we find and **register overdue checkouts**
 
 Wait, but what is this **checkout**?  
 
-![Definitions](docs/images/es/bigpicture/definitions-2.png)  
+![Definitions](images/es/bigpicture/definitions-2.png)  
 
 _- OK, now tell me what is this fee application process_  
 _- Nope, it is not relevant by now, will get back to it later_  
