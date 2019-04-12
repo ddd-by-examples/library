@@ -61,7 +61,7 @@ The description you found in the previous chapter, landed on our virtual wall:
 The EventStorming session led us to numerous discoveries, modeled with the sticky notes:  
 ![Event Storming Big Picture](docs/images/eventstorming-big-picture.jpg)   
 During the session we discovered following definitions:  
-![Event Storming Definitions](docs/images/eventstorming-definitions.jpg)    
+![Event Storming Definitions](docs/images/eventstorming-definitions.png)    
 
 This made us think of real life scenarios that might happen. We discovered them described with the help of
 the **Example mapping**:  
