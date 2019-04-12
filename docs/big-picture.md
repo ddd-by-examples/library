@@ -10,12 +10,13 @@ Let's briefly walk through it:
 - A **Regular Patron** might **reach a maximum holds number** after a **hold is placed**  
 - A **Regular Patron** can either **cancel the hold** or **collect the book**  
 - While the book is **collected** the **hold is completed** and so the **returning process** starts  
-- Whenever a new day starts, we check if a hold is not hanging for too long. If so, the **book hold is expired**  
+- Whenever a new day starts, we check the **daily sheet** if a hold is not hanging for too long. If so,
+the **book hold is expired**  
 
 On the high level, the process looks clear now, but it does not work the way, that all of us
 interpreted each word written no the sticky note similarly. That's why we established some definitions:  
 
-![Definitions](images/es/bigpicture/es-definitions-1.png)  
+![Definitions](images/es/bigpicture/definitions-1.png)  
 
 Similar discoveries were made around **open-ened book holding** process:  
 
@@ -36,11 +37,11 @@ Here's what you see there described with words:
 - If the **checkout is overdue**, it is being unregistered as soon as the **book is returned**
 - In the moment of **returning a book** we start the process of **Fees application**
 - From the moment of **book collection**, a patron might not return the book on time. Whenever a **new day starts**
-we find and **register overdue checkouts**
+we check the **daily sheet** find and **register overdue checkouts**
 
 Wait, but what is this **checkout**?  
 
-![Definitions](images/es/bigpicture/es-definitions-2.png)  
+![Definitions](images/es/bigpicture/definitions-2.png)  
 
 _- OK, now tell me what is this fee application process_  
 _- Nope, it is not relevant by now, will get back to it later_  
@@ -48,3 +49,20 @@ _- But wait, why? Shouldn't you get the full picture from the storming?_
 _- Yes, but remember, the time has its cost. You always need to focus on the most relevant (at this moment) business part.
 I promise to get back to this at the next workshop._  
 _- Fair enough!_  
+
+Fundamental question that raises now is _where do these books come from?_ Looking again at the domain description,
+we have a notion of a **catalogue**. We modelled it accordingly:  
+
+![Definitions](images/es/bigpicture/book-catalogue.png)   
+
+Here's what happens:
+- A **library employee** can add a book into a catalogue
+- A specific **book instance** can be **added** as well, thanks to which it can be made **available** under some not 
+defined yet policy
+- Both **Book removed from catalogue** and **Book instance removed from catalogue** are marked with **hot spots**,
+as they became problematic. We left answering those problems for the future.  
+
+
+This is more or less where the first iteration of _Big Picture EventStorming_ finished. After this phase
+we had a good understanding of how library processes work on high level, and, what is an invaluable outcome,
+we got the **ubiquitous language** including well described definitions.
