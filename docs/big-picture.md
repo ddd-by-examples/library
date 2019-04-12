@@ -15,7 +15,7 @@ Let's briefly walk through it:
 On the high level, the process looks clear now, but it does not work the way, that all of us
 interpreted each word written no the sticky note similarly. That's why we established some definitions:  
 
-![Definitions](images/es/bigpicture/definitions-1.png)  
+![Definitions](images/es/bigpicture/es-definitions-1.png)  
 
 Similar discoveries were made around **open-ened book holding** process:  
 
@@ -29,7 +29,7 @@ Similar discoveries were made around **open-ened book holding** process:
 All right. These two processes are very similar. The part that they have in common, and we know nothing about
 it yet is called the **book returning process**:
 
-![Book returning process](images/es/bigpicture/book-returning-process.png)  
+![Book returning process](images/es/bigpicture/the-book-returning-process.png)  
 
 Here's what you see there described with words:
 - **Any Patron** can **return a book**
@@ -40,7 +40,7 @@ we find and **register overdue checkouts**
 
 Wait, but what is this **checkout**?  
 
-![Definitions](images/es/bigpicture/definitions-2.png)  
+![Definitions](images/es/bigpicture/es-definitions-2.png)  
 
 _- OK, now tell me what is this fee application process_  
 _- Nope, it is not relevant by now, will get back to it later_  
