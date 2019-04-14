@@ -14,20 +14,20 @@ not focusing on the original rules, or use cases_
   
 ## Holding
 
-![Holding](images/em/holding.png)  
+![Holding](images/em/em-holding.png)  
 
 ## Expiring hold
 
-![Expiring hold](images/em/expiring-hold.png) 
+![Expiring hold](images/em/em-expiring-hold.png) 
 
 ## Canceling hold
 
-![Canceling hold](images/em/expiring-hold.png)
+![Canceling hold](images/em/em-expiring-hold.png)
 
 ## Overdue checkouts
 
-![Overdue checkouts](images/em/overdue-checkouts.png)  
+![Overdue checkouts](images/em/em-overdue-checkouts.png)  
 
 ## Adding to catalogue
 
-![Adding to catalogue](images/em/adding-to-catalogue.png)
+![Adding to catalogue](images/em/em-adding-to-catalogue.png)
