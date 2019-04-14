@@ -10,7 +10,7 @@ of them separately with Design Level EventStorming. The intermediate step is cal
 paragraphs, you will find results of this session.
 
 _Please note that this is a simplified variation of Example Mapping, where we just group examples by business areas,
-not focusing on the original rules, or use cases_
+not focusing on the rules, or use cases from the original technique_
   
 ## Holding
 
