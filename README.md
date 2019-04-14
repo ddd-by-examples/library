@@ -505,7 +505,7 @@ class BookPlacedOnHold implements PatronEvent {
 ```
 ```java
 @Value
-class MaximumNumberOhHoldsReached implements PatronEvent {
+class MaximumNumberOfHoldsReached implements PatronEvent {
     ...    
 }
 ```
@@ -542,7 +542,7 @@ class BookPlacedOnHoldEvents implements PatronEvent {
     @NonNull UUID eventId = UUID.randomUUID();
     @NonNull UUID patronId;
     @NonNull BookPlacedOnHold bookPlacedOnHold;
-    @NonNull Option<MaximumNumberOhHoldsReached> maximumNumberOhHoldsReached;
+    @NonNull Option<MaximumNumberOfHoldsReached> maximumNumberOfHoldsReached;
 
     @Override
     public Instant getWhen() {
@@ -553,12 +553,12 @@ class BookPlacedOnHoldEvents implements PatronEvent {
         return new BookPlacedOnHoldEvents(bookPlacedOnHold.getPatronId(), bookPlacedOnHold, Option.none());
     }
 
-    public static BookPlacedOnHoldEvents events(BookPlacedOnHold bookPlacedOnHold, MaximumNumberOhHoldsReached maximumNumberOhHoldsReached) {
-        return new BookPlacedOnHoldEvents(bookPlacedOnHold.patronId, bookPlacedOnHold, Option.of(maximumNumberOhHoldsReached));
+    public static BookPlacedOnHoldEvents events(BookPlacedOnHold bookPlacedOnHold, MaximumNumberOfHoldsReached maximumNumberOfHoldsReached) {
+        return new BookPlacedOnHoldEvents(bookPlacedOnHold.patronId, bookPlacedOnHold, Option.of(maximumNumberOfHoldsReached));
     }
 
     public List<DomainEvent> normalize() {
-        return List.<DomainEvent>of(bookPlacedOnHold).appendAll(maximumNumberOhHoldsReached.toList());
+        return List.<DomainEvent>of(bookPlacedOnHold).appendAll(maximumNumberOfHoldsReached.toList());
     }
 }
 ```
