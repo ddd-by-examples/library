@@ -43,7 +43,7 @@ class PatronProfileReadModel implements PatronProfiles {
 
     private List<Map<String, Object>> findCurrentHoldsFor(PatronId patronId) {
         return sheets.query(
-                "SELECT h.book_id, h.hold_till FROM holds_sheet h WHERE h.hold_by_patron_id = ? AND h.collected_at IS NULL AND h.expired_at IS NULL AND h.canceled_at IS NULL",
+                "SELECT h.book_id, h.hold_till FROM holds_sheet h WHERE h.hold_by_patron_id = ? AND h.checked_out_at IS NULL AND h.expired_at IS NULL AND h.canceled_at IS NULL",
                 new Object[]{patronId.getPatronId()},
                 new ColumnMapRowMapper());
     }
@@ -55,7 +55,7 @@ class PatronProfileReadModel implements PatronProfiles {
 
     private List<Map<String, Object>> findCurrentCheckoutsFor(PatronId patronId) {
         return sheets.query(
-                "SELECT h.book_id, h.checkout_till FROM checkouts_sheet h WHERE h.collected_by_patron_id = ? AND h.returned_at IS NULL",
+                "SELECT h.book_id, h.checkout_till FROM checkouts_sheet h WHERE h.checked_out_by_patron_id = ? AND h.returned_at IS NULL",
                 new Object[]{patronId.getPatronId()},
                 new ColumnMapRowMapper());
     }

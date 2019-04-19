@@ -52,7 +52,7 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
 
     }
 
-    def 'should remove hold on patronCollected event'() {
+    def 'should remove hold on patronCheckedOut event'() {
         given:
             PatronDatabaseEntity entity = createPatron()
         when:
@@ -60,7 +60,7 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
         then:
             entity.booksOnHold.size() == 1
         when:
-            entity.handle(bookCollected())
+            entity.handle(bookCheckedOut())
         then:
             entity.booksOnHold.size() == 0
 
@@ -121,8 +121,8 @@ class CreatingDataModelFromPatronEventsTest extends Specification {
         return new PatronDatabaseEntity(patronId, Regular)
     }
 
-    PatronEvent.BookCollected bookCollected() {
-        return PatronEvent.BookCollected.bookCollectedNow(
+	PatronEvent.BookCheckedOut bookCheckedOut() {
+        return PatronEvent.BookCheckedOut.bookCheckedOutNow(
                 bookId,
                 type,
                 libraryBranchId,

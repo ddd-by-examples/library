@@ -64,9 +64,9 @@ class BookDSL {
         return this
     }
 
-    BookDSL collectedBy(PatronId aPatron) {
+    BookDSL checkedOutBy(PatronId aPatron) {
         bookProvider = { ->
-            new CollectedBook(new BookInformation(bookId, bookType), libraryBranchId, aPatron, version0())
+            new CheckedOutBook(new BookInformation(bookId, bookType), libraryBranchId, aPatron, version0())
         }
         return this
     }
@@ -107,10 +107,10 @@ class BookDSL {
         }
     }
 
-    def isCollectedBy(PatronId aPatron) {
+    def isCheckedOutBy(PatronId aPatron) {
         new BookDSL(this) {
-            PatronEvent.BookCollected at(LibraryBranchId branchId) {
-                return bookCollected(bookProvider(), aPatron, branchId)
+            PatronEvent.BookCheckedOut at(LibraryBranchId branchId) {
+                return bookCheckedOut(bookProvider(), aPatron, branchId)
             }
         }
     }
@@ -128,16 +128,16 @@ class BookDSL {
     }
 
 
-    private static PatronEvent.BookReturned bookReturned(Book bookCollected, PatronId patronId, LibraryBranchId libraryBranchId) {
+    private static PatronEvent.BookReturned bookReturned(Book bookCheckedOut, PatronId patronId, LibraryBranchId libraryBranchId) {
         return new PatronEvent.BookReturned(Instant.now(),
                 patronId.patronId,
-                bookCollected.getBookId().bookId,
-                bookCollected.bookInformation.bookType,
+                bookCheckedOut.getBookId().bookId,
+                bookCheckedOut.bookInformation.bookType,
                 libraryBranchId.libraryBranchId)
     }
 
-    private static PatronEvent.BookCollected bookCollected(Book bookOnHold, PatronId patronId, LibraryBranchId libraryBranchId) {
-        return new PatronEvent.BookCollected(Instant.now(),
+    private static PatronEvent.BookCheckedOut bookCheckedOut(Book bookOnHold, PatronId patronId, LibraryBranchId libraryBranchId) {
+        return new PatronEvent.BookCheckedOut(Instant.now(),
                 patronId.patronId,
                 bookOnHold.getBookId().bookId,
                 bookOnHold.bookInformation.bookType,

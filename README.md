@@ -30,7 +30,7 @@ Available books can be placed on hold only by one patron at any given point in t
 Books are either circulating or restricted, and can have retrieval or usage fees.
 A restricted book can only be held by a researcher patron. A regular patron is limited
 to five holds at any given moment, while a researcher patron is allowed an unlimited number
-of holds. An open-ended book hold is active until the patron collects the book, at which time it
+of holds. An open-ended book hold is active until the patron checks out the book, at which time it
 is completed. A closed-ended book hold that is not completed within a fixed number of 
 days after it was requested will expire. This check is done at the beginning of a day by 
 taking a look at daily sheet with expiring holds. Only a researcher patron can request
@@ -320,7 +320,7 @@ class BookDatabaseRepository implements FindAvailableBook {
     
 #### Type system
 _Type system - like_ modelling - we modelled each domain object's state discovered during EventStorming as separate
-classes: `AvailableBook`, `BookOnHold`, `CollectedBook`. With this approach we provide much clearer abstraction than
+classes: `AvailableBook`, `BookOnHold`, `CheckedOutBook`. With this approach we provide much clearer abstraction than
 having a single `Book` class with an enum-based state management. Moving the logic to these specific classes brings
 Single Responsibility Principle to a different level. Moreover, instead of checking invariants in every business method
 we leave the role to the compiler. As an example, please consider following scenario: _you can place on hold only a book

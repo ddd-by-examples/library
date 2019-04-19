@@ -60,21 +60,21 @@ class BookReturningTest extends Specification {
             onHold.holdPlacedAt == aBranch
     }
 
-    def 'should return book which is marked as collected in the system'() {
+    def 'should return book which is marked as checkedOut in the system'() {
         given:
-            BookDSL collectedBook = aCirculatingBook() with anyBookId() locatedIn anyBranch() collectedBy anyPatron()
+            BookDSL checkedOutBook = aCirculatingBook() with anyBookId() locatedIn anyBranch() checkedOutBy anyPatron()
 
         and:
-            PatronEvent.BookReturned bookReturnedEvent = the collectedBook isReturnedBy anyPatron() at anyBranch()
+            PatronEvent.BookReturned bookReturnedEvent = the checkedOutBook isReturnedBy anyPatron() at anyBranch()
 
         when:
-            AvailableBook available = the collectedBook reactsTo bookReturnedEvent
+            AvailableBook available = the checkedOutBook reactsTo bookReturnedEvent
 
         then:
-            available.bookId == collectedBook.bookId
+            available.bookId == checkedOutBook.bookId
     }
 
-    def 'should collect book which is marked as placed on hold in the system'() {
+    def 'should check out book which is marked as placed on hold in the system'() {
         given:
             BookDSL onHoldBook = aCirculatingBook() with anyBookId() locatedIn anyBranch() placedOnHoldBy anyPatron()
 
@@ -82,14 +82,14 @@ class BookReturningTest extends Specification {
             LibraryBranchId aBranch = anyBranch()
 
         and:
-            PatronEvent.BookCollected bookCollectedEvent = the onHoldBook isCollectedBy anyPatron() at aBranch
+		PatronEvent.BookCheckedOut bookCheckedOutEvent = the onHoldBook isCheckedOutBy anyPatron() at aBranch
 
         when:
-            CollectedBook collectedBook = the onHoldBook reactsTo bookCollectedEvent
+            CheckedOutBook checkedOutBook = the onHoldBook reactsTo bookCheckedOutEvent
 
         then:
-            collectedBook.bookId == onHoldBook.bookId
-            collectedBook.collectedAt == aBranch
+            checkedOutBook.bookId == onHoldBook.bookId
+            checkedOutBook.checkedOutAt == aBranch
     }
 
 }

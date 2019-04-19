@@ -7,8 +7,8 @@ import io.pillopl.library.lending.librarybranch.model.LibraryBranchId;
 import io.pillopl.library.lending.patron.application.hold.FindBookOnHold;
 import io.pillopl.library.lending.patron.model.CheckoutDuration;
 import io.pillopl.library.lending.patron.model.Patron;
-import io.pillopl.library.lending.patron.model.PatronEvent.BookCollected;
-import io.pillopl.library.lending.patron.model.PatronEvent.BookCollectingFailed;
+import io.pillopl.library.lending.patron.model.PatronEvent.BookCheckedOut;
+import io.pillopl.library.lending.patron.model.PatronEvent.BookCheckingOutFailed;
 import io.pillopl.library.lending.patron.model.PatronRepository;
 import io.pillopl.library.lending.patron.model.PatronId;
 import io.vavr.control.Either;
@@ -28,31 +28,31 @@ import static io.vavr.Patterns.$Left;
 import static io.vavr.Patterns.$Right;
 
 @AllArgsConstructor
-public class CollectingBookOnHold {
+public class CheckingOutBookOnHold {
 
     private final FindBookOnHold findBookOnHold;
     private final PatronRepository patronRepository;
 
-    public Try<Result> collect(@NonNull CollectBookCommand command) {
+    public Try<Result> checkOut(@NonNull CheckOutBookCommand command) {
         return Try.of(() -> {
             BookOnHold bookOnHold = find(command.getBookId(), command.getPatronId());
             Patron patron = find(command.getPatronId());
-            Either<BookCollectingFailed, BookCollected> result = patron.collect(bookOnHold, command.getCheckoutDuration());
+            Either<BookCheckingOutFailed, BookCheckedOut> result = patron.checkOut(bookOnHold, command.getCheckoutDuration());
             return Match(result).of(
                     Case($Left($()), this::publishEvents),
                     Case($Right($()), this::publishEvents));
         });
     }
 
-    private Result publishEvents(BookCollected bookCollected) {
+    private Result publishEvents(BookCheckedOut bookCheckedOut) {
         patronRepository
-                .publish(bookCollected);
+                .publish(bookCheckedOut);
         return Success;
     }
 
-    private Result publishEvents(BookCollectingFailed bookCollectingFailed) {
+    private Result publishEvents(BookCheckingOutFailed bookCheckingOutFailed) {
         patronRepository
-                .publish(bookCollectingFailed);
+                .publish(bookCheckingOutFailed);
         return Rejection;
     }
 
@@ -71,15 +71,15 @@ public class CollectingBookOnHold {
 }
 
 @Value
-class CollectBookCommand {
+class CheckOutBookCommand {
     @NonNull Instant timestamp;
     @NonNull PatronId patronId;
     @NonNull LibraryBranchId libraryId;
     @NonNull BookId bookId;
     @NonNull Integer noOfDays;
 
-    static CollectBookCommand create(PatronId patronId, LibraryBranchId libraryBranchId, BookId bookId, int noOfDays) {
-        return new CollectBookCommand(Instant.now(), patronId, libraryBranchId, bookId, noOfDays);
+    static CheckOutBookCommand create(PatronId patronId, LibraryBranchId libraryBranchId, BookId bookId, int noOfDays) {
+        return new CheckOutBookCommand(Instant.now(), patronId, libraryBranchId, bookId, noOfDays);
     }
 
     CheckoutDuration getCheckoutDuration() {

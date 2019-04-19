@@ -97,13 +97,13 @@ class FindingHoldsInDailySheetDatabaseIT extends Specification {
             readModel.queryForHoldsToExpireSheet().count() == currentNoOfExpiredHolds
     }
 
-    def 'should never find already collected holds'() {
+    def 'should never find already checkedOut holds'() {
         given:
             int currentNoOfExpiredHolds = readModel.queryForHoldsToExpireSheet().count()
         when:
             readModel.handle(placedOnHold(aCloseEndedHoldTillYesterday()))
         and:
-            readModel.handle(bookCollected())
+            readModel.handle(bookCheckedOut())
         then:
             readModel.queryForHoldsToExpireSheet().count() == currentNoOfExpiredHolds
     }
@@ -148,8 +148,8 @@ class FindingHoldsInDailySheetDatabaseIT extends Specification {
                 libraryBranchId.getLibraryBranchId())
     }
 
-    PatronEvent.BookCollected bookCollected() {
-        return new PatronEvent.BookCollected(
+	PatronEvent.BookCheckedOut bookCheckedOut() {
+        return new PatronEvent.BookCheckedOut(
                 now(),
                 patronId.getPatronId(),
                 bookId.getBookId(),

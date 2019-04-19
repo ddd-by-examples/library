@@ -46,8 +46,8 @@ public class BookFixture {
         return circulatingAvailableBookAt(anyBranch());
     }
 
-    public static CollectedBook collectedBook() {
-        return new CollectedBook(new BookInformation(anyBookId(), Circulating), anyBranch(), anyPatronId(), version0());
+    public static CheckedOutBook checkedOutBook() {
+        return new CheckedOutBook(new BookInformation(anyBookId(), Circulating), anyBranch(), anyPatronId(), version0());
     }
 
     public static AvailableBook restrictedBook() {

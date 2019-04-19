@@ -7,37 +7,37 @@ import spock.lang.Specification
 import java.time.Duration
 import java.time.Instant
 
-import static PatronEvent.BookCollectingFailed
+import static io.pillopl.library.lending.patron.model.PatronEvent.BookCheckingOutFailed
 import static PatronFixture.regularPatron
 import static PatronFixture.regularPatronWith
 import static io.pillopl.library.lending.book.model.BookFixture.bookOnHold
 import static io.pillopl.library.lending.patron.model.CheckoutDuration.MAX_CHECKOUT_DURATION
 import static io.pillopl.library.lending.patron.model.CheckoutDuration.maxDuration
 import static io.pillopl.library.lending.patron.model.CheckoutDuration.forNoOfDays
-import static PatronEvent.BookCollected
+import static io.pillopl.library.lending.patron.model.PatronEvent.BookCheckedOut
 import static PatronFixture.onHold
 
-class PatronCollectingBookTest extends Specification {
+class PatronCheckingOutBookTest extends Specification {
 
-    def 'patron cannot collect book which is not placed on hold'() {
+    def 'patron cannot check out book which is not placed on hold'() {
         when:
-            Either<BookCollectingFailed, BookCollected> collect = regularPatron().collect(bookOnHold(), maxDuration())
+            Either<BookCheckingOutFailed, BookCheckedOut> checkOut = regularPatron().checkOut(bookOnHold(), maxDuration())
         then:
-            collect.isLeft()
-            BookCollectingFailed e = collect.getLeft()
+		checkOut.isLeft()
+            BookCheckingOutFailed e = checkOut.getLeft()
             e.reason.contains("book is not on hold by patron")
     }
 
 
-    def 'patron can collect book which was placed on hold by him'() {
+    def 'patron can check out book which was placed on hold by him'() {
         given:
             Hold onHold = onHold()
         and:
             Patron patron = regularPatronWith(onHold)
         when:
-            Either<BookCollectingFailed, BookCollected> collect = patron.collect(bookOnHold(onHold.bookId, onHold.libraryBranchId), maxDuration())
+            Either<BookCheckingOutFailed, BookCheckedOut> checkOut = patron.checkOut(bookOnHold(onHold.bookId, onHold.libraryBranchId), maxDuration())
         then:
-            collect.isRight()
+		checkOut.isRight()
     }
 
     def 'patron can checkout up to 60 days'() {
@@ -50,10 +50,10 @@ class PatronCollectingBookTest extends Specification {
         and:
             BookOnHold bookOnHold = bookOnHold(onHold.bookId, onHold.libraryBranchId)
         when:
-            Either<BookCollectingFailed, BookCollected> collect = patron.collect(bookOnHold, forNoOfDays(checkoutTime, checkoutDays))
+            Either<BookCheckingOutFailed, BookCheckedOut> checkOut = patron.checkOut(bookOnHold, forNoOfDays(checkoutTime, checkoutDays))
         then:
-            collect.isRight()
-            collect.get().with {
+		checkOut.isRight()
+		checkOut.get().with {
                 assert it.libraryBranchId == bookOnHold.holdPlacedAt.libraryBranchId
                 assert it.bookId == bookOnHold.bookInformation.bookId.bookId
                 assert it.till == checkoutTime.plus(Duration.ofDays(checkoutDays))
@@ -69,7 +69,7 @@ class PatronCollectingBookTest extends Specification {
         and:
             Patron patron = regularPatronWith(onHold)
         when:
-            patron.collect(bookOnHold(onHold.bookId, onHold.libraryBranchId), forNoOfDays(checkoutDays))
+            patron.checkOut(bookOnHold(onHold.bookId, onHold.libraryBranchId), forNoOfDays(checkoutDays))
         then:
             thrown(IllegalArgumentException)
         where:

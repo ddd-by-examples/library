@@ -8,8 +8,8 @@ was the **close-ended book holding** process:
 Let's briefly walk through it:
 - A **Regular Patron** can **place a book on a close-ended hold**  
 - A **Regular Patron** might **reach a maximum holds number** after a **hold is placed**  
-- A **Regular Patron** can either **cancel the hold** or **collect the book**  
-- While the book is **collected** the **hold is completed** and so the **returning process** starts  
+- A **Regular Patron** can either **cancel the hold** or **check out the book**  
+- While the book is **checkedout** the **hold is completed** and so the **returning process** starts  
 - Whenever a new day starts, we check the **daily sheet** if a hold is not hanging for too long. If so,
 the **book hold is expired**  
 
@@ -23,8 +23,8 @@ Similar discoveries were made around **open-ened book holding** process:
 ![Open ended book holding](images/es/bigpicture/open-ended-holding-process.png)  
 
 - A **Researcher Patron** can **place a book on an open-ended hold**
-- A **Researcher Patron** can either **cancel the hold** or **collect a book**
-- While the book is **collected** the **hold is completed** and so the **returning process** starts
+- A **Researcher Patron** can either **cancel the hold** or **checkout a book**
+- While the book is **checkedout** the **hold is completed** and so the **returning process** starts
 - Within the **open-ended holding** a **hold** cannot **expire** (mind the lack of **hold expired** event)
 
 All right. These two processes are very similar. The part that they have in common, and we know nothing about

@@ -38,7 +38,7 @@ class PatronDatabaseEntity {
         return API.Match(event).of(
                 Case($(instanceOf(BookPlacedOnHoldEvents.class)), this::handle),
                 Case($(instanceOf(BookPlacedOnHold.class)), this::handle),
-                Case($(instanceOf(BookCollected.class)), this::handle),
+                Case($(instanceOf(BookCheckedOut.class)), this::handle),
                 Case($(instanceOf(BookHoldCanceled.class)), this::handle),
                 Case($(instanceOf(BookHoldExpired.class)), this::handle),
                 Case($(instanceOf(OverdueCheckoutRegistered.class)), this::handle),
@@ -62,7 +62,7 @@ class PatronDatabaseEntity {
     }
 
 
-    private PatronDatabaseEntity handle(BookCollected event) {
+    private PatronDatabaseEntity handle(BookCheckedOut event) {
         return removeHoldIfPresent(event.getPatronId(), event.getBookId(), event.getLibraryBranchId());
     }
 

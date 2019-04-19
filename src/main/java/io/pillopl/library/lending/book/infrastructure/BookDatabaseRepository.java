@@ -51,7 +51,7 @@ class BookDatabaseRepository implements BookRepository, FindAvailableBook, FindB
         int result = Match(book).of(
                 Case($(instanceOf(AvailableBook.class)), this::update),
                 Case($(instanceOf(BookOnHold.class)), this::update),
-                Case($(instanceOf(CollectedBook.class)), this::update)
+                Case($(instanceOf(CheckedOutBook.class)), this::update)
         );
         if (result == 0) {
             throw new AggregateRootIsStale("Someone has updated book in the meantime, book: " + book);
@@ -79,21 +79,21 @@ class BookDatabaseRepository implements BookRepository, FindAvailableBook, FindB
                 bookOnHold.getVersion().getVersion());
     }
 
-    private int update(CollectedBook collectedBook) {
-        return jdbcTemplate.update("UPDATE book_database_entity b SET b.book_state = ?, b.collected_at_branch = ?, b.collected_by_patron = ?, b.version = ? WHERE book_id = ? AND version = ?",
-                Collected.toString(),
-                collectedBook.getCollectedAt().getLibraryBranchId(),
-                collectedBook.getByPatron().getPatronId(),
-                collectedBook.getVersion().getVersion() + 1,
-                collectedBook.getBookId().getBookId(),
-                collectedBook.getVersion().getVersion());
+    private int update(CheckedOutBook checkedoutBook) {
+        return jdbcTemplate.update("UPDATE book_database_entity b SET b.book_state = ?, b.checked_out_at_branch = ?, b.checked_out_by_patron = ?, b.version = ? WHERE book_id = ? AND version = ?",
+                CheckedOut.toString(),
+                checkedoutBook.getCheckedOutAt().getLibraryBranchId(),
+                checkedoutBook.getByPatron().getPatronId(),
+                checkedoutBook.getVersion().getVersion() + 1,
+                checkedoutBook.getBookId().getBookId(),
+                checkedoutBook.getVersion().getVersion());
     }
 
     private void insertNew(Book book) {
         Match(book).of(
                 Case($(instanceOf(AvailableBook.class)), this::insert),
                 Case($(instanceOf(BookOnHold.class)), this::insert),
-                Case($(instanceOf(CollectedBook.class)), this::insert)
+                Case($(instanceOf(CheckedOutBook.class)), this::insert)
         );
     }
 
@@ -106,12 +106,12 @@ class BookDatabaseRepository implements BookRepository, FindAvailableBook, FindB
 
     }
 
-    private int insert(CollectedBook collectedBook) {
-        return insert(collectedBook.getBookId(), collectedBook.type(), Collected, null, null, null, null, collectedBook.getCollectedAt().getLibraryBranchId(), collectedBook.getByPatron().getPatronId());
+    private int insert(CheckedOutBook checkedoutBook) {
+        return insert(checkedoutBook.getBookId(), checkedoutBook.type(), CheckedOut, null, null, null, null, checkedoutBook.getCheckedOutAt().getLibraryBranchId(), checkedoutBook.getByPatron().getPatronId());
 
     }
 
-    private int insert(BookId bookId, BookType bookType, BookDatabaseEntity.BookState state, UUID availableAt, UUID onHoldAt, UUID onHoldBy, Instant onHoldTill, UUID collectedAt, UUID collectedBy) {
+    private int insert(BookId bookId, BookType bookType, BookDatabaseEntity.BookState state, UUID availableAt, UUID onHoldAt, UUID onHoldBy, Instant onHoldTill, UUID checkedOutAt, UUID checkedOutBy) {
         return jdbcTemplate.update("INSERT INTO book_database_entity " +
                         "(id, " +
                         "book_id, " +
@@ -121,11 +121,11 @@ class BookDatabaseRepository implements BookRepository, FindAvailableBook, FindB
                         "on_hold_at_branch, " +
                         "on_hold_by_patron, " +
                         "on_hold_till, " +
-                        "collected_at_branch, " +
-                        "collected_by_patron, " +
+                        "checked_out_at_branch, " +
+                        "checked_out_by_patron, " +
                         "version) VALUES " +
                         "(book_database_entity_seq.nextval, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)",
-                bookId.getBookId(), bookType.toString(), state.toString(), availableAt, onHoldAt, onHoldBy, onHoldTill, collectedAt, collectedBy);
+                bookId.getBookId(), bookType.toString(), state.toString(), availableAt, onHoldAt, onHoldBy, onHoldTill, checkedOutAt, checkedOutBy);
     }
 
     @Override

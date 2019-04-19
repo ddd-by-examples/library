@@ -3,10 +3,10 @@ id INTEGER IDENTITY PRIMARY KEY,
   book_id UUID NOT NULL,
   status VARCHAR(20) NOT NULL,
   checkout_event_id UUID UNIQUE,
-  collected_by_patron_id UUID,
-  collected_at TIMESTAMP,
+  checked_out_by_patron_id UUID,
+  checked_out_at TIMESTAMP,
   returned_at TIMESTAMP,
-  collected_at_branch UUID,
+  checked_out_at_branch UUID,
   checkout_till TIMESTAMP);
 
 
@@ -21,7 +21,7 @@ id INTEGER IDENTITY PRIMARY KEY,
   hold_till TIMESTAMP,
   expired_at TIMESTAMP,
   canceled_at TIMESTAMP,
-  collected_at TIMESTAMP);
+  checked_out_at TIMESTAMP);
 
 CREATE SEQUENCE holds_sheet_seq;
 CREATE SEQUENCE checkouts_sheet_seq;

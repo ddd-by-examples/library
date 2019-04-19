@@ -5,7 +5,7 @@ import io.pillopl.library.lending.book.model.AvailableBook
 import io.pillopl.library.lending.book.model.Book
 import io.pillopl.library.catalogue.BookId
 import io.pillopl.library.lending.book.model.BookOnHold
-import io.pillopl.library.lending.book.model.CollectedBook
+import io.pillopl.library.lending.book.model.CheckedOutBook
 import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
 import io.pillopl.library.lending.patron.model.PatronId
 import io.pillopl.library.lending.book.infrastructure.BookDatabaseEntity.BookState
@@ -59,18 +59,18 @@ class BookEntityToDomainModelMappingTest extends Specification {
             bookOnHold.holdTill == holdTill
     }
 
-    def 'should map to collected book'() {
+    def 'should map to checked out book'() {
         given:
-            BookDatabaseEntity entity = bookEntity(Collected)
+            BookDatabaseEntity entity = bookEntity(CheckedOut)
         when:
             Book book = entity.toDomainModel()
         and:
-            CollectedBook collectedBook = book as CollectedBook
+            CheckedOutBook checkedOutBook = book as CheckedOutBook
         then:
-            collectedBook.bookId == bookId
-            collectedBook.bookInformation.bookType == Circulating
-            collectedBook.collectedAt == yetAnotherBranchId
-            collectedBook.byPatron == anotherPatronId
+            checkedOutBook.bookId == bookId
+            checkedOutBook.bookInformation.bookType == Circulating
+            checkedOutBook.checkedOutAt == yetAnotherBranchId
+            checkedOutBook.byPatron == anotherPatronId
     }
 
     BookDatabaseEntity bookEntity(BookState state) {
@@ -82,7 +82,7 @@ class BookEntityToDomainModelMappingTest extends Specification {
                 on_hold_at_branch: anotherBranchId.libraryBranchId,
                 on_hold_by_patron: patronId.patronId,
                 on_hold_till: holdTill,
-                collected_at_branch: yetAnotherBranchId.libraryBranchId,
-                collected_by_patron: anotherPatronId.patronId)
+                checked_out_at_branch: yetAnotherBranchId.libraryBranchId,
+                checked_out_by_patron: anotherPatronId.patronId)
     }
 }
