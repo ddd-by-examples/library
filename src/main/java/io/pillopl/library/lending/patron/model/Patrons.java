@@ -2,7 +2,7 @@ package io.pillopl.library.lending.patron.model;
 
 import io.vavr.control.Option;
 
-public interface PatronRepository {
+public interface Patrons {
 
     Option<Patron> findBy(PatronId patronId);
 

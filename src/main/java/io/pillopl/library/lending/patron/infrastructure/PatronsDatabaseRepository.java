@@ -23,7 +23,7 @@ import static io.vavr.Predicates.instanceOf;
 import static java.util.stream.Collectors.*;
 
 @AllArgsConstructor
-class PatronDatabaseRepository implements PatronRepository {
+class PatronsDatabaseRepository implements Patrons {
 
     private final PatronEntityRepository patronEntityRepository;
     private final DomainModelMapper domainModelMapper;

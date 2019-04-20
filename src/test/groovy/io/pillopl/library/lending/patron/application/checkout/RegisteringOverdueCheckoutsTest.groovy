@@ -4,7 +4,7 @@ import io.pillopl.library.commons.commands.BatchResult
 import io.pillopl.library.lending.dailysheet.model.CheckoutsToOverdueSheet
 import io.pillopl.library.lending.dailysheet.model.DailySheet
 import io.pillopl.library.lending.patron.model.PatronEvent
-import io.pillopl.library.lending.patron.model.PatronRepository
+import io.pillopl.library.lending.patron.model.Patrons
 import io.pillopl.library.lending.patron.model.PatronId
 import io.vavr.control.Try
 import spock.lang.Specification
@@ -17,7 +17,7 @@ import static io.vavr.collection.List.of
 
 class RegisteringOverdueCheckoutsTest extends Specification {
 
-    PatronRepository repository = Stub()
+    Patrons repository = Stub()
     DailySheet dailySheet = Stub()
     PatronId patronWithOverdueCheckouts = anyPatronId()
     PatronId anotherPatronWithOverdueCheckouts = anyPatronId()

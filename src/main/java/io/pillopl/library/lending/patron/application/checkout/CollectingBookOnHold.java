@@ -9,7 +9,7 @@ import io.pillopl.library.lending.patron.model.CheckoutDuration;
 import io.pillopl.library.lending.patron.model.Patron;
 import io.pillopl.library.lending.patron.model.PatronEvent.BookCollected;
 import io.pillopl.library.lending.patron.model.PatronEvent.BookCollectingFailed;
-import io.pillopl.library.lending.patron.model.PatronRepository;
+import io.pillopl.library.lending.patron.model.Patrons;
 import io.pillopl.library.lending.patron.model.PatronId;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
@@ -31,7 +31,7 @@ import static io.vavr.Patterns.$Right;
 public class CollectingBookOnHold {
 
     private final FindBookOnHold findBookOnHold;
-    private final PatronRepository patronRepository;
+    private final Patrons patronRepository;
 
     public Try<Result> collect(@NonNull CollectBookCommand command) {
         return Try.of(() -> {
