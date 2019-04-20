@@ -7,6 +7,7 @@
     3.2 [Project structure and architecture](#project-structure-and-architecture)    
     3.3 [Aggregates](#aggregates)  
     3.4 [Events](#events)  
+    3.4.1 [Events in Repositories](#events-in-repositories)   
     3.5 [ArchUnit](#archunit)  
     3.6 [Functional thinking](#functional-thinking)  
     3.7 [No ORM](#no-orm)  
@@ -228,6 +229,45 @@ aggregates to exist and function. Otherwise there is a threat that the level of 
 introducing **feature envy**, because other aggregates might start using those events to perform actions
 they are not supposed to perform. A solution to this problem could be the distinction of domain events
 and integration events, which will be described here soon.  
+
+### Events in Repositories 
+Repositories are one of the most popoluar design pattern. They abstract our domain model from data layer. 
+In other words, they deal with state. That said, a common use-case is when we pass a new state to our repository,
+so that it gets persisted. It may look like so:
+
+```java
+public class BusinessService {
+   
+    private final PatronRepository patronRepository;
+    
+    void businessMethod(PatronId patronId) {
+        Patron patron = patronRepository.findById(patronId);
+        //do sth
+        patronRepository.save(patron);
+    }
+}
+```
+
+Conceptually, between 1st and 3rd line of that business method we change state of our Patron from A to B. 
+This change might be calculated by dirty checking or we might just override entire Patron state in the database. 
+Third option is _Let's make implicit explicit_ and actually call this state change A->B an **event**. 
+After all, event-driven architecture is all about promoting state changes as domain events.
+
+Thanks to this our domain model may become immutable and just return events as results of invocking a command like so:
+
+```java
+public BookPlacedOnHold placeOnHold(AvailableBook book) {
+      ...
+}
+```
+
+And our repository might operate directly on events like so:
+
+```java
+public interface PatronRepository {
+     void save(PatronEvent event) {
+}
+```
 
 ### ArchUnit
 
