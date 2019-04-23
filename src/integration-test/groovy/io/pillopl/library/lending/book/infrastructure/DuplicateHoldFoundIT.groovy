@@ -8,7 +8,7 @@ import io.pillopl.library.lending.book.model.BookRepository
 import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
 import io.pillopl.library.lending.patron.model.HoldDuration
 import io.pillopl.library.lending.patron.model.Patron
-import io.pillopl.library.lending.patron.model.PatronRepository
+import io.pillopl.library.lending.patron.model.Patrons
 import io.pillopl.library.lending.patron.model.PatronId
 import io.vavr.control.Option
 import org.springframework.beans.factory.annotation.Autowired
@@ -36,7 +36,7 @@ class DuplicateHoldFoundIT extends Specification {
     AvailableBook book = BookFixture.circulatingBook()
 
     @Autowired
-    PatronRepository patronRepo
+    Patrons patronRepo
 
     @Autowired
     BookRepository bookRepository

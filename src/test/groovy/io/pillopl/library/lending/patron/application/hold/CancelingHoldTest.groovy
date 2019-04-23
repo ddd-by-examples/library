@@ -21,7 +21,7 @@ class CancelingHoldTest extends Specification {
 
     FindBookOnHold willFindBook = { bookId, patronId -> Option.of(bookOnHold) }
     FindBookOnHold willNotFindBook = { bookId, patronId -> Option.none() }
-    PatronRepository repository = Stub()
+    Patrons repository = Stub()
 
     def 'should successfully cancel hold if book was placed on hold by patron and patron and book exist'() {
         given:

@@ -5,7 +5,7 @@ import io.pillopl.library.lending.LendingTestContext
 import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
 import io.pillopl.library.lending.patron.model.HoldDuration
 import io.pillopl.library.lending.patron.model.Patron
-import io.pillopl.library.lending.patron.model.PatronRepository
+import io.pillopl.library.lending.patron.model.Patrons
 import io.pillopl.library.lending.patron.model.PatronId
 import io.pillopl.library.lending.patron.model.PatronType
 import io.vavr.control.Option
@@ -32,7 +32,7 @@ class PatronDatabaseRepositoryIT extends Specification {
     LibraryBranchId libraryBranchId = anyBranch()
 
     @Autowired
-    PatronRepository patronRepo
+    Patrons patronRepo
 
     def 'persistence in real database should work'() {
         when:

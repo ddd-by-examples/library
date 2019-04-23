@@ -6,7 +6,7 @@ import io.pillopl.library.lending.patron.application.hold.FindBookOnHold
 import io.pillopl.library.lending.book.model.BookOnHold
 import io.pillopl.library.lending.patron.model.Patron
 import io.pillopl.library.lending.patron.model.PatronEvent
-import io.pillopl.library.lending.patron.model.PatronRepository
+import io.pillopl.library.lending.patron.model.Patrons
 import io.pillopl.library.lending.patron.model.PatronId
 import io.vavr.control.Option
 import io.vavr.control.Try
@@ -24,7 +24,7 @@ class CheckingOutBookOnHoldTest extends Specification {
 
     FindBookOnHold willFindBook = { bookId, patronId -> Option.of(bookOnHold) }
     FindBookOnHold willNotFindBook = { bookId, patronId -> Option.none() }
-    PatronRepository repository = Stub()
+    Patrons repository = Stub()
 
     def 'should successfully check out book if patron and book exist'() {
         given:

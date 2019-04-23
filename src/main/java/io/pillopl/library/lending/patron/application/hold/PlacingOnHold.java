@@ -25,7 +25,7 @@ import static io.vavr.Patterns.$Right;
 public class PlacingOnHold {
 
     private final FindAvailableBook findAvailableBook;
-    private final PatronRepository patronRepository;
+    private final Patrons patronRepository;
 
     Try<Result> placeOnHold(@NonNull PlaceOnHoldCommand command) {
         return Try.of(() -> {

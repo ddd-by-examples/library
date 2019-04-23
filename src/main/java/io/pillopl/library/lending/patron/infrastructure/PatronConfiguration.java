@@ -11,7 +11,7 @@ import io.pillopl.library.lending.patron.application.hold.FindBookOnHold;
 import io.pillopl.library.lending.patron.application.hold.HandleDuplicateHold;
 import io.pillopl.library.lending.patron.application.hold.PlacingOnHold;
 import io.pillopl.library.lending.patron.model.PatronFactory;
-import io.pillopl.library.lending.patron.model.PatronRepository;
+import io.pillopl.library.lending.patron.model.Patrons;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
@@ -21,22 +21,22 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 public class PatronConfiguration {
 
     @Bean
-    CheckingOutBookOnHold checkingOutBookOnHold(FindBookOnHold findBookOnHold, PatronRepository patronRepository) {
+    CheckingOutBookOnHold checkingOutBookOnHold(FindBookOnHold findBookOnHold, Patrons patronRepository) {
         return new CheckingOutBookOnHold(findBookOnHold, patronRepository);
     }
 
     @Bean
-    RegisteringOverdueCheckout registeringOverdueCheckout(DailySheet dailySheet, PatronRepository patronRepository) {
+    RegisteringOverdueCheckout registeringOverdueCheckout(DailySheet dailySheet, Patrons patronRepository) {
         return new RegisteringOverdueCheckout(dailySheet, patronRepository);
     }
 
     @Bean
-    CancelingHold cancelingHold(FindBookOnHold findBookOnHold, PatronRepository patronRepository) {
+    CancelingHold cancelingHold(FindBookOnHold findBookOnHold, Patrons patronRepository) {
         return new CancelingHold(findBookOnHold, patronRepository);
     }
 
     @Bean
-    ExpiringHolds expiringHolds(DailySheet dailySheet, PatronRepository patronRepository) {
+    ExpiringHolds expiringHolds(DailySheet dailySheet, Patrons patronRepository) {
         return new ExpiringHolds(dailySheet, patronRepository);
     }
 
@@ -46,14 +46,14 @@ public class PatronConfiguration {
     }
 
     @Bean
-    PlacingOnHold placingOnHold(FindAvailableBook findAvailableBook, PatronRepository patronRepository) {
+    PlacingOnHold placingOnHold(FindAvailableBook findAvailableBook, Patrons patronRepository) {
         return new PlacingOnHold(findAvailableBook, patronRepository);
     }
 
     @Bean
-    PatronRepository patronRepository(PatronEntityRepository patronEntityRepository,
-                                                DomainEvents domainEvents) {
-        return new PatronDatabaseRepository(
+    Patrons patronRepository(PatronEntityRepository patronEntityRepository,
+                             DomainEvents domainEvents) {
+        return new PatronsDatabaseRepository(
                 patronEntityRepository,
                 new DomainModelMapper(new PatronFactory()),
                 domainEvents);

@@ -3,7 +3,7 @@ package io.pillopl.library.lending.patron.application.hold;
 import io.pillopl.library.commons.commands.BatchResult;
 import io.pillopl.library.lending.dailysheet.model.DailySheet;
 import io.pillopl.library.lending.patron.model.PatronEvent;
-import io.pillopl.library.lending.patron.model.PatronRepository;
+import io.pillopl.library.lending.patron.model.Patrons;
 import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
 
@@ -11,7 +11,7 @@ import lombok.AllArgsConstructor;
 public class ExpiringHolds {
 
     private final DailySheet find;
-    private final PatronRepository patronRepository;
+    private final Patrons patronRepository;
 
     public Try<BatchResult> expireHolds() {
         return Try.of(() ->
