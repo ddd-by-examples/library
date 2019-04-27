@@ -128,8 +128,18 @@ It might also happen that a **patron** has the hold, whereas the book is missing
 
 ## Expiring a hold
 
+According to the domain description, any **close-ended hold** is active until it is either checked out by **patron** or
+expired. The expiration check is done automatically by the system at the **beginning of the day**:
+
 ![Expiring hold example 1](images/dl/expiringhold/example-1.png)  
+
+When the book is **placed on hold** and the hold is **cancelled** before its expiration due date, it shouldn't be registered
+as expired hold:
+
 ![Expiring hold example 2](images/dl/expiringhold/example-2.png)  
+
+The expiration check should mark each hold as expired only once:
+
 ![Expiring hold example 3](images/dl/expiringhold/example-3.png)  
 
 ## Registering overdue checkout
