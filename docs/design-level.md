@@ -105,10 +105,25 @@ on hold** another book:
 
 ## Checkout
 
+Checking out is actually the essence of library functioning. **Any patron** can checkout a hold, but it is only possible
+when the **hold** exists:
+ 
 ![Checkout example 1](images/dl/bookcheckouts/example-1.png)  
+
+It is also not allowed to checkout someone else's hold:
+
 ![Checkout example 2](images/dl/bookcheckouts/example-2.png)  
+
+An example summing things up is depicted below:
+
 ![Checkout example 3](images/dl/bookcheckouts/example-3.png)  
+
+A real-life scenario could be that a **patron** cancels his/her hold, and tries to check the book out:
+ 
 ![Checkout example 4](images/dl/bookcheckouts/example-4.png)  
+
+It might also happen that a **patron** has the hold, whereas the book is missing in a library:
+  
 ![Checkout example 5](images/dl/bookcheckouts/example-5.png)  
 
 ## Expiring a hold
