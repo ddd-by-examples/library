@@ -79,11 +79,29 @@ Last three examples depict successful holding scenarios:
 
 ## Canceling a hold
 
+Any patron can cancel the hold. The unbreakable condition to be fulfilled is the one that the hold exists.
+If it is not the case **book hold cancelling failed** event occurs.
+
 ![Canceling hold example 1](images/dl/cancelinghold/example-1.png)  
+
+If the hold is present, then it should be possible to cancel it:
+
 ![Canceling hold example 2](images/dl/cancelinghold/example-2.png)  
+
+We also need to take care of the scenario when a **patron** tries to **cancel a hold** that was actually
+not placed by himself/herself:
+
 ![Canceling hold example 3](images/dl/cancelinghold/example-3.png)  
-![Canceling hold example 4](images/dl/cancelinghold/example-4.png)  
+
+It shouldn't be also possible to **cancel a hold** twice:
+
 ![Canceling hold example 5](images/dl/cancelinghold/example-5.png)  
+
+Getting back to holding-related examples, let's try to join them with hold cancellation. Each **patron** can have no more
+than five holds at a particular point in time. Thus, cancelling one of them should be enough for **patron** to **place
+on hold** another book:
+  
+![Canceling hold example 4](images/dl/cancelinghold/example-4.png)  
 
 ## Checkout
 
