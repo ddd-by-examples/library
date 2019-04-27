@@ -147,7 +147,13 @@ The expiration check should mark each hold as expired only once:
 
 ## Registering overdue checkout
 
+Each book can be checked out for not longer than 60 days. **Overdue checkouts** are identified on a daily basis by looking
+at the **Daily sheet** (please mind the green sticky note):
+ 
 ![Overdue checkout example 1](images/dl/overduecheckouts/example-1.png)  
+
+Moreover we do not expect the **returned book** to be ever registered as **overdue checkout**:
+
 ![Overdue checkout example 2](images/dl/overduecheckouts/example-2.png)  
 
 ## Adding to catalogue
