@@ -80,7 +80,8 @@ Last three examples depict successful holding scenarios:
 ## Canceling a hold
 
 Any patron can cancel the hold. The unbreakable condition to be fulfilled is the one that the hold exists.
-If it is not the case **book hold cancelling failed** event occurs.
+If it is not the case **book hold cancelling failed** event occurs. What you can spot here is that now the **patron**,
+in order to cancel a hold, he/she needs to have a view of current holds (mind the **Holds view** green sticky note).
 
 ![Canceling hold example 1](images/dl/cancelinghold/example-1.png)  
 
@@ -129,7 +130,9 @@ It might also happen that a **patron** has the hold, whereas the book is missing
 ## Expiring a hold
 
 According to the domain description, any **close-ended hold** is active until it is either checked out by **patron** or
-expired. The expiration check is done automatically by the system at the **beginning of the day**:
+expired. The expiration check is done automatically by the system at the **beginning of the day**. In order to find holds
+that qualify to expiration, a system needs to have a read model of such entries. Domain description names it a **Daily sheet**
+(please mind the green sticky note)
 
 ![Expiring hold example 1](images/dl/expiringhold/example-1.png)  
 
