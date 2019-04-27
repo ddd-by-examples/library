@@ -1,11 +1,12 @@
 # Design Level EventStorming
 
 As soon as we got our examples written down, we could start digging deep into each of them, identifying key interactions
-with the system, spotting the business rules and constantly refining the model. In the following sections you will
-find mentioned examples modelled with Design Level EventStorming,
+with the system, spotting business rules and constantly refining the model. In the following sections you will
+find mentioned examples modelled with Design Level EventStorming.
+
 
 ## Holding
-### Close-ended book holding
+### Regular patron
 
 The first example is _the one when regular patron tries to place his 6th hold_:
    
@@ -20,19 +21,60 @@ that describes conditions that needs to be fulfilled for the **Book hold failed*
 
 Fair enough, let's go further.
 
-### Open-ended book holding  
+When a **patron** tires to place on hold a book that is currently not available it should not be possible, thus resulting
+in **book hold failed** event, as it is depicted below:
 
 ![Holding example 2](images/dl/holding/example-2.png)  
+
+Taking a look at the domain description again, we find out that each patron can have no more than 1 **overdue checkouts**.
+In such situation, every attempt to **place a book on hold** should fail:
+
 ![Holding example 3](images/dl/holding/example-3.png)  
-![Holding example 4](images/dl/holding/example-4.png)  
+
+If we are talking about **regular patrons**, what is special about them is that they are not allowed to hold a
+**restricted book**:
+  
+![Holding example 4](images/dl/holding/example-4.png)
+
+Second thing that is not allowed for a **regular patron** is **open-ended** hold: 
+![Holding example 12](images/dl/holding/example-12.png)    
+
+All right, enough with failures, let patrons lend some books, eventually:
+  
 ![Holding example 5](images/dl/holding/example-5.png)  
+
+Having in mind all previous examples, we discovered following conditions that need to be fulfilled for **patron** to
+**place a book on hold**:
+* Book must be available
+* Book must not be **restricted**
+* At the moment of placing a hold, a patron cannot have more than 4 holds
+* Patron cannot have more than 1 overdue checkout
+
+And here is the last example, partially covered before:
+
 ![Holding example 6](images/dl/holding/example-6.png)  
+
+### Regular patron
+
+In the previous part of this paragraph we focused on a *regular patron* only. Let's have a look at *researcher patron* now.
+The domain description clearly states that **any** patron with more than 2 **overdue checkouts** will get a rejection
+when trying to place book on hold. So we have it modelled:
+  
 ![Holding example 7](images/dl/holding/example-7.png)  
+
+There is also no exception in terms of holding a book that is **not available**:
+
 ![Holding example 8](images/dl/holding/example-8.png)  
+
+The thing that differentiates **researcher patron** from a **regular** one is that he/she can place on hold a **restricted**
+book:
+
 ![Holding example 9](images/dl/holding/example-9.png)  
+
+Last three examples depict successful holding scenarios:
+
 ![Holding example 10](images/dl/holding/example-10.png)  
 ![Holding example 11](images/dl/holding/example-11.png)  
-![Holding example 12](images/dl/holding/example-12.png)  
 ![Holding example 13](images/dl/holding/example-13.png)    
 
 ## Canceling a hold
