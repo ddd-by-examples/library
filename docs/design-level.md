@@ -158,5 +158,12 @@ Moreover we do not expect the **returned book** to be ever registered as **overd
 
 ## Adding to catalogue
 
+The last area of analysis is the book **catalogue**. Catalogue is a collection of books and their instances.
+A book instance can be added only when there is a book with matching ISBN already registered in the catalogue:
+   
 ![Catalogue example 1](images/dl/addingtocatalogue/example-1.png)  
+
+If this is not the case, adding a book instance into catalogue should end up with failure.
 ![Catalogue example 2](images/dl/addingtocatalogue/example-2.png)  
+
+
