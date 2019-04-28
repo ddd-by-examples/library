@@ -192,7 +192,7 @@ a better name of the **aggregate**. In this paragraph you will see how we worked
 The first shot was to use **Book** as an aggregate. We are __placing **a book** on hold__, __cancelling the hold for **a book**__,
 __checking **a book** out__ - all this sentences make logical sense, and even suits linguistically:
 
-![Aggregate 1](images/aggregates/aggregate-1.png)  
+![Aggregate 1](images/aggregates/agg-1.png)  
 
 The first question that raised, was: __What about the invariants? Do they apply to a book?__. Well, not only.
 When you take a look again at the rules that we discovered in previous paragraphs, you will see things like:
@@ -211,7 +211,7 @@ book.placeOnHoldBy(patron);
 We could, but it is the **patron** that knows more invariants, and we do not want to let any other object to protect them.
 Here is the alternative, then:
 
-![Aggregate 2](images/aggregates/aggregate-2.png)  
+![Aggregate 2](images/aggregates/agg-2.png)  
 
 Okay, so now in order to for example __place a hold__ we need to pass a **Book** object into a **Patron**, right?
 
@@ -236,4 +236,4 @@ likely to be relevant. It is also probably less harmful, then, to place on hold 
 
 Now the final model is following:
 
-![Aggregate 3](images/aggregates/aggregate-3.png)  
+![Aggregate 3](images/aggregates/agg-3.png)  
