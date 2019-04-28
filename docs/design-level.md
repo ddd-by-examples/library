@@ -164,3 +164,77 @@ A book instance can be added only when there is a book with matching ISBN alread
 
 If this is not the case, adding a book instance into catalogue should end up with failure.
 ![Catalogue example 2](images/dl/addingtocatalogue/example-2.png)  
+
+
+## Bounded Context Classification
+
+Until now, we have already identified two **bounded contexts** - **lending contexts**, and **catalogue contexts**.
+Having in mind the domain description, and looking at the amount of discovered business rules, we can clearly see,
+that **lending context** is the one that requires a lot of attention. Comparing the business complexities of both
+contexts led us to conclusion that using **tactical building blocks** of **Domain Driven Design** and applying 
+**hexagonal architecture** are a reasonable choice for **lending context** while **catalogue context** is just
+a simple **CRUD**, and applying the same local architecture would be over-engineering.
+
+You may ask yourself now: __how do you know that **catalogue context** is a CRUD?__. Here's a heuristic.
+If most of the events, named as verbs in past tense, are triggered by commands, being named with the same verbs
+but as imperatives, then it means we are probably just creating, updating, or deleting an object from some database.
+Moreover, if there are no specific (or very little) business rules, then it might suggest that the essential complexity
+sourced in the business is low enough for CRUD to be well applicable. 
+
+## Aggregates
+
+What you could see in the above examples is that we did not specified the **aggregates** that would be responsible for
+handling commands and emitting events. This is actually a trick suggested by **Alberto Brandolini** in his book.
+Such approach keeps us away from being steered into a particular solution/language and consequently limited from the very
+beginning. Looking at behaviours and responsibilities first lets us understand the problem better, and thus find
+a better name of the **aggregate**. In this paragraph you will see how we worked out the final aggregate model.
+
+The first shot was to use **Book** as an aggregate. We are __placing **a book** on hold__, __cancelling the hold for **a book**__,
+__checking **a book** out__ - all this sentences make logical sense, and even suits linguistically:
+
+![Aggregate 1](images/aggregates/aggregate-1.png)  
+
+The first question that raised, was: __What about the invariants? Do they apply to a book?__. Well, not only.
+When you take a look again at the rules that we discovered in previous paragraphs, you will see things like:
+* is the patron a **regular** one or a **researcher**?
+* is patron's maximum number of holds reached?
+* is patron's maximum number of patron's overdue checkouts reached?
+* is book available?
+* is book restricted?
+Book availability and its potential restriction (which is actually a property/characteristic) does not seem to be 
+as critical as those connected with patrons. Secondly, we have more patron-related rules than book-related ones.
+
+OK, but why don't we just pass the **Patron** object into **Book's** methods like:  
+```java
+book.placeOnHoldBy(patron);
+```
+We could, but it is the **patron** that knows more invariants, and we do not want to let any other object to protect them.
+Here is the alternative, then:
+
+![Aggregate 2](images/aggregates/aggregate-2.png)  
+
+Okay, so now in order to for example __place a hold__ we need to pass a **Book** object into a **Patron**, right?
+
+```java
+patron.hold(book);
+```  
+
+Then, if both patron's and book's invariants pass, we would modify patron and book aggregates. But doesn't it sound like
+modifying two different aggregates in one transaction? Moreover, there is one more catch. Book's invariants (including its
+availability) are just our "best wish". Our book model is just an abstraction of the real world books to lend in a library.
+Why? Because in the real world a book that is placed on hold, might be found damaged or lost in the meantime.
+Patron's invariants are more likely to be up to date and "driven" by our system. Gauges like number of holds, overdue checkouts
+are much easier to be "real ones". This in turn means that it is okay to follow (suggested - after all) eventual consistency
+model of inter-aggregate communication. It would make our model more realistic. Classes would be smaller, and easier
+to work with and to maintain.
+
+We have 2 aggregates now. We could revise the decision of *Patron* being the first aggregate to be modified, and the
+**Book** being consistent in the future (eventually). We have already concluded that the **Book** is just a nice
+projection of the real world plus patron has more invariants to drive the process. Also, these invariants are more
+likely to be relevant. It is also probably less harmful, then, to place on hold a book which is actually not available
+(and run compensation process) than let patrons place books on hold while having overdue checkouts.
+
+Now the final model is following:
+
+
+ 
