@@ -236,5 +236,4 @@ likely to be relevant. It is also probably less harmful, then, to place on hold 
 
 Now the final model is following:
 
-
- 
+![Aggregate 3](images/aggregates/aggregate-3.png)  
