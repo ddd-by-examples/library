@@ -53,7 +53,7 @@ _- Fair enough!_
 Fundamental question that raises now is _where do these books come from?_ Looking again at the domain description,
 we have a notion of a **catalogue**. We modelled it accordingly:  
 
-![Definitions](images/es/bigpicture/book-catalogue.png)   
+![Catalogue](images/es/bigpicture/book-catalogue.png)   
 
 Here's what happens:
 - A **library employee** can add a book into a catalogue
@@ -62,7 +62,19 @@ defined yet policy
 - Both **Book removed from catalogue** and **Book instance removed from catalogue** are marked with **hot spots**,
 as they became problematic. We left answering those problems for the future.  
 
+There is one interesting thing we can spot in this simple **catalogue** flow. **A book** is not the same **book** that
+we had in previous processes. To make things clear, let's have a look at new definitions:
+
+![Catalogue definitions](images/es/bigpicture/book-catalogue-definitions.png)    
+
+Spotting such differences helps us in drawing linguistic boundaries, that are one of the heuristics for defining 
+**bounded contexts**. From this moment on, we can assume that we have at least two **bounded contexts**:
+* **lending** - context containing all business processes logically connected with book lending, including holding, 
+checkout, and return
+* **catalogue** - contexts for cataloguing books and their instances
+
+__More information on bounded contexts' defining will be added soon__
 
 This is more or less where the first iteration of _Big Picture EventStorming_ finished. After this phase
 we had a good understanding of how library processes work on high level, and, what is an invaluable outcome,
-we got the **ubiquitous language** including well described definitions.
+we got the **ubiquitous language** including well described definitions, and initial **bounded contexts**.

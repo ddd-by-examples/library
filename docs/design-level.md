@@ -4,7 +4,6 @@ As soon as we got our examples written down, we could start digging deep into ea
 with the system, spotting business rules and constantly refining the model. In the following sections you will
 find mentioned examples modelled with Design Level EventStorming.
 
-
 ## Holding
 ### Regular patron
 
@@ -165,5 +164,3 @@ A book instance can be added only when there is a book with matching ISBN alread
 
 If this is not the case, adding a book instance into catalogue should end up with failure.
 ![Catalogue example 2](images/dl/addingtocatalogue/example-2.png)  
-
-
