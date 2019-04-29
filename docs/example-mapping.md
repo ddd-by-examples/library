@@ -14,7 +14,11 @@ not focusing on the rules, or use cases from the original technique_
   
 ## Holding
 
-![Holding](images/em/holding.png)  
+![Holding](images/em/holding.png)
+
+## Checkout
+
+![Checkout](images/em/checking-out.png)  
 
 ## Expiring hold
 

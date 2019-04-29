@@ -72,8 +72,9 @@ This in turn became the base for our *Design Level* sessions, where we analyzed 
 ![Example mapping](docs/images/eventstorming-design-level.jpg)  
 
 Please follow the links below to get more details on each of the mentioned steps:
-- [Big Picture Event Storming](./docs/big-picture.md)
+- [Big Picture EventStorming](./docs/big-picture.md)
 - [Example Mapping](docs/example-mapping.md)
+- [Design Level EventStorming](docs/design-level.md)
 
 ### Project structure and architecture
 At the very beginning, not to overcomplicate the project, we decided to assign each bounded context
