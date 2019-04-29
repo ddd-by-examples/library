@@ -184,7 +184,7 @@ sourced in the business is low enough for CRUD to be well applicable.
 ## Aggregates
 
 What you could see in the above examples is that we did not specified the **aggregates** that would be responsible for
-handling commands and emitting events. This is actually a trick suggested by **Alberto Brandolini** in his book.
+handling commands and emitting events.
 Such approach keeps us away from being steered into a particular solution/language and consequently limited from the very
 beginning. Looking at behaviours and responsibilities first lets us understand the problem better, and thus find
 a better name of the **aggregate**. In this paragraph you will see how we worked out the final aggregate model.
