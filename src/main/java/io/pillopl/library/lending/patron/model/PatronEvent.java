@@ -104,7 +104,7 @@ public interface PatronEvent extends DomainEvent {
     }
 
     @Value
-    class BookCollected implements PatronEvent {
+    class BookCheckedOut implements PatronEvent {
         @NonNull UUID eventId = UUID.randomUUID();
         @NonNull Instant when;
         @NonNull UUID patronId;
@@ -113,8 +113,8 @@ public interface PatronEvent extends DomainEvent {
         @NonNull UUID libraryBranchId;
         @NonNull Instant till;
 
-        public static BookCollected bookCollectedNow(BookId bookId, BookType bookType, LibraryBranchId libraryBranchId, PatronId patronId, CheckoutDuration checkoutDuration) {
-            return new BookCollected(
+        public static BookCheckedOut bookCheckedOutNow(BookId bookId, BookType bookType, LibraryBranchId libraryBranchId, PatronId patronId, CheckoutDuration checkoutDuration) {
+            return new BookCheckedOut(
                     Instant.now(),
                     patronId.getPatronId(),
                     bookId.getBookId(),
@@ -154,7 +154,7 @@ public interface PatronEvent extends DomainEvent {
     }
 
     @Value
-    class BookCollectingFailed implements PatronEvent {
+    class BookCheckingOutFailed implements PatronEvent {
         @NonNull UUID eventId = UUID.randomUUID();
         @NonNull String reason;
         @NonNull Instant when;
@@ -162,8 +162,8 @@ public interface PatronEvent extends DomainEvent {
         @NonNull UUID bookId;
         @NonNull UUID libraryBranchId;
 
-        static BookCollectingFailed bookCollectingFailedNow(Rejection rejection, BookId bookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
-            return new BookCollectingFailed(
+        static BookCheckingOutFailed bookCheckingOutFailedNow(Rejection rejection, BookId bookId, LibraryBranchId libraryBranchId, PatronInformation patronInformation) {
+            return new BookCheckingOutFailed(
                     rejection.getReason().getReason(),
                     Instant.now(),
                     patronInformation.getPatronId().getPatronId(),

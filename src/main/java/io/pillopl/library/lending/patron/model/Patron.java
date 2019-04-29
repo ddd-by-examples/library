@@ -14,8 +14,8 @@ import lombok.NonNull;
 
 import static io.pillopl.library.commons.events.EitherResult.announceFailure;
 import static io.pillopl.library.commons.events.EitherResult.announceSuccess;
-import static io.pillopl.library.lending.patron.model.PatronEvent.BookCollected.bookCollectedNow;
-import static io.pillopl.library.lending.patron.model.PatronEvent.BookCollectingFailed.bookCollectingFailedNow;
+import static io.pillopl.library.lending.patron.model.PatronEvent.BookCheckedOut.bookCheckedOutNow;
+import static io.pillopl.library.lending.patron.model.PatronEvent.BookCheckingOutFailed.bookCheckingOutFailedNow;
 import static io.pillopl.library.lending.patron.model.PatronEvent.BookHoldCanceled.holdCanceledNow;
 import static io.pillopl.library.lending.patron.model.PatronEvent.BookHoldCancelingFailed.holdCancelingFailedNow;
 import static io.pillopl.library.lending.patron.model.PatronEvent.BookHoldFailed.bookHoldFailedNow;
@@ -63,11 +63,11 @@ public class Patron {
         return announceFailure(holdCancelingFailedNow(book.getBookId(), book.getHoldPlacedAt(), patron.getPatronId()));
     }
 
-    public Either<BookCollectingFailed, BookCollected> collect(BookOnHold book, CheckoutDuration duration) {
+    public Either<BookCheckingOutFailed, BookCheckedOut> checkOut(BookOnHold book, CheckoutDuration duration) {
         if (patronHolds.a(book)) {
-            return announceSuccess(bookCollectedNow(book.getBookId(), book.type(), book.getHoldPlacedAt(), patron.getPatronId(), duration));
+            return announceSuccess(bookCheckedOutNow(book.getBookId(), book.type(), book.getHoldPlacedAt(), patron.getPatronId(), duration));
         }
-        return announceFailure(bookCollectingFailedNow(withReason("book is not on hold by patron"), book.getBookId(), book.getHoldPlacedAt(), patron));
+        return announceFailure(bookCheckingOutFailedNow(withReason("book is not on hold by patron"), book.getBookId(), book.getHoldPlacedAt(), patron));
     }
 
     private Option<Rejection> patronCanHold(AvailableBook aBook, HoldDuration forDuration) {

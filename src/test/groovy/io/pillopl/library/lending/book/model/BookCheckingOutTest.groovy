@@ -7,12 +7,12 @@ import static BookDSL.aCirculatingBook
 import static BookDSL.the
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
 import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
-import static io.pillopl.library.lending.patron.model.PatronEvent.BookCollected
+import static io.pillopl.library.lending.patron.model.PatronEvent.BookCheckedOut
 import static io.pillopl.library.lending.patron.model.PatronFixture.anyPatron
 
-class BookCollectingTest extends Specification {
+class BookCheckingOutTest extends Specification {
 
-    def 'should collect book which is marked as placed on hold in the system'() {
+    def 'should check out book which is marked as placed on hold in the system'() {
         given:
             BookDSL bookOnHold = aCirculatingBook() with anyBookId() locatedIn anyBranch() placedOnHoldBy anyPatron()
 
@@ -20,14 +20,14 @@ class BookCollectingTest extends Specification {
             LibraryBranchId aBranch = anyBranch()
 
         and:
-            BookCollected bookCollectedEvent = the bookOnHold isCollectedBy anyPatron() at aBranch
+            BookCheckedOut bookCheckedOutEvent = the bookOnHold isCheckedOutBy anyPatron() at aBranch
 
         when:
-            CollectedBook collectedBook = the bookOnHold reactsTo bookCollectedEvent
+            CheckedOutBook checkedOutBook = the bookOnHold reactsTo bookCheckedOutEvent
 
         then:
-            collectedBook.bookId == bookOnHold.bookId
-            collectedBook.collectedAt == aBranch
-            collectedBook.version == bookOnHold.version
+            checkedOutBook.bookId == bookOnHold.bookId
+            checkedOutBook.checkedOutAt == aBranch
+            checkedOutBook.version == bookOnHold.version
     }
 }

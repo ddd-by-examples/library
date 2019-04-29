@@ -46,18 +46,18 @@ class FindingOverdueCheckoutsInDailySheetDatabaseIT extends Specification {
         given:
             int currentNoOfOverdueCheckouts = readModel.queryForCheckoutsToOverdue().count()
         when:
-            readModel.handle(bookCollected(tillYesterday()))
+            readModel.handle(bookCheckedOut(tillYesterday()))
         and:
-            readModel.handle(bookCollected(tillTomorrow()))
+            readModel.handle(bookCheckedOut(tillTomorrow()))
         then:
             readModel.queryForCheckoutsToOverdue().count() == currentNoOfOverdueCheckouts + 1
     }
 
-    def 'handling bookCollected should de idempotent'() {
+    def 'handling bookCheckedOut should de idempotent'() {
         given:
             int currentNoOfOverdueCheckouts = readModel.queryForCheckoutsToOverdue().count()
         and:
-            PatronEvent.BookCollected event = bookCollected(tillYesterday())
+		PatronEvent.BookCheckedOut event = bookCheckedOut(tillYesterday())
         when:
             2.times { readModel.handle(event) }
         then:
@@ -68,7 +68,7 @@ class FindingOverdueCheckoutsInDailySheetDatabaseIT extends Specification {
         given:
             int currentNoOfOverdueCheckouts = readModel.queryForCheckoutsToOverdue().count()
         and:
-            readModel.handle(bookCollected(tillTomorrow()))
+            readModel.handle(bookCheckedOut(tillTomorrow()))
         when:
             readModel.handle(bookReturned())
         then:
@@ -115,8 +115,8 @@ class FindingOverdueCheckoutsInDailySheetDatabaseIT extends Specification {
                 libraryBranchId.getLibraryBranchId())
     }
 
-    PatronEvent.BookCollected bookCollected(Instant till) {
-        return new PatronEvent.BookCollected(
+	PatronEvent.BookCheckedOut bookCheckedOut(Instant till) {
+        return new PatronEvent.BookCheckedOut(
                 now(),
                 patronId.getPatronId(),
                 bookId.getBookId(),

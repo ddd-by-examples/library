@@ -14,13 +14,13 @@ import lombok.Value;
 @Value
 @AllArgsConstructor
 @EqualsAndHashCode(of = "bookInformation")
-public class CollectedBook implements Book {
+public class CheckedOutBook implements Book {
 
     @NonNull
     BookInformation bookInformation;
 
     @NonNull
-    LibraryBranchId collectedAt;
+    LibraryBranchId checkedOutAt;
 
     @NonNull
     PatronId byPatron;
@@ -28,7 +28,7 @@ public class CollectedBook implements Book {
     @NonNull
     Version version;
 
-    public CollectedBook(BookId bookId, BookType type, LibraryBranchId libraryBranchId, PatronId patronId, Version version) {
+    public CheckedOutBook(BookId bookId, BookType type, LibraryBranchId libraryBranchId, PatronId patronId, Version version) {
         this(new BookInformation(bookId, type), libraryBranchId, patronId, version);
     }
 

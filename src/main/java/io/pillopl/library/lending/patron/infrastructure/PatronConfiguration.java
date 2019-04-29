@@ -2,7 +2,7 @@ package io.pillopl.library.lending.patron.infrastructure;
 
 import io.pillopl.library.commons.events.DomainEvents;
 import io.pillopl.library.lending.dailysheet.model.DailySheet;
-import io.pillopl.library.lending.patron.application.checkout.CollectingBookOnHold;
+import io.pillopl.library.lending.patron.application.checkout.CheckingOutBookOnHold;
 import io.pillopl.library.lending.patron.application.checkout.RegisteringOverdueCheckout;
 import io.pillopl.library.lending.patron.application.hold.CancelingHold;
 import io.pillopl.library.lending.patron.application.hold.ExpiringHolds;
@@ -21,8 +21,8 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 public class PatronConfiguration {
 
     @Bean
-    CollectingBookOnHold collectingBookOnHold(FindBookOnHold findBookOnHold, Patrons patronRepository) {
-        return new CollectingBookOnHold(findBookOnHold, patronRepository);
+    CheckingOutBookOnHold checkingOutBookOnHold(FindBookOnHold findBookOnHold, Patrons patronRepository) {
+        return new CheckingOutBookOnHold(findBookOnHold, patronRepository);
     }
 
     @Bean

@@ -20,7 +20,7 @@ import static io.vavr.API.*;
 class BookDatabaseEntity {
 
     enum BookState {
-        Available, OnHold, Collected
+        Available, OnHold, CheckedOut
     }
 
     UUID book_id;
@@ -30,15 +30,15 @@ class BookDatabaseEntity {
     UUID on_hold_at_branch;
     UUID on_hold_by_patron;
     Instant on_hold_till;
-    UUID collected_at_branch;
-    UUID collected_by_patron;
+    UUID checked_out_at_branch;
+    UUID checked_out_by_patron;
     int version;
 
     Book toDomainModel() {
         return Match(book_state).of(
                 Case($(Available), this::toAvailableBook),
                 Case($(OnHold), this::toBookOnHold),
-                Case($(Collected), this::toCollectedBook)
+                Case($(CheckedOut), this::toCheckedOutBook)
         );
     }
 
@@ -50,8 +50,8 @@ class BookDatabaseEntity {
         return new BookOnHold(new BookId(book_id), book_type, new LibraryBranchId(on_hold_at_branch), new PatronId(on_hold_by_patron), on_hold_till, new Version(version));
     }
 
-    private CollectedBook toCollectedBook() {
-        return new CollectedBook(new BookId(book_id), book_type,  new LibraryBranchId(collected_at_branch), new PatronId(collected_by_patron), new Version(version));
+    private CheckedOutBook toCheckedOutBook() {
+        return new CheckedOutBook(new BookId(book_id), book_type,  new LibraryBranchId(checked_out_at_branch), new PatronId(checked_out_by_patron), new Version(version));
     }
 }
 

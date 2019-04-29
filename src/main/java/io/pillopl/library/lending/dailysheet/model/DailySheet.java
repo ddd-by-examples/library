@@ -14,7 +14,7 @@ public interface DailySheet {
 
     void handle(BookHoldExpired event);
 
-    void handle(BookCollected event);
+    void handle(BookCheckedOut event);
 
     void handle(BookReturned event);
 

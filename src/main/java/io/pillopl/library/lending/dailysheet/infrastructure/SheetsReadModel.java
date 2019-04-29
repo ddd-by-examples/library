@@ -68,7 +68,7 @@ class SheetsReadModel implements DailySheet {
 
     private List<Map<String, Object>> findCheckoutsToOverdue() {
         return sheets.query(
-                "SELECT c.book_id, c.collected_by_patron_id, c.collected_at_branch FROM checkouts_sheet c WHERE c.status = 'COLLECTED' and c.checkout_till <= ?",
+                "SELECT c.book_id, c.checked_out_by_patron_id, c.checked_out_at_branch FROM checkouts_sheet c WHERE c.status = 'CHECKEDOUT' and c.checkout_till <= ?",
                 new Object[]{from(Instant.now(clock))},
                 new ColumnMapRowMapper());
     }
@@ -76,8 +76,8 @@ class SheetsReadModel implements DailySheet {
     private Tuple3<BookId, PatronId, LibraryBranchId> toOverdueCheckoutsTuple(Map<String, Object> map) {
         return of(
                 new BookId((UUID) map.get("BOOK_ID")),
-                new PatronId((UUID) map.get("COLLECTED_BY_PATRON_ID")),
-                new LibraryBranchId((UUID) map.get("COLLECTED_AT_BRANCH")));
+                new PatronId((UUID) map.get("CHECKED_OUT_BY_PATRON_ID")),
+                new LibraryBranchId((UUID) map.get("CHECKED_OUT_AT_BRANCH")));
     }
 
     @Override
@@ -93,7 +93,7 @@ class SheetsReadModel implements DailySheet {
 
     private void createNewHold(BookPlacedOnHold event) {
         sheets.update("INSERT INTO holds_sheet " +
-                        "(id, book_id, status, hold_event_id, hold_by_patron_id, hold_at, hold_till, expired_at, canceled_at, hold_at_branch, collected_at) VALUES " +
+                        "(id, book_id, status, hold_event_id, hold_by_patron_id, hold_at, hold_till, expired_at, canceled_at, hold_at_branch, checked_out_at) VALUES " +
                         "(holds_sheet_seq.nextval, ?, ?, ?, ?, ?, ?, null, null, ?, null)",
                 event.getBookId(),
                 "ACTIVE",
@@ -124,7 +124,7 @@ class SheetsReadModel implements DailySheet {
 
     @Override
     @EventListener
-    public void handle(BookCollected event) {
+    public void handle(BookCheckedOut event) {
         try {
             createNewCheckout(event);
         } catch (DuplicateKeyException ex) {
@@ -132,18 +132,18 @@ class SheetsReadModel implements DailySheet {
         }
     }
 
-    private void createNewCheckout(BookCollected event) {
+    private void createNewCheckout(BookCheckedOut event) {
         sheets.update("INSERT INTO checkouts_sheet " +
-                        "(id, book_id, status, checkout_event_id, collected_by_patron_id, collected_at, checkout_till, collected_at_branch, returned_at) VALUES " +
+                        "(id, book_id, status, checkout_event_id, checked_out_by_patron_id, checked_out_at, checkout_till, checked_out_at_branch, returned_at) VALUES " +
                         "(checkouts_sheet_seq.nextval, ?, ?, ?, ?, ?, ?, ?, null)",
                 event.getBookId(),
-                "COLLECTED",
+                "CHECKEDOUT",
                 event.getEventId(),
                 event.getPatronId(),
                 from(event.getWhen()),
                 from(event.getTill()),
                 event.getLibraryBranchId());
-        sheets.update("UPDATE holds_sheet SET collected_at = ?, status = 'COLLECTED' WHERE collected_at IS NULL AND book_id = ? AND hold_by_patron_id = ?",
+        sheets.update("UPDATE holds_sheet SET checked_out_at = ?, status = 'CHECKEDOUT' WHERE checked_out_at IS NULL AND book_id = ? AND hold_by_patron_id = ?",
                 from(event.getWhen()),
                 event.getBookId(),
                 event.getPatronId());
@@ -154,24 +154,24 @@ class SheetsReadModel implements DailySheet {
     public void handle(BookReturned event) {
         int results = markAsReturned(event);
         if (results == 0) {
-            insertAsReturnedWithCollectedEventMissing(event);
+            insertAsReturnedWithCheckedOutEventMissing(event);
         }
 
     }
 
     private int markAsReturned(BookReturned event) {
-        return sheets.update("UPDATE checkouts_sheet SET returned_at = ?, status = 'RETURNED' WHERE returned_at IS NULL AND book_id = ? AND collected_by_patron_id = ?",
+        return sheets.update("UPDATE checkouts_sheet SET returned_at = ?, status = 'RETURNED' WHERE returned_at IS NULL AND book_id = ? AND checked_out_by_patron_id = ?",
                 from(event.getWhen()),
                 event.getBookId(),
                 event.getPatronId());
     }
 
-    private void insertAsReturnedWithCollectedEventMissing(BookReturned event) {
+    private void insertAsReturnedWithCheckedOutEventMissing(BookReturned event) {
         sheets.update("INSERT INTO checkouts_sheet " +
-                        "(id, book_id, status, checkout_event_id, collected_by_patron_id, collected_at, collected_till, returned_at) VALUES " +
+                        "(id, book_id, status, checkout_event_id, checked_out_by_patron_id, checked_out_at, checked_out_till, returned_at) VALUES " +
                         "(checkouts_sheet_seq.nextval, ?, ?, ?, ?, null, null, ?)",
                 event.getBookId(),
-                "COLLECTED",
+                "CHECKEDOUT",
                 event.getEventId(),
                 event.getPatronId(),
                 from(event.getWhen()));

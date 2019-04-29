@@ -63,7 +63,7 @@ class FindingPatronProfileInDatabaseIT extends Specification {
         then:
             thereIsOnlyOneHold(profile)
         when:
-            dailySheet.handle(bookCollectedTill(TOMORROW))
+            dailySheet.handle(bookCheckedOutTill(TOMORROW))
             profile = createProfile()
         then:
             thereIsOnlyOneCheckout(profile)
@@ -99,8 +99,8 @@ class FindingPatronProfileInDatabaseIT extends Specification {
 
     }
 
-    PatronEvent.BookCollected bookCollectedTill(Instant till) {
-        return new PatronEvent.BookCollected(
+	PatronEvent.BookCheckedOut bookCheckedOutTill(Instant till) {
+        return new PatronEvent.BookCheckedOut(
                 now(),
                 patronId.getPatronId(),
                 bookId.getBookId(),

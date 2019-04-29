@@ -6,8 +6,8 @@ CREATE TABLE IF NOT EXISTS book_database_entity (
   available_at_branch UUID,
   on_hold_at_branch UUID,
   on_hold_by_patron UUID,
-  collected_at_branch UUID,
-  collected_by_patron UUID,
+  checked_out_at_branch UUID,
+  checked_out_by_patron UUID,
   on_hold_till TIMESTAMP,
   version INTEGER);
 
