@@ -18,7 +18,7 @@ not focusing on the rules, or use cases from the original technique_
 
 ## Checkout
 
-![Checkout](images/em/checkout.png)  
+![Checkout](images/em/checking-out.png)  
 
 ## Expiring hold
 

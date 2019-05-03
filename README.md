@@ -66,7 +66,7 @@ During the session we discovered following definitions:
 
 This made us think of real life scenarios that might happen. We discovered them described with the help of
 the **Example mapping**:  
-![Example mapping](docs/images/examplemapping.jpg)  
+![Example mapping](docs/images/example-mapping.png)  
 
 This in turn became the base for our *Design Level* sessions, where we analyzed each example:  
 ![Example mapping](docs/images/eventstorming-design-level.jpg)  
