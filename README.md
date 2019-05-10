@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/ajurasz/library.svg?style=svg)](https://circleci.com/gh/ajurasz/library)
+
 # Table of contents
 
 1. [About](#about)
