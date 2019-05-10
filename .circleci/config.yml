@@ -16,7 +16,10 @@ jobs:
             - ~/.m2
           key: maven-dependencies-{{ checksum "pom.xml" }}
 
-      - run: ./mvnw package
+      - run: ./mvnw verify
 
       - store_test_results:
           path: target/surefire-reports
+
+      - store_test_results:
+          path: target/failsafe-reports
