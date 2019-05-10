@@ -10,7 +10,7 @@ jobs:
           key: maven-dependencies-{{ checksum "pom.xml" }}
 
       - run:
-          name: Download dependencies
+          name: Downloading dependencies
           command: ./mvnw dependency:go-offline
 
       - save_cache:
@@ -19,7 +19,7 @@ jobs:
           key: maven-dependencies-{{ checksum "pom.xml" }}
 
       - run:
-          name: Build and test
+          name: Building and testing
           command: ./mvnw verify
 
       - store_test_results:
