@@ -27,3 +27,7 @@ jobs:
 
       - store_test_results:
           path: target/failsafe-reports
+
+      - run:
+          name: Uploading coverage reports
+          command: bash <(curl -s https://codecov.io/bash)
