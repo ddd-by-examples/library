@@ -1,0 +1,22 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/openjdk:11-jdk-stretch
+    steps:
+      - checkout
+
+      - restore_cache:
+          key: maven-dependencies-{{ checksum "pom.xml" }}
+
+      - run: ./mvnw dependency:go-offline
+
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: maven-dependencies-{{ checksum "pom.xml" }}
+
+      - run: ./mvnw package
+
+      - store_test_results:
+          path: target/surefire-reports
