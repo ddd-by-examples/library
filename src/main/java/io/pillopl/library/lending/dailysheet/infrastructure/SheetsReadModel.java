@@ -1,13 +1,10 @@
 package io.pillopl.library.lending.dailysheet.infrastructure;
 
 import io.pillopl.library.catalogue.BookId;
-import io.pillopl.library.lending.dailysheet.model.CheckoutsToOverdueSheet;
-import io.pillopl.library.lending.dailysheet.model.DailySheet;
-import io.pillopl.library.lending.dailysheet.model.HoldsToExpireSheet;
+import io.pillopl.library.lending.dailysheet.model.*;
 import io.pillopl.library.lending.librarybranch.model.LibraryBranchId;
 import io.pillopl.library.lending.patron.model.PatronEvent.*;
 import io.pillopl.library.lending.patron.model.PatronId;
-import io.vavr.Tuple3;
 import io.vavr.control.Option;
 import lombok.AllArgsConstructor;
 import org.springframework.context.event.EventListener;
@@ -23,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static io.vavr.Tuple.of;
 import static io.vavr.collection.List.ofAll;
 import static java.sql.Timestamp.from;
 import static java.util.stream.Collectors.toList;
@@ -39,7 +35,7 @@ class SheetsReadModel implements DailySheet {
         return new HoldsToExpireSheet(ofAll(
                 findHoldsToExpire()
                         .stream()
-                        .map(this::toExpiredHoldsTuple)
+                        .map(this::toExpiredHold)
                         .collect(toList())));
     }
 
@@ -50,8 +46,8 @@ class SheetsReadModel implements DailySheet {
                 new ColumnMapRowMapper());
     }
 
-    private Tuple3<BookId, PatronId, LibraryBranchId> toExpiredHoldsTuple(Map<String, Object> map) {
-        return of(
+    private ExpiredHold toExpiredHold(Map<String, Object> map) {
+        return new ExpiredHold(
                 new BookId((UUID) map.get("BOOK_ID")),
                 new PatronId((UUID) map.get("HOLD_BY_PATRON_ID")),
                 new LibraryBranchId((UUID) map.get("HOLD_AT_BRANCH")));
@@ -62,7 +58,7 @@ class SheetsReadModel implements DailySheet {
         return new CheckoutsToOverdueSheet(ofAll(
                 findCheckoutsToOverdue()
                         .stream()
-                        .map(this::toOverdueCheckoutsTuple)
+                        .map(this::toOverdueCheckout)
                         .collect(toList())));
     }
 
@@ -73,8 +69,8 @@ class SheetsReadModel implements DailySheet {
                 new ColumnMapRowMapper());
     }
 
-    private Tuple3<BookId, PatronId, LibraryBranchId> toOverdueCheckoutsTuple(Map<String, Object> map) {
-        return of(
+    private OverdueCheckout toOverdueCheckout(Map<String, Object> map) {
+        return new OverdueCheckout(
                 new BookId((UUID) map.get("BOOK_ID")),
                 new PatronId((UUID) map.get("CHECKED_OUT_BY_PATRON_ID")),
                 new LibraryBranchId((UUID) map.get("CHECKED_OUT_AT_BRANCH")));

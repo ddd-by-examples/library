@@ -8,6 +8,8 @@ import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
 import io.pillopl.library.lending.patron.model.PatronEvent
 import io.pillopl.library.lending.patron.model.PatronId
 import io.pillopl.library.lending.patron.model.PatronType
+import io.pillopl.library.lending.patronprofile.model.Checkout
+import io.pillopl.library.lending.patronprofile.model.Hold
 import io.pillopl.library.lending.patronprofile.model.PatronProfile
 import io.pillopl.library.lending.patronprofile.model.PatronProfiles
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,7 +25,6 @@ import static io.pillopl.library.catalogue.BookType.Restricted
 import static io.pillopl.library.lending.book.model.BookFixture.anyBookId
 import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixture.anyBranch
 import static io.pillopl.library.lending.patron.model.PatronFixture.anyPatronId
-import static io.vavr.Tuple.of
 import static java.time.Instant.now
 
 @SpringBootTest(classes = LendingTestContext.class)
@@ -83,14 +84,14 @@ class FindingPatronProfileInDatabaseIT extends Specification {
 
     void thereIsOnlyOneHold(PatronProfile profile) {
         assert profile.holdsView.currentHolds.size() == 1
-        assert profile.holdsView.currentHolds.get(0).equals(of(bookId, TOMORROW))
+        assert profile.holdsView.currentHolds.get(0) == new Hold(bookId, TOMORROW)
         assert profile.currentCheckouts.currentCheckouts.size() == 0
     }
 
     void thereIsOnlyOneCheckout(PatronProfile profile) {
         assert profile.holdsView.currentHolds.size() == 0
         assert profile.currentCheckouts.currentCheckouts.size() == 1
-        assert profile.currentCheckouts.currentCheckouts.get(0).equals(of(bookId, TOMORROW))
+        assert profile.currentCheckouts.currentCheckouts.get(0) == new Checkout(bookId, TOMORROW)
     }
 
     void thereIsZeroHoldsAndZeroCheckouts(PatronProfile profile) {
@@ -99,7 +100,7 @@ class FindingPatronProfileInDatabaseIT extends Specification {
 
     }
 
-	PatronEvent.BookCheckedOut bookCheckedOutTill(Instant till) {
+    PatronEvent.BookCheckedOut bookCheckedOutTill(Instant till) {
         return new PatronEvent.BookCheckedOut(
                 now(),
                 patronId.getPatronId(),

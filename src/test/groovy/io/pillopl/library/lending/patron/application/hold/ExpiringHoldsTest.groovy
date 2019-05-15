@@ -2,10 +2,11 @@ package io.pillopl.library.lending.patron.application.hold
 
 import io.pillopl.library.commons.commands.BatchResult
 import io.pillopl.library.lending.dailysheet.model.DailySheet
+import io.pillopl.library.lending.dailysheet.model.ExpiredHold
 import io.pillopl.library.lending.dailysheet.model.HoldsToExpireSheet
 import io.pillopl.library.lending.patron.model.PatronEvent
-import io.pillopl.library.lending.patron.model.Patrons
 import io.pillopl.library.lending.patron.model.PatronId
+import io.pillopl.library.lending.patron.model.Patrons
 import io.vavr.control.Try
 import spock.lang.Specification
 
@@ -61,9 +62,8 @@ class ExpiringHoldsTest extends Specification {
     HoldsToExpireSheet expiredHoldsBy(PatronId patronId, PatronId anotherPatronId) {
         return new HoldsToExpireSheet(
                 of(
-                        io.vavr.Tuple.of(anyBookId(), patronId, anyBranch()),
-                        io.vavr.Tuple.of(anyBookId(), anotherPatronId, anyBranch())
-
+                        new ExpiredHold(anyBookId(), patronId, anyBranch()),
+                        new ExpiredHold(anyBookId(), anotherPatronId, anyBranch())
                 ))
     }
 

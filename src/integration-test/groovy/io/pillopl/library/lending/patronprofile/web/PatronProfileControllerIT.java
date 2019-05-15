@@ -6,11 +6,7 @@ import io.pillopl.library.lending.book.model.BookFixture;
 import io.pillopl.library.lending.patron.application.hold.CancelingHold;
 import io.pillopl.library.lending.patron.model.PatronFixture;
 import io.pillopl.library.lending.patron.model.PatronId;
-import io.pillopl.library.lending.patronprofile.model.CheckoutsView;
-import io.pillopl.library.lending.patronprofile.model.HoldsView;
-import io.pillopl.library.lending.patronprofile.model.PatronProfile;
-import io.pillopl.library.lending.patronprofile.model.PatronProfiles;
-import io.vavr.Tuple;
+import io.pillopl.library.lending.patronprofile.model.*;
 import io.vavr.control.Try;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,9 +31,7 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(PatronProfileController.class)
@@ -191,7 +185,7 @@ public class PatronProfileControllerIT {
 
     PatronProfile profiles() {
         return new PatronProfile(
-                new HoldsView(of(Tuple.of(bookId, anyDate))),
-                new CheckoutsView(of(Tuple.of(anotherBook, anotherDate))));
+                new HoldsView(of(new Hold(bookId, anyDate))),
+                new CheckoutsView(of(new Checkout(anotherBook, anotherDate))));
     }
 }
