@@ -4,7 +4,7 @@
 # Table of contents
 
 1. [About](#about)
-2. [Domain description](#domain)
+2. [Domain description](#domain-description)
 3. [General assumptions](#general-assumptions)  
     3.1 [Process discovery](#process-discovery)  
     3.2 [Project structure and architecture](#project-structure-and-architecture)    
