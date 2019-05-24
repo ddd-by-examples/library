@@ -320,7 +320,7 @@ Each class that represents a business concept is immutable, thanks to which we:
 * control all side effects much clearer. 
 
 #### Pure functions
-Modelling domain operations, discovered in Design Level Event Storming, as pure functions, and declaring them in
+We model domain operations, discovered in Design Level Event Storming, as pure functions, and declare them in
 both domain and application layers in the form of Java's functional interfaces. Their implementations are placed
 in infrastructure layer as ordinary methods with side effects. Thanks to this approach we can follow the abstraction
 of ubiquitous language explicitly, and keep this abstraction implementation-agnostic. As an example, you could have
@@ -383,6 +383,24 @@ public Either<BookHoldFailed, BookPlacedOnHoldEvents> placeOnHold(AvailableBook 
 }
 ```  
 The more errors we discover at compile time the better.
+
+Yet another advantage of applying such type system is that we can represent business flows and state transitions
+with functions much easier. As an example, following functions:
+```
+placeOnHold: AvailableBook -> BookHoldFailed | BookPlacedOnHold
+cancelHold: BookOnHold -> BookHoldCancelingFailed | BookHoldCanceled
+``` 
+are much more concise and descriptive than these:
+```
+placeOnHold: Book -> BookHoldFailed | BookPlacedOnHold
+cancelHold: Book -> BookHoldCancelingFailed | BookHoldCanceled
+```
+as here we have a lot of constraints hidden within function implementations.
+
+Moreover if you think of your domain as a set of operations (functions) that are being executed on business objects
+(aggregates) you don't think of any execution model (like async processing). It is fine, because you don't have to.
+Domain functions are free from I/O operations, async, and other side-effects-prone things, which are put into the
+infrastructure layer. Thanks to this, we can easily test them without mocking mentioned parts. 
 
 #### Monads
 Business methods might have different results. One might return a value or a `null`, throw an exception when something
