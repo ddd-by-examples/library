@@ -24,9 +24,13 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-import static io.vavr.API.*;
+import static io.vavr.API.$;
+import static io.vavr.API.Case;
+import static io.vavr.API.Match;
 import static java.util.stream.Collectors.toList;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.afford;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -110,29 +114,6 @@ class PatronProfileController {
                         .withSelfRel());
     }
 
-    @Value
-    private class Hold {
-
-        UUID bookId;
-        Instant till;
-
-        private Hold(io.pillopl.library.lending.patronprofile.model.Hold hold) {
-            this.bookId = hold.getBook().getBookId();
-            this.till = hold.getTill();
-        }
-    }
-
-    @Value
-    private class Checkout {
-
-        UUID bookId;
-        Instant till;
-
-        private Checkout(io.pillopl.library.lending.patronprofile.model.Checkout hold) {
-            this.bookId = hold.getBook().getBookId();
-            this.till = hold.getTill();
-        }
-    }
 }
 
 @Value
@@ -150,3 +131,27 @@ class ProfileResource extends RepresentationModel {
 
 }
 
+@Value
+class Hold {
+
+    UUID bookId;
+    Instant till;
+
+    Hold(io.pillopl.library.lending.patronprofile.model.Hold hold) {
+        this.bookId = hold.getBook().getBookId();
+        this.till = hold.getTill();
+    }
+}
+
+@Value
+class Checkout {
+
+    UUID bookId;
+    Instant till;
+
+    Checkout(io.pillopl.library.lending.patronprofile.model.Checkout hold) {
+        this.bookId = hold.getBook().getBookId();
+        this.till = hold.getTill();
+    }
+
+}

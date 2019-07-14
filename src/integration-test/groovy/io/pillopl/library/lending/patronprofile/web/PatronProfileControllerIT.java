@@ -6,7 +6,12 @@ import io.pillopl.library.lending.book.model.BookFixture;
 import io.pillopl.library.lending.patron.application.hold.CancelingHold;
 import io.pillopl.library.lending.patron.model.PatronFixture;
 import io.pillopl.library.lending.patron.model.PatronId;
-import io.pillopl.library.lending.patronprofile.model.*;
+import io.pillopl.library.lending.patronprofile.model.Checkout;
+import io.pillopl.library.lending.patronprofile.model.CheckoutsView;
+import io.pillopl.library.lending.patronprofile.model.Hold;
+import io.pillopl.library.lending.patronprofile.model.HoldsView;
+import io.pillopl.library.lending.patronprofile.model.PatronProfile;
+import io.pillopl.library.lending.patronprofile.model.PatronProfiles;
 import io.vavr.control.Try;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,7 +36,9 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(PatronProfileController.class)

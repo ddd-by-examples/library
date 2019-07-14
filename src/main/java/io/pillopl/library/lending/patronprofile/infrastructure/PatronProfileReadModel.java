@@ -2,7 +2,12 @@ package io.pillopl.library.lending.patronprofile.infrastructure;
 
 import io.pillopl.library.catalogue.BookId;
 import io.pillopl.library.lending.patron.model.PatronId;
-import io.pillopl.library.lending.patronprofile.model.*;
+import io.pillopl.library.lending.patronprofile.model.Checkout;
+import io.pillopl.library.lending.patronprofile.model.CheckoutsView;
+import io.pillopl.library.lending.patronprofile.model.Hold;
+import io.pillopl.library.lending.patronprofile.model.HoldsView;
+import io.pillopl.library.lending.patronprofile.model.PatronProfile;
+import io.pillopl.library.lending.patronprofile.model.PatronProfiles;
 import lombok.AllArgsConstructor;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
