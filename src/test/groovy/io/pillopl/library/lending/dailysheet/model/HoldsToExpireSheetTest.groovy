@@ -4,7 +4,6 @@ import io.pillopl.library.catalogue.BookId
 import io.pillopl.library.lending.librarybranch.model.LibraryBranchId
 import io.pillopl.library.lending.patron.model.PatronEvent
 import io.pillopl.library.lending.patron.model.PatronId
-import io.vavr.Tuple
 import io.vavr.collection.List
 import spock.lang.Specification
 
@@ -45,6 +44,8 @@ class HoldsToExpireSheetTest extends Specification {
     }
 
     private HoldsToExpireSheet sheet(PatronId patronId, PatronId anotherPatronId, BookId bookId, BookId anotherBookId, LibraryBranchId libraryBranchId, LibraryBranchId anotherBranchId) {
-        new HoldsToExpireSheet(List.of(Tuple.of(bookId, patronId, libraryBranchId), Tuple.of(anotherBookId, anotherPatronId, anotherBranchId)))
+        new HoldsToExpireSheet(List.of(
+                new ExpiredHold(bookId, patronId, libraryBranchId),
+                new ExpiredHold(anotherBookId, anotherPatronId, anotherBranchId)))
     }
 }

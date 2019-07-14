@@ -2,18 +2,17 @@ package io.pillopl.library.lending.patronprofile.infrastructure;
 
 import io.pillopl.library.catalogue.BookId;
 import io.pillopl.library.lending.patron.model.PatronId;
+import io.pillopl.library.lending.patronprofile.model.Checkout;
 import io.pillopl.library.lending.patronprofile.model.CheckoutsView;
+import io.pillopl.library.lending.patronprofile.model.Hold;
 import io.pillopl.library.lending.patronprofile.model.HoldsView;
 import io.pillopl.library.lending.patronprofile.model.PatronProfile;
 import io.pillopl.library.lending.patronprofile.model.PatronProfiles;
-import io.vavr.Tuple;
-import io.vavr.Tuple2;
 import lombok.AllArgsConstructor;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -31,12 +30,12 @@ class PatronProfileReadModel implements PatronProfiles {
         HoldsView holdsView = new HoldsView(
                 ofAll(findCurrentHoldsFor(patronId)
                         .stream()
-                        .map(this::toHoldViewTuple)
+                        .map(this::toHold)
                         .collect(toList())));
         CheckoutsView checkoutsView = new CheckoutsView(
                 ofAll(findCurrentCheckoutsFor(patronId)
                         .stream()
-                        .map(this::toCheckoutsViewTuple)
+                        .map(this::toCheckout)
                         .collect(toList())));
         return new PatronProfile(holdsView, checkoutsView);
     }
@@ -48,8 +47,8 @@ class PatronProfileReadModel implements PatronProfiles {
                 new ColumnMapRowMapper());
     }
 
-    private Tuple2<BookId, Instant> toHoldViewTuple(Map<String, Object> map) {
-        return Tuple.of(new BookId((UUID) map.get("BOOK_ID")),
+    private Hold toHold(Map<String, Object> map) {
+        return new Hold(new BookId((UUID) map.get("BOOK_ID")),
                 ((Timestamp) map.get("HOLD_TILL")).toInstant());
     }
 
@@ -60,8 +59,8 @@ class PatronProfileReadModel implements PatronProfiles {
                 new ColumnMapRowMapper());
     }
 
-    private Tuple2<BookId, Instant> toCheckoutsViewTuple(Map<String, Object> map) {
-        return Tuple.of(new BookId((UUID) map.get("BOOK_ID")),
+    private Checkout toCheckout(Map<String, Object> map) {
+        return new Checkout(new BookId((UUID) map.get("BOOK_ID")),
                 ((Timestamp) map.get("CHECKOUT_TILL")).toInstant());
     }
 }

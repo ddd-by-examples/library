@@ -3,9 +3,10 @@ package io.pillopl.library.lending.patron.application.checkout
 import io.pillopl.library.commons.commands.BatchResult
 import io.pillopl.library.lending.dailysheet.model.CheckoutsToOverdueSheet
 import io.pillopl.library.lending.dailysheet.model.DailySheet
+import io.pillopl.library.lending.dailysheet.model.OverdueCheckout
 import io.pillopl.library.lending.patron.model.PatronEvent
-import io.pillopl.library.lending.patron.model.Patrons
 import io.pillopl.library.lending.patron.model.PatronId
+import io.pillopl.library.lending.patron.model.Patrons
 import io.vavr.control.Try
 import spock.lang.Specification
 
@@ -63,8 +64,8 @@ class RegisteringOverdueCheckoutsTest extends Specification {
     CheckoutsToOverdueSheet overdueCheckoutsBy(PatronId patronId, PatronId anotherPatronId) {
         return new CheckoutsToOverdueSheet(
                 of(
-                        io.vavr.Tuple.of(anyBookId(), patronId, anyBranch()),
-                        io.vavr.Tuple.of(anyBookId(), anotherPatronId, anyBranch()),
+                        new OverdueCheckout(anyBookId(), patronId, anyBranch()),
+                        new OverdueCheckout(anyBookId(), anotherPatronId, anyBranch()),
 
                 ))
     }
