@@ -235,7 +235,7 @@ they are not supposed to perform. A solution to this problem could be the distin
 and integration events, which will be described here soon.  
 
 ### Events in Repositories 
-Repositories are one of the most popoluar design pattern. They abstract our domain model from data layer. 
+Repositories are one of the most popular design pattern. They abstract our domain model from data layer. 
 In other words, they deal with state. That said, a common use-case is when we pass a new state to our repository,
 so that it gets persisted. It may look like so:
 
