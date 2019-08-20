@@ -20,7 +20,7 @@ that describes conditions that needs to be fulfilled for the **Book hold failed*
 
 Fair enough, let's go further.
 
-When a **patron** tires to place on hold a book that is currently not available it should not be possible, thus resulting
+When a **patron** tries to place on hold a book that is currently not available it should not be possible, thus resulting
 in **book hold failed** event, as it is depicted below:
 
 ![Holding example 2](images/dl/holding/example-2.png)  
