@@ -703,7 +703,7 @@ a look:
         }
     }
     ```
-- As you could se above, we also try not to use component scan wherever possible. Instead we utilize
+- As you could see above, we also try not to use component scan wherever possible. Instead we utilize
 `@Configuration` classes where we define module specific beans in the infrastracture layer. Those
 configuration classes are explicitly declared in the main application class.
 
