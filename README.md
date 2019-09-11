@@ -704,7 +704,7 @@ a look:
     }
     ```
 - As you could see above, we also try not to use component scan wherever possible. Instead we utilize
-`@Configuration` classes where we define module specific beans in the infrastracture layer. Those
+`@Configuration` classes where we define module specific beans in the infrastructure layer. Those
 configuration classes are explicitly declared in the main application class.
 
 ### Tests
@@ -794,6 +794,20 @@ Either way once built you can run it like so:
 $ docker run -ti --rm --name spring-library -p 8080:8080 spring/library
 ```
 
+To run the application as well as Grafana dashboard for visualizing metrics run all services:
+
+```console
+$ docker-compose run
+```
+
+
+### Production ready metrics and visualization
+* http://localhost:8080/actuator/prometheus - published Micrometer metrics
+* http://localhost:9090 - Prometheus dashboard
+* http://localhost:3000 - Grafana dashboard
+
+To create a dashboard go to Create -> Import and select attached `jvm-micrometer_rev8.json`. File has been pulled from 
+`https://grafana.com/grafana/dashboards/4701`
 
 ## References
 
