@@ -1,6 +1,7 @@
 package io.pillopl.library.lending.patronprofile.web;
 
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import io.micrometer.core.annotation.Timed;
 import io.pillopl.library.catalogue.BookId;
 import io.pillopl.library.commons.commands.Result;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -41,7 +43,7 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.ok;
 
-@Timed
+@Timed(percentiles = {0.5, 0.75, 0.95, 0.99})
 @RestController
 @AllArgsConstructor
 class PatronProfileController {
@@ -95,11 +97,17 @@ class PatronProfileController {
                 .getOrElse(notFound().build());
     }
 
-    //TODO: @RequestBody
-    @PostMapping("/profiles/{patronId}/holds/{bookId}/branch/{branchId}")
-    ResponseEntity placeHold(@PathVariable UUID patronId, @PathVariable UUID bookId, @PathVariable UUID branchId) {
-        Try<Result> result = placingOnHold.placeOnHold(new PlaceOnHoldCommand(Instant.now(), new PatronId(patronId), new LibraryBranchId(branchId),
-        new BookId(bookId), Option.of(1)));
+    @PostMapping("/holds")
+    ResponseEntity placeHold(@RequestBody PlaceHoldRequest request) {
+        Try<Result> result = placingOnHold.placeOnHold(
+                new PlaceOnHoldCommand(
+                        Instant.now(),
+                        new PatronId(request.getPatronId()),
+                        new LibraryBranchId(request.getLibraryBranchId()),
+                        new BookId(request.getBookId()),
+                        Option.of(request.getNumberOfDays())
+                )
+        );
         return result
                 .map(success -> ResponseEntity.ok().build())
                 .getOrElse(ResponseEntity.status(INTERNAL_SERVER_ERROR).build());
@@ -129,7 +137,6 @@ class PatronProfileController {
                 linkTo(methodOn(PatronProfileController.class).findCheckout(patronId, checkout.getBook().getBookId()))
                         .withSelfRel());
     }
-
 }
 
 @Value
@@ -170,4 +177,13 @@ class Checkout {
         this.till = hold.getTill();
     }
 
+}
+
+@Value
+@AllArgsConstructor(onConstructor = @__(@JsonCreator))
+class PlaceHoldRequest {
+    UUID bookId;
+    UUID patronId;
+    UUID libraryBranchId;
+    Integer numberOfDays;
 }

@@ -10,6 +10,8 @@ import io.vavr.control.Either;
 import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+
 
 import static io.pillopl.library.commons.commands.Result.Success;
 import static io.vavr.API.*;
@@ -17,6 +19,7 @@ import static io.vavr.Patterns.$Left;
 import static io.vavr.Patterns.$Right;
 
 @AllArgsConstructor
+@Slf4j
 public class PlacingOnHold {
 
     private final FindAvailableBook findAvailableBook;
@@ -31,7 +34,7 @@ public class PlacingOnHold {
                     Case($Left($()), this::publishEvents),
                     Case($Right($()), this::publishEvents)
             );
-        });
+        }).onFailure(t -> log.error("Failed to place a hold", t));
     }
 
     private Result publishEvents(BookPlacedOnHoldEvents placedOnHold) {
