@@ -1,5 +1,6 @@
 package io.pillopl.library.lending.patronprofile.web;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import io.pillopl.library.catalogue.BookId;
 import io.pillopl.library.lending.LendingTestContext;
 import io.pillopl.library.lending.book.model.BookFixture;
@@ -61,6 +62,9 @@ public class PatronProfileControllerIT {
 
     @MockBean
     private CancelingHold cancelingHold;
+
+    @MockBean
+    private MeterRegistry meterRegistry;
 
     @Test
     public void shouldContainPatronProfileResourceWithCorrectHeadersAndLinksToCheckoutsAndHolds() throws Exception {

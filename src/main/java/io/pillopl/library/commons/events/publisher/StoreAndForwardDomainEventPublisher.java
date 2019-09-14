@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 public class StoreAndForwardDomainEventPublisher implements DomainEvents {
 
-    private final JustForwardDomainEventPublisher justForwardDomainEventPublisher;
+    private final DomainEvents eventsPublisher;
     private final EventsStorage eventsStorage;
 
     @Override
@@ -23,7 +23,7 @@ public class StoreAndForwardDomainEventPublisher implements DomainEvents {
     @Transactional
     public void publishAllPeriodically() {
         List<DomainEvent> domainEvents = eventsStorage.toPublish();
-        domainEvents.forEach(justForwardDomainEventPublisher::publish);
+        domainEvents.forEach(eventsPublisher::publish);
         eventsStorage.published(domainEvents);
     }
 }
