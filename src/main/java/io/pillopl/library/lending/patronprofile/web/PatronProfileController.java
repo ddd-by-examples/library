@@ -1,14 +1,22 @@
 package io.pillopl.library.lending.patronprofile.web;
 
 
+import io.micrometer.core.annotation.Timed;
 import io.pillopl.library.catalogue.BookId;
 import io.pillopl.library.commons.commands.Result;
+import io.pillopl.library.lending.librarybranch.model.LibraryBranchId;
 import io.pillopl.library.lending.patron.application.hold.CancelHoldCommand;
 import io.pillopl.library.lending.patron.application.hold.CancelingHold;
+import io.pillopl.library.lending.patron.application.hold.PlaceOnHoldCommand;
+import io.pillopl.library.lending.patron.application.hold.PlacingOnHold;
 import io.pillopl.library.lending.patron.model.PatronId;
 import io.pillopl.library.lending.patronprofile.model.PatronProfiles;
 import io.vavr.Predicates;
+import io.vavr.control.Option;
 import io.vavr.control.Try;
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 import org.springframework.hateoas.CollectionModel;
@@ -18,11 +26,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
 
 import static io.vavr.API.$;
 import static io.vavr.API.Case;
@@ -31,14 +37,17 @@ import static java.util.stream.Collectors.toList;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.afford;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.ok;
 
+@Timed
 @RestController
 @AllArgsConstructor
 class PatronProfileController {
 
     private final PatronProfiles patronProfiles;
+    private final PlacingOnHold placingOnHold;
     private final CancelingHold cancelingHold;
 
     @GetMapping("/profiles/{patronId}")
@@ -84,7 +93,16 @@ class PatronProfileController {
                 .findCheckout(new BookId(bookId))
                 .map(hold -> ok(resourceWithLinkToCheckoutSelf(patronId, hold)))
                 .getOrElse(notFound().build());
+    }
 
+    //TODO: @RequestBody
+    @PostMapping("/profiles/{patronId}/holds/{bookId}/branch/{branchId}")
+    ResponseEntity placeHold(@PathVariable UUID patronId, @PathVariable UUID bookId, @PathVariable UUID branchId) {
+        Try<Result> result = placingOnHold.placeOnHold(new PlaceOnHoldCommand(Instant.now(), new PatronId(patronId), new LibraryBranchId(branchId),
+        new BookId(bookId), Option.of(1)));
+        return result
+                .map(success -> ResponseEntity.ok().build())
+                .getOrElse(ResponseEntity.status(INTERNAL_SERVER_ERROR).build());
     }
 
     @DeleteMapping("/profiles/{patronId}/holds/{bookId}")
@@ -93,9 +111,7 @@ class PatronProfileController {
         return result
                 .map(success -> ResponseEntity.noContent().build())
                 .recover(r -> Match(r).of(Case($(Predicates.instanceOf(IllegalArgumentException.class)), ResponseEntity.notFound().build())))
-                .getOrElse(ResponseEntity.status(500).build());
-
-
+                .getOrElse(ResponseEntity.status(INTERNAL_SERVER_ERROR).build());
     }
 
     private EntityModel<Hold> resourceWithLinkToHoldSelf(UUID patronId, io.pillopl.library.lending.patronprofile.model.Hold hold) {

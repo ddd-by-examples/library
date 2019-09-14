@@ -23,15 +23,19 @@ class MeteredDomainEventPublisherSpec extends Specification {
     @Autowired
     MeteredDomainEventPublisher publisher
 
-    def "should meter published events"() {
+    def "should count published events"() {
         when:
             publisher.publish(new TestEvent())
         then:
-            meterRegistry.counter(TextEvent.class.name, "aaa", "bbb").count() == 1.0
+            countedEvents("domain_events", "name", "TestEvent") == 1.0
         when:
             publisher.publish(new TestEvent())
         then:
-            meterRegistry.counter(TextEvent.class.name, "aaa", "bbb").count() == 2.0
+            countedEvents("domain_events", "name", "TestEvent") == 2.0
+    }
+
+    private double countedEvents(String metricName, String key, String tag) {
+        meterRegistry.counter(metricName, key, tag).count()
     }
 }
 

@@ -797,7 +797,7 @@ $ docker run -ti --rm --name spring-library -p 8080:8080 spring/library
 To run the application as well as Grafana dashboard for visualizing metrics run all services:
 
 ```console
-$ docker-compose run
+$ docker-compose up
 ```
 
 

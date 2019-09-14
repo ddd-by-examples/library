@@ -6,6 +6,8 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
+    environment:
+      - "SPRING_PROFILES_ACTIVE=local"
     ports:
       - '8080:8080'
 
