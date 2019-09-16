@@ -794,20 +794,22 @@ Either way once built you can run it like so:
 $ docker run -ti --rm --name spring-library -p 8080:8080 spring/library
 ```
 
-To run the application as well as Grafana dashboard for visualizing metrics run all services:
+### Production ready metrics and visualization
+To run the application as well as Prometheus and Grafana dashboard for visualizing metrics you can run all services:
 
 ```console
 $ docker-compose up
 ```
 
-
-### Production ready metrics and visualization
+If everything goes well, you can access the following services at given location:
 * http://localhost:8080/actuator/prometheus - published Micrometer metrics
 * http://localhost:9090 - Prometheus dashboard
 * http://localhost:3000 - Grafana dashboard
 
-To create a dashboard go to Create -> Import and select attached `jvm-micrometer_rev8.json`. File has been pulled from 
-`https://grafana.com/grafana/dashboards/4701`
+In order to see some metrics, you must create a dashboard. Go to `Create` -> `Import` and select attached `jvm-micrometer_rev8.json`. File has been pulled from 
+`https://grafana.com/grafana/dashboards/4701`.
+
+Please note application will be run with `local` Spring profile to setup some initial data.
 
 ## References
 
