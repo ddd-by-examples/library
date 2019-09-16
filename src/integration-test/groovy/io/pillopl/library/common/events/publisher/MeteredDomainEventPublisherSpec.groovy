@@ -34,7 +34,7 @@ class MeteredDomainEventPublisherSpec extends Specification {
             countedEvents("domain_events", "name", "TestEvent") == 2.0
     }
 
-    private double countedEvents(String metricName, String key, String tag) {
+    def countedEvents(String metricName, String key, String tag) {
         meterRegistry.counter(metricName, key, tag).count()
     }
 }

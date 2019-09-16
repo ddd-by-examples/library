@@ -76,6 +76,4 @@ class LendingDatabaseConfig extends AbstractJdbcConfiguration {
             log.info("Created patronId: {}", patronId);
         };
     }
-
-
 }
