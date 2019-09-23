@@ -1,5 +1,6 @@
 package io.pillopl.library.lending.patronprofile.web;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import io.pillopl.library.catalogue.BookId;
 import io.pillopl.library.lending.LendingTestContext;
 import io.pillopl.library.lending.book.model.BookFixture;
@@ -62,6 +63,9 @@ public class PatronProfileControllerIT {
     @MockBean
     private CancelingHold cancelingHold;
 
+    @MockBean
+    private MeterRegistry meterRegistry;
+
     @Test
     public void shouldContainPatronProfileResourceWithCorrectHeadersAndLinksToCheckoutsAndHolds() throws Exception {
         given(patronProfiles.fetchFor(patronId)).willReturn(profiles());
@@ -70,7 +74,7 @@ public class PatronProfileControllerIT {
         mvc.perform(get("/profiles/" + patronId.getPatronId())
                 .accept(MediaTypes.HAL_FORMS_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(header().string(CONTENT_TYPE, MediaTypes.HAL_FORMS_JSON_VALUE + ";charset=UTF-8"))
+                .andExpect(header().string(CONTENT_TYPE, MediaTypes.HAL_FORMS_JSON_VALUE))
                 .andExpect(jsonPath("$._links.self.href", containsString("profiles/" + patronId.getPatronId())))
                 .andExpect(jsonPath("$.patronId", is(patronId.getPatronId().toString())))
                 .andExpect(jsonPath("$._links.holds.href", containsString("/profiles/" + patronId.getPatronId() + "/holds")))
@@ -85,7 +89,7 @@ public class PatronProfileControllerIT {
         mvc.perform(get("/profiles/" + patronId.getPatronId() + "/holds/")
                 .accept(MediaTypes.HAL_FORMS_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(header().string(CONTENT_TYPE, MediaTypes.HAL_FORMS_JSON_VALUE + ";charset=UTF-8"))
+                .andExpect(header().string(CONTENT_TYPE, MediaTypes.HAL_FORMS_JSON_VALUE))
                 .andExpect(jsonPath("$._embedded.holdList[0].bookId", is(bookId.getBookId().toString())))
                 .andExpect(jsonPath("$._embedded.holdList[0]._links.self.href", containsString("/profiles/" + patronId.getPatronId() + "/holds/" + bookId.getBookId())))
                 .andExpect(jsonPath("$._embedded.holdList[0].till", is(anyDate.toString())))
@@ -100,7 +104,7 @@ public class PatronProfileControllerIT {
         mvc.perform(get("/profiles/" + patronId.getPatronId() + "/checkouts/")
                 .accept(MediaTypes.HAL_FORMS_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(header().string(CONTENT_TYPE, MediaTypes.HAL_FORMS_JSON_VALUE + ";charset=UTF-8"))
+                .andExpect(header().string(CONTENT_TYPE, MediaTypes.HAL_FORMS_JSON_VALUE))
                 .andExpect(jsonPath("$._embedded.checkoutList[0].bookId", is(anotherBook.getBookId().toString())))
                 .andExpect(jsonPath("$._embedded.checkoutList[0].till", is(anotherDate.toString())))
                 .andExpect(jsonPath("$._embedded.checkoutList[0]._links.self.href", containsString("/profiles/" + patronId.getPatronId() + "/checkouts/" + anotherBook.getBookId())));
@@ -135,7 +139,7 @@ public class PatronProfileControllerIT {
         mvc.perform(get("/profiles/" + patronId.getPatronId() + "/holds/" + bookId.getBookId())
                 .accept(MediaTypes.HAL_FORMS_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(header().string(CONTENT_TYPE, MediaTypes.HAL_FORMS_JSON_VALUE + ";charset=UTF-8"))
+                .andExpect(header().string(CONTENT_TYPE, MediaTypes.HAL_FORMS_JSON_VALUE))
                 .andExpect(jsonPath("$.bookId", is(bookId.getBookId().toString())))
                 .andExpect(jsonPath("$.till", is(anyDate.toString())))
                 .andExpect(jsonPath("$._templates.default.method", is("delete")))
@@ -150,7 +154,7 @@ public class PatronProfileControllerIT {
         mvc.perform(get("/profiles/" + patronId.getPatronId() + "/checkouts/" + anotherBook.getBookId())
                 .accept(MediaTypes.HAL_FORMS_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(header().string(CONTENT_TYPE, MediaTypes.HAL_FORMS_JSON_VALUE + ";charset=UTF-8"))
+                .andExpect(header().string(CONTENT_TYPE, MediaTypes.HAL_FORMS_JSON_VALUE))
                 .andExpect(jsonPath("$.bookId", is(anotherBook.getBookId().toString())))
                 .andExpect(jsonPath("$.till", is(anotherDate.toString())))
                 .andExpect(jsonPath("$._links.self.href", containsString("profiles/" + patronId.getPatronId() + "/checkouts/" + anotherBook.getBookId())));

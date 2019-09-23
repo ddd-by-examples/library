@@ -3,21 +3,17 @@ package io.pillopl.library.lending.patron.application.checkout;
 import io.pillopl.library.catalogue.BookId;
 import io.pillopl.library.commons.commands.Result;
 import io.pillopl.library.lending.book.model.BookOnHold;
-import io.pillopl.library.lending.librarybranch.model.LibraryBranchId;
 import io.pillopl.library.lending.patron.application.hold.FindBookOnHold;
-import io.pillopl.library.lending.patron.model.CheckoutDuration;
 import io.pillopl.library.lending.patron.model.Patron;
 import io.pillopl.library.lending.patron.model.PatronEvent.BookCheckedOut;
 import io.pillopl.library.lending.patron.model.PatronEvent.BookCheckingOutFailed;
-import io.pillopl.library.lending.patron.model.Patrons;
 import io.pillopl.library.lending.patron.model.PatronId;
+import io.pillopl.library.lending.patron.model.Patrons;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.Value;
 
-import java.time.Instant;
 
 import static io.pillopl.library.commons.commands.Result.Rejection;
 import static io.pillopl.library.commons.commands.Result.Success;
@@ -68,21 +64,4 @@ public class CheckingOutBookOnHold {
                 .getOrElseThrow(() -> new IllegalArgumentException("Patron with given Id does not exists: " + patronId.getPatronId()));
     }
 
-}
-
-@Value
-class CheckOutBookCommand {
-    @NonNull Instant timestamp;
-    @NonNull PatronId patronId;
-    @NonNull LibraryBranchId libraryId;
-    @NonNull BookId bookId;
-    @NonNull Integer noOfDays;
-
-    static CheckOutBookCommand create(PatronId patronId, LibraryBranchId libraryBranchId, BookId bookId, int noOfDays) {
-        return new CheckOutBookCommand(Instant.now(), patronId, libraryBranchId, bookId, noOfDays);
-    }
-
-    CheckoutDuration getCheckoutDuration() {
-        return CheckoutDuration.forNoOfDays(noOfDays);
-    }
 }
