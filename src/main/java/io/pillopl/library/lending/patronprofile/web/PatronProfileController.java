@@ -97,12 +97,12 @@ class PatronProfileController {
                 .getOrElse(notFound().build());
     }
 
-    @PostMapping("/holds")
-    ResponseEntity placeHold(@RequestBody PlaceHoldRequest request) {
+    @PostMapping("/profiles/{patronId}/holds")
+    ResponseEntity placeHold(@PathVariable UUID patronId, @RequestBody PlaceHoldRequest request) {
         Try<Result> result = placingOnHold.placeOnHold(
                 new PlaceOnHoldCommand(
                         Instant.now(),
-                        new PatronId(request.getPatronId()),
+                        new PatronId(patronId),
                         new LibraryBranchId(request.getLibraryBranchId()),
                         new BookId(request.getBookId()),
                         Option.of(request.getNumberOfDays())
@@ -183,7 +183,6 @@ class Checkout {
 @AllArgsConstructor(onConstructor = @__(@JsonCreator))
 class PlaceHoldRequest {
     UUID bookId;
-    UUID patronId;
     UUID libraryBranchId;
     Integer numberOfDays;
 }

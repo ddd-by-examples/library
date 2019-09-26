@@ -5,6 +5,7 @@ import io.pillopl.library.catalogue.BookId;
 import io.pillopl.library.lending.LendingTestContext;
 import io.pillopl.library.lending.book.model.BookFixture;
 import io.pillopl.library.lending.patron.application.hold.CancelingHold;
+import io.pillopl.library.lending.patron.application.hold.PlacingOnHold;
 import io.pillopl.library.lending.patron.model.PatronFixture;
 import io.pillopl.library.lending.patron.model.PatronId;
 import io.pillopl.library.lending.patronprofile.model.Checkout;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -35,8 +37,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -59,6 +60,9 @@ public class PatronProfileControllerIT {
 
     @MockBean
     private PatronProfiles patronProfiles;
+
+    @MockBean
+    private PlacingOnHold placingOnHold;
 
     @MockBean
     private CancelingHold cancelingHold;
@@ -158,6 +162,33 @@ public class PatronProfileControllerIT {
                 .andExpect(jsonPath("$.bookId", is(anotherBook.getBookId().toString())))
                 .andExpect(jsonPath("$.till", is(anotherDate.toString())))
                 .andExpect(jsonPath("$._links.self.href", containsString("profiles/" + patronId.getPatronId() + "/checkouts/" + anotherBook.getBookId())));
+    }
+
+    @Test
+    public void shouldPlaceBookOnHold() throws Exception {
+        given(placingOnHold.placeOnHold(any())).willReturn(Try.success(Success));
+        var request = "{\"bookId\":\"6e1dfec5-5cfe-487e-814e-d70114f5396e\", \"libraryBranchId\":\"a518e2ef-5f6c-43e3-a7fc-5d895e15be3a\",\"numberOfDays\":1}";
+
+        // expect
+        mvc.perform(post("/profiles/" + patronId.getPatronId() + "/holds")
+                .accept(MediaTypes.HAL_FORMS_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(request))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldReturn500IfSomethingFailedWhileDuringPlacingOnHold() throws Exception {
+        given(placingOnHold.placeOnHold(any())).willReturn(Try.failure(new IllegalArgumentException()));
+        var request = "{\"bookId\":\"6e1dfec5-5cfe-487e-814e-d70114f5396e\", \"libraryBranchId\":\"a518e2ef-5f6c-43e3-a7fc-5d895e15be3a\",\"numberOfDays\":1}";
+
+
+        // expect
+        mvc.perform(post("/profiles/" + patronId.getPatronId() + "/holds")
+                .accept(MediaTypes.HAL_FORMS_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(request))
+                .andExpect(status().isInternalServerError());
     }
 
     @Test
