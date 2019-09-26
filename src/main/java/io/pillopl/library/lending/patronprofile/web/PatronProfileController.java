@@ -53,8 +53,8 @@ class PatronProfileController {
     private final CancelingHold cancelingHold;
 
     @GetMapping("/profiles/{patronId}")
-    ResponseEntity<EntityModel<ProfileResource>> patronProfile(@PathVariable UUID patronId) {
-        return ok(new EntityModel<>(new ProfileResource(patronId)));
+    ResponseEntity<ProfileResource> patronProfile(@PathVariable UUID patronId) {
+        return ok(new ProfileResource(patronId));
     }
 
     @GetMapping("/profiles/{patronId}/holds/")
