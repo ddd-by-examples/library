@@ -37,7 +37,9 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -181,7 +183,6 @@ public class PatronProfileControllerIT {
     public void shouldReturn500IfSomethingFailedWhileDuringPlacingOnHold() throws Exception {
         given(placingOnHold.placeOnHold(any())).willReturn(Try.failure(new IllegalArgumentException()));
         var request = "{\"bookId\":\"6e1dfec5-5cfe-487e-814e-d70114f5396e\", \"libraryBranchId\":\"a518e2ef-5f6c-43e3-a7fc-5d895e15be3a\",\"numberOfDays\":1}";
-
 
         // expect
         mvc.perform(post("/profiles/" + patronId.getPatronId() + "/holds")
