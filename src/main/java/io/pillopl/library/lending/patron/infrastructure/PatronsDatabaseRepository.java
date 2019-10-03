@@ -8,6 +8,7 @@ import io.pillopl.library.lending.patron.model.PatronEvent.PatronCreated;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.control.Option;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -22,7 +23,7 @@ import static io.vavr.API.*;
 import static io.vavr.Predicates.instanceOf;
 import static java.util.stream.Collectors.*;
 
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 class PatronsDatabaseRepository implements Patrons {
 
     private final PatronEntityRepository patronEntityRepository;

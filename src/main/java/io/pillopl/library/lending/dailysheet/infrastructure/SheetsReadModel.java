@@ -14,6 +14,7 @@ import io.pillopl.library.lending.patron.model.PatronEvent.BookPlacedOnHold;
 import io.pillopl.library.lending.patron.model.PatronEvent.BookReturned;
 import io.pillopl.library.lending.patron.model.PatronId;
 import io.vavr.control.Option;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.dao.DuplicateKeyException;
@@ -32,7 +33,7 @@ import static io.vavr.collection.List.ofAll;
 import static java.sql.Timestamp.from;
 import static java.util.stream.Collectors.toList;
 
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 class SheetsReadModel implements DailySheet {
 
     private final JdbcTemplate sheets;

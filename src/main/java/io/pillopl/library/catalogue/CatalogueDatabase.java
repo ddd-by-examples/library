@@ -1,6 +1,7 @@
 package io.pillopl.library.catalogue;
 
 import io.vavr.control.Option;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,7 +9,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 class CatalogueDatabase {
 
     private final JdbcTemplate jdbcTemplate;
@@ -48,7 +49,7 @@ class CatalogueDatabase {
 }
 
 @Data
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
 class BookDatabaseRow {
     String isbn;
     String author;

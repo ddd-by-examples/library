@@ -1,5 +1,6 @@
 package io.pillopl.library.catalogue;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -7,7 +8,7 @@ import lombok.Value;
 
 @Value
 @EqualsAndHashCode(of = "bookIsbn")
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 class Book {
 
     @NonNull

@@ -1,5 +1,6 @@
 package io.pillopl.library.lending.patron.infrastructure;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -7,7 +8,7 @@ import org.springframework.data.annotation.Id;
 import java.time.Instant;
 import java.util.UUID;
 
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Getter
 class HoldDatabaseEntity {
 

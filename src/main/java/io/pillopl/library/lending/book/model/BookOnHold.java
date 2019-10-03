@@ -9,6 +9,7 @@ import io.pillopl.library.lending.patron.model.PatronEvent.BookHoldCanceled;
 import io.pillopl.library.lending.patron.model.PatronEvent.BookHoldExpired;
 import io.pillopl.library.lending.patron.model.PatronEvent.BookReturned;
 import io.pillopl.library.lending.patron.model.PatronId;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -17,7 +18,7 @@ import lombok.Value;
 import java.time.Instant;
 
 @Value
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 @EqualsAndHashCode(of = "bookInformation")
 public class BookOnHold implements Book {
 

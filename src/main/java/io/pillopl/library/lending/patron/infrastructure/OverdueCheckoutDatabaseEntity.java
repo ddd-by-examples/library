@@ -1,5 +1,6 @@
 package io.pillopl.library.lending.patron.infrastructure;
 
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,7 +8,7 @@ import org.springframework.data.annotation.Id;
 
 import java.util.UUID;
 
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
 @EqualsAndHashCode
 @Getter
 class OverdueCheckoutDatabaseEntity {
