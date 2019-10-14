@@ -1,5 +1,6 @@
 package io.pillopl.library.catalogue;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
@@ -7,7 +8,7 @@ import lombok.Value;
 import java.util.UUID;
 
 @Value
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 class BookInstance {
 
     @NonNull

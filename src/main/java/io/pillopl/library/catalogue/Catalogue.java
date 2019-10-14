@@ -3,12 +3,13 @@ package io.pillopl.library.catalogue;
 import io.pillopl.library.commons.commands.Result;
 import io.pillopl.library.commons.events.DomainEvents;
 import io.vavr.control.Try;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 
 import static io.pillopl.library.commons.commands.Result.Rejection;
 import static io.pillopl.library.commons.commands.Result.Success;
 
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class Catalogue {
 
     private final CatalogueDatabase database;
