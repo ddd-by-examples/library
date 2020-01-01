@@ -25,7 +25,7 @@ in **book hold failed** event, as it is depicted below:
 
 ![Holding example 2](images/dl/holding/example-2.png)  
 
-Taking a look at the domain description again, we find out that each patron can have no more than 1 **overdue checkouts**.
+Taking a look at the domain description again, we find out that each patron can have no more than 2 **overdue checkouts**.
 In such situation, every attempt to **place a book on hold** should fail:
 
 ![Holding example 3](images/dl/holding/example-3.png)  
@@ -53,7 +53,7 @@ And here is the last example, partially covered before:
 
 ![Holding example 6](images/dl/holding/example-6.png)  
 
-### Regular patron
+### Researcher patron
 
 In the previous part of this paragraph we focused on a *regular patron* only. Let's have a look at *researcher patron* now.
 The domain description clearly states that **any** patron with more than 2 **overdue checkouts** will get a rejection

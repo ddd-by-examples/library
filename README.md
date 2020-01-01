@@ -257,7 +257,7 @@ This change might be calculated by dirty checking or we might just override enti
 Third option is _Let's make implicit explicit_ and actually call this state change A->B an **event**. 
 After all, event-driven architecture is all about promoting state changes as domain events.
 
-Thanks to this our domain model may become immutable and just return events as results of invocking a command like so:
+Thanks to this our domain model may become immutable and just return events as results of invoking a command like so:
 
 ```java
 public BookPlacedOnHold placeOnHold(AvailableBook book) {
