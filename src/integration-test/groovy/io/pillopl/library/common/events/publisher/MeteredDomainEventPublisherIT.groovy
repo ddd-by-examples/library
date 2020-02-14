@@ -2,20 +2,17 @@ package io.pillopl.library.common.events.publisher
 
 import groovy.transform.CompileStatic
 import io.micrometer.core.instrument.MeterRegistry
-import io.pillopl.library.LibraryApplication
 import io.pillopl.library.commons.events.DomainEvent
 import io.pillopl.library.commons.events.publisher.MeteredDomainEventPublisher
 import io.pillopl.library.lending.LendingTestContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification
 
-import java.awt.event.TextEvent
 import java.time.Instant
 
 @SpringBootTest(classes = [LendingTestContext.class, DomainEventsTestConfig.class])
-class MeteredDomainEventPublisherSpec extends Specification {
+class MeteredDomainEventPublisherIT extends Specification {
 
     @Autowired
     MeterRegistry meterRegistry
