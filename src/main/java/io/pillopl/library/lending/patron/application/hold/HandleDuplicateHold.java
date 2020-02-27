@@ -5,7 +5,6 @@ import io.pillopl.library.lending.book.model.BookDuplicateHoldFound;
 import io.pillopl.library.catalogue.BookId;
 import io.pillopl.library.lending.patron.model.PatronId;
 import io.vavr.control.Try;
-import lombok.AllArgsConstructor;
 import org.springframework.context.event.EventListener;
 
 import java.time.Clock;
@@ -18,8 +17,7 @@ public class HandleDuplicateHold {
     private final Clock clock;
 
     public HandleDuplicateHold(CancelingHold cancelingHold) {
-        this.cancelingHold = cancelingHold;
-        this.clock = Clock.systemUTC();
+        this(cancelingHold, Clock.systemUTC());
     }
 
     public HandleDuplicateHold(CancelingHold cancelingHold, Clock clock) {
