@@ -8,12 +8,24 @@ import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
 import org.springframework.context.event.EventListener;
 
+import java.time.Clock;
+
 import static java.time.Instant.now;
 
-@AllArgsConstructor
 public class HandleDuplicateHold {
 
     private final CancelingHold cancelingHold;
+    private final Clock clock;
+
+    public HandleDuplicateHold(CancelingHold cancelingHold) {
+        this.cancelingHold = cancelingHold;
+        this.clock = Clock.systemUTC();
+    }
+
+    public HandleDuplicateHold(CancelingHold cancelingHold, Clock clock) {
+        this.cancelingHold = cancelingHold;
+        this.clock = clock;
+    }
 
     @EventListener
     public Try<Result> handle(BookDuplicateHoldFound event) {
@@ -22,7 +34,7 @@ public class HandleDuplicateHold {
 
     private CancelHoldCommand cancelHoldCommandFrom(BookDuplicateHoldFound event) {
         return new CancelHoldCommand(
-                now(),
+                now(clock),
                 new PatronId(event.getSecondPatronId()),
                 new BookId(event.getBookId()));
     }
