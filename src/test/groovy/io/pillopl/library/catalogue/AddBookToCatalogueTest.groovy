@@ -13,26 +13,26 @@ class AddBookToCatalogueTest extends Specification {
 
     CatalogueDatabase catalogueDatabase = Stub()
     DomainEvents domainEvents = Mock()
-    Catalogue catalouge = new Catalogue(catalogueDatabase, domainEvents)
+    Catalogue catalogue = new Catalogue(catalogueDatabase, domainEvents)
 
     def 'should add a new book to catalogue'() {
         given:
             databaseWorks()
         when:
-            Try<Result> result = catalouge.addBook("Eric Evans", "DDD", DDD_ISBN_STR)
+            Try<Result> result = catalogue.addBook("Eric Evans", "DDD", DDD_ISBN_STR)
         then:
             result.isSuccess()
             result.get() == Result.Success
 
     }
 
-    def 'should add a new book instance to catalouge'() {
+    def 'should add a new book instance to catalogue'() {
         given:
             databaseWorks()
         and:
             thereIsBookWith(DDD_ISBN_STR)
         when:
-            Try<Result> result = catalouge.addBookInstance(DDD_ISBN_STR, Restricted)
+            Try<Result> result = catalogue.addBookInstance(DDD_ISBN_STR, Restricted)
         then:
             result.isSuccess()
             result.get() == Result.Success
@@ -47,7 +47,7 @@ class AddBookToCatalogueTest extends Specification {
         and:
             thereIsNoBookWith(DDD_ISBN_STR)
         when:
-            Try<Result> result = catalouge.addBookInstance(DDD_ISBN_STR, Restricted)
+            Try<Result> result = catalogue.addBookInstance(DDD_ISBN_STR, Restricted)
         then:
             result.isSuccess()
             result.get() == Result.Rejection
@@ -60,7 +60,7 @@ class AddBookToCatalogueTest extends Specification {
         given:
             databaseDoesNotWork()
         when:
-            Try<Result> result = catalouge.addBook("Eric Evans", "DDD", DDD_ISBN_STR)
+            Try<Result> result = catalogue.addBook("Eric Evans", "DDD", DDD_ISBN_STR)
         then:
             result.isFailure()
     }
@@ -71,7 +71,7 @@ class AddBookToCatalogueTest extends Specification {
         and:
             thereIsBookWith(DDD_ISBN_STR)
         when:
-            Try<Result> result = catalouge.addBookInstance(DDD_ISBN_STR, Restricted)
+            Try<Result> result = catalogue.addBookInstance(DDD_ISBN_STR, Restricted)
         then:
             result.isFailure()
         and:
