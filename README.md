@@ -64,21 +64,22 @@ This enables us to have book with **same ISBN** as Circulated and Restricted at 
 
 The first thing we started with was **domain exploration** with the help of **Big Picture EventStorming**.
 
-The description you found in the previous chapter, landed on our virtual wall:    
-![Event Storming Domain description](docs/images/eventstorming-domain-desc.png)   
-The EventStorming session led us to numerous discoveries, modeled with the sticky notes:  
+The **domain description** you found in the previous chapter, landed on our virtual wall:
+![Event Storming Domain description](docs/images/eventstorming-domain-desc.png) 
+
+The **EventStorming Session** led us to numerous **discoveries**, modeled with the sticky notes:  
 ![Event Storming Big Picture](docs/images/eventstorming-big-picture.jpg)   
+
 During the session we discovered following definitions:  
 ![Event Storming Definitions](docs/images/eventstorming-definitions.png)    
 
-This made us think of real life scenarios that might happen. We discovered them described with the help of
-the **Example mapping**:  
+This made us think of **real life scenarios** that might happen. We discovered them described with the help of the **Example Mapping**:  
 ![Example mapping](docs/images/example-mapping.png)  
 
-This in turn became the base for our *Design Level* sessions, where we analyzed each example:  
+This in turn became the base for our **Design Level Sessions**, where we analyzed each example:  
 ![Example mapping](docs/images/eventstorming-design-level.jpg)  
 
-Please follow the links below to get more details on each of the mentioned steps:
+Please follow the links below to get **more details** on each of the mentioned steps:
 - [Big Picture EventStorming](./docs/big-picture.md)
 - [Example Mapping](docs/example-mapping.md)
 - [Design Level EventStorming](docs/design-level.md)
