@@ -70,7 +70,7 @@ The **domain description** you found in the previous chapter, landed on our virt
 The **EventStorming Session** led us to numerous **discoveries**, modeled with the sticky notes:  
 ![Event Storming Big Picture](docs/images/eventstorming-big-picture.jpg)   
 
-During the session we discovered following definitions:  
+During the session we discovered following **definitions**:  
 ![Event Storming Definitions](docs/images/eventstorming-definitions.png)    
 
 This made us think of **real life scenarios** that might happen. We discovered them described with the help of the **Example Mapping**:  
@@ -85,43 +85,31 @@ Please follow the links below to get **more details** on each of the mentioned s
 - [Design Level EventStorming](docs/design-level.md)
 
 ### Project structure and architecture
-At the very beginning, not to overcomplicate the project, we decided to assign each bounded context
-to a separate package, which means that the system is a modular monolith. There are no obstacles, though,
-to put contexts into maven modules or finally into microservices.
 
-Bounded contexts should (amongst others) introduce autonomy in the sense of architecture. Thus, each module
-encapsulating the context has its own local architecture aligned to problem complexity.
-In the case of a context, where we identified true business logic (**lending**) we introduced a domain model
-that is a simplified (for the purpose of the project) abstraction of the reality and utilized
-hexagonal architecture. In the case of a context, that during Event Storming turned out to lack any complex
-domain logic, we applied CRUD-like local architecture.  
+At the very beginning, not to over-complicate the project, we decided to assign each **bounded context** to a separate package, which means that the system is a **modular monolith**. There are no obstacles, though, to put contexts into **maven modules** or finally into **microservices**.
+
+**Bounded Contexts** should (amongst others) introduce **autonomy** in the sense of architecture. Thus, each module encapsulating the context has its own local architecture aligned to problem complexity. 
+
+In the case of a context, where we identified true business logic (**lending**) we introduced a **domain model** that is a simplified (for the purpose of the project) abstraction of the reality and utilized **hexagonal architecture**. In other context, that during **Event Storming** turned out to lack any **complex domain logic**, we applied **CRUD-like local architecture**. 
 
 ![Architecture](docs/images/architecture-big-picture.png) 
 
-If we are talking about hexagonal architecture, it lets us separate domain and application logic from
-frameworks (and infrastructure). What do we gain with this approach? Firstly, we can unit test most important
-part of the application - **business logic** - usually without the need to stub any dependency.
-Secondly, we create ourselves an opportunity to adjust infrastructure layer without the worry of
-breaking the core functionality. In the infrastructure layer we intensively use Spring Framework
-as probably the most mature and powerful application framework with an incredible test support.
-More information about how we use Spring you will find [here](#spring).
+If we are talking about **hexagonal architecture**, it lets us **separate domain and application logic from frameworks and infrastructure**. What do we gain with this approach?
+- Firstly, we can **unit test** most important part of the application - **business logic** - usually without the need to stub any dependency.
+- Secondly, we create ourselves an opportunity to **adjust infrastructure layer without the worry of breaking the core functionality**. 
 
-As we already mentioned, the architecture was driven by Event Storming sessions. Apart from identifying
-contexts and their complexity, we could also make a decision that we separate read and write models (CQRS).
-As an example you can have a look at **Patron Profiles** and *Daily Sheets*.
+In the infrastructure layer we intensively use Spring Framework as probably the most mature and powerful application framework with an incredible test support. More information about how we use Spring you will find [here](#spring).
+
+As we already mentioned, the architecture was driven by **Event Storming Sessions**. Apart from identifying contexts and their complexity, we could also make a decision that we **separate read and write models** ([CQRS](https://martinfowler.com/bliki/CQRS.html)).
+As an example you can have a look at *Patron Profiles* and *Daily Sheets*.
 
 ### Aggregates
-Aggregates discovered during Event Storming sessions communicate with each other with events. There is
-a contention, though, should they be consistent immediately or eventually? As aggregates in general
-determine business boundaries, eventual consistency sounds like a better choice, but choices in software
-are never costless. Providing eventual consistency requires some infrastructural tools, like message broker
-or event store. That's why we could (and did) start with immediate consistency.
 
-> Good architecture is the one which postpones all important decisions
+**Aggregates** discovered during Event Storming Sessions **communicate** with each other through **events**. There is a contention, though, should they be **consistent immediately or eventually**? As aggregates in general determine **business boundaries**, eventual consistency sounds like a better choice, but choices in software are **never costless**. Providing eventual consistency requires some infrastructural tools, like message broker or event store. That's why we could (and did) start with **immediate consistency**.
 
-... that's why we made it easy to change the consistency model, providing tests for each option, including
-basic implementations based on **DomainEvents** interface, which can be adjusted to our needs and
-toolset in future. Let's have a look at following examples:
+> Good architecture allows major architectural decisions to be deferred
+
+... that's why we made it **easy to change** the consistency model, providing **tests** for each option, including basic implementations based on **Domain Events** interface, which can be adjusted to our needs and tool set in future. Let's have a look at following examples:
 
 * Immediate consistency
     ```groovy
@@ -151,9 +139,9 @@ toolset in future. Let's have a look at following examples:
                 .get("COUNT(*)") == 1
     }
     ```
-   _Please note that here we are just reading from database right after events are being published_
+   _Please note that here we are **just reading** from database right after events are being published._
    
-   Simple implementation of the event bus is based on Spring application events:
+   Simple implementation of the **event bus** is based on Spring Application Events:
     ```java
     @AllArgsConstructor
     public class JustForwardDomainEventPublisher implements DomainEvents {
@@ -196,10 +184,9 @@ toolset in future. Let's have a look at following examples:
         }
     }
     ```
-    _Please note that the test looks exactly the same as previous one, but now we utilized Groovy's
-    **PollingConditions** to perform asynchronous functionality tests_
+    _Please note that the test looks exactly the same as previous one, but now we utilized Groovy's **PollingConditions** to perform **asynchronous functionality tests**._
 
-    Sample implementation of event bus is following:
+    Sample implementation of **event bus** is following:
     
     ```java
     @AllArgsConstructor
