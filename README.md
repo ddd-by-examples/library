@@ -22,13 +22,9 @@
 5. [References](#references)
 
 ## About
-
-This is a project of a library, driven by real [business requirements](#domain-description).
-We use techniques strongly connected with Domain Driven Design, Behavior-Driven Development,
-Event Storming and User Story Mapping. 
+This is a project of a library, driven by real [business requirements](#domain-description). We use techniques strongly connected with Domain Driven Design, Behavior-Driven Development, Event Storming and User Story Mapping.
 
 ## Domain description
-
 - A public library allows **patrons** to place **books** on hold at its various **library branches**.
 - Available books can be placed **on hold** only by one patron at any given **point in time**.
 
@@ -61,7 +57,6 @@ This enables us to have book with **same ISBN** as Circulated and Restricted at 
 ## General assumptions
 
 ### Process discovery
-
 The first thing we started with was **domain exploration** with the help of **Big Picture EventStorming**.
 
 The **domain description** you found in the previous chapter, landed on our virtual wall:
@@ -85,7 +80,6 @@ Please follow the links below to get **more details** on each of the mentioned s
 - [Design Level EventStorming](docs/design-level.md)
 
 ### Project structure and architecture
-
 At the very beginning, not to over-complicate the project, we decided to assign each **bounded context** to a separate package, which means that the system is a **modular monolith**. There are no obstacles, though, to put contexts into **maven modules** or finally into **microservices**.
 
 **Bounded Contexts** should (amongst others) introduce **autonomy** in the sense of architecture. Thus, each module encapsulating the context has its own local architecture aligned to problem complexity. 
@@ -104,7 +98,6 @@ As we already mentioned, the architecture was driven by **Event Storming Session
 As an example you can have a look at *Patron Profiles* and *Daily Sheets*.
 
 ### Aggregates
-
 **Aggregates** discovered during Event Storming Sessions **communicate** with each other through **events**. There is a contention, though, should they be **consistent immediately or eventually**? As aggregates in general determine **business boundaries**, eventual consistency sounds like a better choice, but choices in software are **never costless**. Providing eventual consistency requires some infrastructural tools, like message broker or event store. That's why we could (and did) start with **immediate consistency**.
 
 > Good architecture allows major architectural decisions to be deferred
@@ -133,7 +126,8 @@ As an example you can have a look at *Patron Profiles* and *Daily Sheets*.
     }
     
     boolean dailySheetIsUpdated() {
-        return new JdbcTemplate(datasource).query("select count(*) from holds_sheet s where s.hold_by_patron_id = ?",
+        return new JdbcTemplate(datasource)
+                .query("select count(*) from holds_sheet s where s.hold_by_patron_id = ?",
                 [patronId.patronId] as Object[],
                 new ColumnMapRowMapper()).get(0)
                 .get("COUNT(*)") == 1
@@ -210,27 +204,15 @@ As an example you can have a look at *Patron Profiles* and *Daily Sheets*.
     }
     ```
 
-To clarify, we should always aim for aggregates that can handle a business operation atomically
-(transactionally if you like), so each aggregate should be as independent and decoupled from other
-aggregates as possible. Thus, eventual consistency is promoted. As we already mentioned, it comes
-with some tradeoffs, so from the pragmatic point of view immediate consistency is also a choice.
-You might ask yourself a question now: _What if I don't have any events yet?_. Well, a pragmatic
-approach would be to encapsulate the communication between aggregates in a _Service-like_ class,
-where you could call proper aggregates line by line explicitly.
+To clarify, we should always aim for aggregates that can handle a **business operation atomically** (transactionally, if you like), so each aggregate should be as independent and decoupled from other aggregates as possible. Thus, eventual consistency is promoted. As we already mentioned, it comes with some tradeoffs, so from the pragmatic point of view immediate consistency is also a choice.
+
+You might ask yourself a question now: _What if I don't have any events yet?_. Well, a pragmatic approach would be to **encapsulate the communication** between aggregates in a _Service-like_ class, where you could call proper aggregates line by line explicitly.
 
 ### Events
-Talking about inter-aggregate communication, we must remember that events reduce coupling, but don't remove
-it completely. Thus, it is very vital to share(publish) only those events, that are necessary for other
-aggregates to exist and function. Otherwise there is a threat that the level of coupling will increase
-introducing **feature envy**, because other aggregates might start using those events to perform actions
-they are not supposed to perform. A solution to this problem could be the distinction of domain events
-and integration events, which will be described here soon.  
+Talking about **inter-aggregate communication**, we must remember that events reduce coupling, but don't remove it completely. Thus, it is very vital to share (**publish**) only those events that are **necessary** for other aggregates to exist and function. Otherwise there is a threat that the level of coupling will increase introducing [**feature envy**](https://refactoring.guru/smells/feature-envy), because other aggregates might start using those events to perform actions they are not supposed to perform. A solution to this problem could be the **distinction** of domain events and integration events, which will be described here soon.
 
 ### Events in Repositories 
-Repositories are one of the most popular design pattern. They abstract our domain model from data layer. 
-In other words, they deal with state. That said, a common use-case is when we pass a new state to our repository,
-so that it gets persisted. It may look like so:
-
+Repositories are one of the most popular **design pattern**. They **abstract** our domain model from data layer. In other words, they deal with state. That said, a common use-case is when we pass a new state to our repository, so that it gets persisted. It may look like so:
 ```java
 public class BusinessService {
    
@@ -238,44 +220,33 @@ public class BusinessService {
     
     void businessMethod(PatronId patronId) {
         Patron patron = patronRepository.findById(patronId);
-        //do sth
+        //do something
         patronRepository.save(patron);
     }
 }
 ```
 
-Conceptually, between 1st and 3rd line of that business method we change state of our Patron from A to B. 
-This change might be calculated by dirty checking or we might just override entire Patron state in the database. 
-Third option is _Let's make implicit explicit_ and actually call this state change A->B an **event**. 
-After all, event-driven architecture is all about promoting state changes as domain events.
+Conceptually, between 1st and 3rd line of that business method we **change state** of our Patron from A to B. This change might be calculated by dirty checking or we might just override entire Patron state in the database. Third option is _Let's make implicit explicit_ and actually call this state change A->B an **event**. After all, event-driven architecture is all about promoting state changes as domain events.
 
-Thanks to this our domain model may become immutable and just return events as results of invoking a command like so:
-
+Thanks to this our domain model may become **immutable** and just return events as results of invoking a command like so:
 ```java
 public BookPlacedOnHold placeOnHold(AvailableBook book) {
-      ...
+    ...
 }
 ```
 
 And our repository might operate directly on events like so:
-
 ```java
 public interface PatronRepository {
-     void save(PatronEvent event) {
+    void save(PatronEvent event);
 }
 ```
 
 ### ArchUnit
+One of the main components of a successful project is technical leadership that lets the team go in the right direction. Nevertheless, there are **tools** that can support teams in keeping the code clean and protect the architecture, so that the project won't become a **Big Ball of Mud**, and thus will be pleasant to develop and to maintain. The first option, the one we proposed, is [**ArchUnit**](https://www.archunit.org/) - a Java architecture test tool. ArchUnit lets you write unit tests of your architecture, so that it is always **consistent** with initial vision. Maven modules could be an alternative as well, but let's focus on the former.
 
-One of the main components of a successful project is technical leadership that lets the team go in the right
-direction. Nevertheless, there are tools that can support teams in keeping the code clean and protect the
-architecture, so that the project won't become a Big Ball of Mud, and thus will be pleasant to develop and
-to maintain. The first option, the one we proposed, is [ArchUnit](https://www.archunit.org/) - a Java architecture
-test tool. ArchUnit lets you write unit tests of your architecture, so that it is always consistent with initial
-vision. Maven modules could be an alternative as well, but let's focus on the former.
+In terms of **hexagonal architecture**, it is essential to ensure, that we do not mix different **levels of abstraction** (hexagon levels):
 
-In terms of hexagonal architecture, it is essential to ensure, that we do not mix different levels of
-abstraction (hexagon levels):
 ```java 
 @ArchTest
 public static final ArchRule model_should_not_depend_on_infrastructure =
@@ -285,8 +256,9 @@ public static final ArchRule model_should_not_depend_on_infrastructure =
         .should()
         .dependOnClassesThat()
         .resideInAPackage("..infrastructure..");
-```      
-and that frameworks do not affect the domain model  
+```  
+
+and that frameworks **do not affect** the domain model:
 ```java
 @ArchTest
 public static final ArchRule model_should_not_depend_on_spring =
@@ -299,25 +271,20 @@ public static final ArchRule model_should_not_depend_on_spring =
 ```    
 
 ### Functional thinking
-When you look at the code you might find a scent of functional programming. Although we do not follow
-a _clean_ FP, we try to think of business processes as pipelines or workflows, utilizing functional style through
-following concepts.
+When you look at the code you might find a scent of **functional programming**. Although we do not follow a _clean FP_, we try to **think of business processes as pipelines or workflows**, utilizing functional style through following concepts. This is very power for code legibility and reuse.
 
 _Please note that this is not a reference project for FP._
 
 #### Immutable objects
-Each class that represents a business concept is immutable, thanks to which we:
-* provide full encapsulation and objects' states protection,
-* secure objects for multithreaded access,
-* control all side effects much clearer. 
+**Each class that represents a business concept is immutable**, thanks to which we:
+* provide full encapsulation and objects' states protection;
+* secure objects for multithreaded access;
+* control all side effects much clearer;
 
 #### Pure functions
-We model domain operations, discovered in Design Level Event Storming, as pure functions, and declare them in
-both domain and application layers in the form of Java's functional interfaces. Their implementations are placed
-in infrastructure layer as ordinary methods with side effects. Thanks to this approach we can follow the abstraction
-of ubiquitous language explicitly, and keep this abstraction implementation-agnostic. As an example, you could have
-a look at `FindAvailableBook` interface and its implementation:
+We model **domain operations**, discovered in Design Level Event Storming, as **pure functions**, and declare them in both domain and application layers in the form of **Java's functional interfaces**. Their implementations are placed in infrastructure layer as ordinary methods with side effects. Thanks to this approach we can follow the abstraction of **ubiquitous language** explicitly, and keep this abstraction implementation-agnostic.
 
+As an example, you could have a look at `FindAvailableBook` interface and its implementation:
 ```java
 @FunctionalInterface
 public interface FindAvailableBook {
@@ -355,44 +322,42 @@ class BookDatabaseRepository implements FindAvailableBook {
 ```
     
 #### Type system
-_Type system - like_ modelling - we modelled each domain object's state discovered during EventStorming as separate
-classes: `AvailableBook`, `BookOnHold`, `CheckedOutBook`. With this approach we provide much clearer abstraction than
-having a single `Book` class with an enum-based state management. Moving the logic to these specific classes brings
-Single Responsibility Principle to a different level. Moreover, instead of checking invariants in every business method
-we leave the role to the compiler. As an example, please consider following scenario: _you can place on hold only a book
-that is currently available_. We could have done it in a following way:
+_Type system - like_ modelling - we modelled each domain object's state discovered during EventStorming as separate classes: `AvailableBook`, `BookOnHold`, `CheckedOutBook`.
+
+With this approach we provide much clearer abstraction than having a single `Book` class with an enum-based state management. Moving the logic to these specific classes brings **Single Responsibility Principle** to a different level. Moreover, instead of checking invariants in every business method we leave the role to the compiler.
+
+As an example, please consider following scenario: _you can place on hold only a book that is currently available_. We could have done it in a following way:
 ```java
 public Either<BookHoldFailed, BookPlacedOnHoldEvents> placeOnHold(Book book) {
-  if (book.status == AVAILABLE) {  
-      ...
-  }
+    if (book.status == AVAILABLE) {  
+        ...
+    }
 }
 ```
-but we use the _type system_ and declare method of following signature
+but we use the _type system_ and declare method of following signature:
 ```java
 public Either<BookHoldFailed, BookPlacedOnHoldEvents> placeOnHold(AvailableBook book) {
-      ...
+    ...
 }
 ```  
-The more errors we discover at compile time the better.
+The more errors we discover at compile time the **better**.
 
-Yet another advantage of applying such type system is that we can represent business flows and state transitions
-with functions much easier. As an example, following functions:
+Yet another advantage of applying such type system is that we can **represent business flows and state transitions with functions** much easier.
+
+As an example, following functions:
 ```
 placeOnHold: AvailableBook -> BookHoldFailed | BookPlacedOnHold
 cancelHold: BookOnHold -> BookHoldCancelingFailed | BookHoldCanceled
 ``` 
-are much more concise and descriptive than these:
+
+are much more **concise and descriptive** than these:
 ```
 placeOnHold: Book -> BookHoldFailed | BookPlacedOnHold
 cancelHold: Book -> BookHoldCancelingFailed | BookHoldCanceled
 ```
 as here we have a lot of constraints hidden within function implementations.
 
-Moreover if you think of your domain as a set of operations (functions) that are being executed on business objects
-(aggregates) you don't think of any execution model (like async processing). It is fine, because you don't have to.
-Domain functions are free from I/O operations, async, and other side-effects-prone things, which are put into the
-infrastructure layer. Thanks to this, we can easily test them without mocking mentioned parts. 
+Moreover if you think of your domain as a **set of operations** (functions) that are being **executed on business objects** (aggregates) you don't think of any execution model (like async processing). It is fine, because you don't have to. Domain functions are **free** from I/O operations, async, and other side-effects-prone things, which are put into the infrastructure layer. Thanks to this, we can **easily test** them without mocking mentioned parts.
 
 #### Monads
 Business methods might have different results. One might return a value or a `null`, throw an exception when something
