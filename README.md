@@ -562,14 +562,12 @@ class BookPlacedOnHoldEvents implements PatronEvent {
 
 `BookPlacedOnHoldEvents` is a container for `BookPlacedOnHold` event, and - if patron has 5 book placed on hold already - `MaximumNumberOfHoldsReached` (please mind the `Option` monad). You can see now how perfectly **the code reflects the model**.
 
-It is not everything, though. In the picture above you can also see a big rectangular yellow card with rules (policies)
-that define the conditions that need to be fulfilled in order to get the given result. All those rules are implemented 
-as functions **either** allowing or rejecting the hold:
+It is not everything, though. In the picture above you can also see a big rectangular yellow card with rules (policies) that define the conditions that need to be fulfilled in order to get the given result. All those rules are implemented as functions **either** allowing or rejecting the hold:
 
 ![Restricted book policy](docs/images/placing-on-hold-policy-restricted.png)
 ```java
-PlacingOnHoldPolicy onlyResearcherPatronsCanHoldRestrictedBooksPolicy = (AvailableBook toHold, Patron patron, HoldDuration holdDuration) -> {
-    if (toHold.isRestricted() && patron.isRegular()) {
+PlacingOnHoldPolicy onlyResearcherPatronsCanHoldRestrictedBooksPolicy = (AvailableBook bookToHold, Patron patron, HoldDuration holdDuration) -> {
+    if (bookToHold.isRestricted() && patron.isRegular()) {
         return left(Rejection.withReason("Regular patrons cannot hold restricted books"));
     }
     return right(new Allowance());
@@ -577,47 +575,40 @@ PlacingOnHoldPolicy onlyResearcherPatronsCanHoldRestrictedBooksPolicy = (Availab
 ```
 
 ![Overdue checkouts policy](docs/images/placing-on-hold-policy-overdue.png)
-
 ```java
-PlacingOnHoldPolicy overdueCheckoutsRejectionPolicy = (AvailableBook toHold, Patron patron, HoldDuration holdDuration) -> {
-    if (patron.overdueCheckoutsAt(toHold.getLibraryBranch()) >= OverdueCheckouts.MAX_COUNT_OF_OVERDUE_RESOURCES) {
-        return left(Rejection.withReason("cannot place on hold when there are overdue checkouts"));
+PlacingOnHoldPolicy overdueCheckoutsRejectionPolicy = (AvailableBook bookToHold, Patron patron, HoldDuration holdDuration) -> {
+    if (patron.overdueCheckoutsAt(bookToHold.getLibraryBranch()) >= OverdueCheckouts.MAX_COUNT_OF_OVERDUE_RESOURCES) {
+        return left(Rejection.withReason("Cannot place book on hold when there are overdue checkouts"));
     }
     return right(new Allowance());
 };
 ```
 
 ![Max number of holds policy](docs/images/placing-on-hold-policy-max.png)
-
 ```java
-PlacingOnHoldPolicy regularPatronMaximumNumberOfHoldsPolicy = (AvailableBook toHold, Patron patron, HoldDuration holdDuration) -> {
+PlacingOnHoldPolicy regularPatronMaximumNumberOfHoldsPolicy = (AvailableBook bookToHold, Patron patron, HoldDuration holdDuration) -> {
     if (patron.isRegular() && patron.numberOfHolds() >= PatronHolds.MAX_NUMBER_OF_HOLDS) {
-        return left(Rejection.withReason("patron cannot hold more books"));
+        return left(Rejection.withReason("Patron cannot hold more books"));
     }
     return right(new Allowance());
 };
 ```
 
 ![Open ended hold policy](docs/images/placing-on-hold-policy-open-ended.png)
-
 ```java
-PlacingOnHoldPolicy onlyResearcherPatronsCanPlaceOpenEndedHolds = (AvailableBook toHold, Patron patron, HoldDuration holdDuration) -> {
+PlacingOnHoldPolicy onlyResearcherPatronsCanPlaceOpenEndedHolds = (AvailableBook bookToHold, Patron patron, HoldDuration holdDuration) -> {
     if (patron.isRegular() && holdDuration.isOpenEnded()) {
-        return left(Rejection.withReason("regular patron cannot place open ended holds"));
+        return left(Rejection.withReason("Regular patron cannot place open ended holds"));
     }
     return right(new Allowance());
 };
 ```
 
 #### Spring
-Spring Framework seems to be the most popular Java framework ever used. Unfortunately it is also quite common
-to overuse its features in the business code. What you find in this project is that the domain packages
-are fully focused on modelling business problems, and are free from any DI, which makes it easy to
-unit-test it which is invaluable in terms of code reliability and maintainability. It does not mean,
-though, that we do not use Spring Framework - we do. Below you will find some details:
-- Each bounded context has its own independent application context. It means that we removed the runtime
-coupling, which is a step towards extracting modules (and microservices). How did we do that? Let's have
-a look:
+Spring Framework seems to be the most popular Java framework ever used. Unfortunately it is also quite common to **overuse** its features in the business code. What you find in this project is that the **domain packages are fully focused on modelling business problems**, and are free from any DI, which makes it easy to unit-test it which is invaluable in terms of **code reliability and maintainability**.
+
+It does not mean, though, that we do not use Spring Framework - we do. Below you will find some details:
+- Each bounded context has its own independent application context. It means that we removed the runtime coupling, which is a step towards extracting modules (and microservices). How did we do that? Let's have a look:
     ```java
     @SpringBootConfiguration
     @EnableAutoConfiguration
@@ -632,17 +623,13 @@ a look:
         }
     }
     ```
-- As you could see above, we also try not to use component scan wherever possible. Instead we utilize
-`@Configuration` classes where we define module specific beans in the infrastructure layer. Those
-configuration classes are explicitly declared in the main application class.
+
+- As you could see above, we also try not to use component scan wherever possible. Instead we utilize `@Configuration` classes where we define module specific beans in the infrastructure layer. Those configuration classes are **explicitly declared** in the main application class.
 
 ### Tests
-Tests are written in a BDD manner, expressing stories defined with Example Mapping.
-It means we utilize both TDD and Domain Language discovered with Event Storming. 
+Tests are written in a BDD manner, **expressing stories** defined with Example Mapping. It means we utilize both TDD and Domain Language discovered with Event Storming.
 
-We also made an effort to show how to create a DSL, that enables to write
-tests as if they were sentences taken from the domain descriptions. Please
-find an example below:
+We also made an effort to show how to create a DSL, that enables to write tests as if they were **sentences** taken from the domain descriptions. Please find an example below:
 
 ```groovy
 def 'should make book available when hold canceled'() {
@@ -659,14 +646,11 @@ def 'should make book available when hold canceled'() {
         availableBook.version == bookOnHold.version
 }
 ``` 
-_Please also note the **when** block, where we manifest the fact that books react to 
-cancellation event_
+_Please also note the **when** block, where we manifest the fact that books react to cancellation event._
 
 ## How to contribute
 
-The project is still under construction, so if you like it enough to collaborate, just let us
-know or simply create a Pull Request.
-
+The project is still under construction, so if you like it enough to collaborate, just let us know or simply create a Pull Request.
 
 ## How to Build
 
@@ -683,10 +667,9 @@ You can run the library app by simply typing the following:
 $ mvn spring-boot:run
 ...
 ...
-2019-04-03 15:55:39.162  INFO 18957 --- [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 2 endpoint(s) beneath base path '/actuator'
-2019-04-03 15:55:39.425  INFO 18957 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
-2019-04-03 15:55:39.428  INFO 18957 --- [           main] io.pillopl.library.LibraryApplication    : Started LibraryApplication in 5.999 seconds (JVM running for 23.018)
-
+2019-04-03 15:55:39.162 INFO 18957 --- [main] o.s.b.a.e.web.EndpointLinksResolver : Exposing 2 endpoint(s) beneath base path '/actuator'
+2019-04-03 15:55:39.425 INFO 18957 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer : Tomcat started on port(s): 8080 (http) with context path
+2019-04-03 15:55:39.428 INFO 18957 --- [main] io.pillopl.library.LibraryApplication : Started LibraryApplication in 5.999 seconds (JVM running for 23.018)
 ```
 
 ### Build a Jar package
@@ -735,8 +718,7 @@ If everything goes well, you can access the following services at given location
 * http://localhost:9090 - Prometheus dashboard
 * http://localhost:3000 - Grafana dashboard
 
-In order to see some metrics, you must create a dashboard. Go to `Create` -> `Import` and select attached `jvm-micrometer_rev8.json`. File has been pulled from 
-`https://grafana.com/grafana/dashboards/4701`.
+In order to see some metrics, you must create a dashboard. Go to `Create` -> `Import` and select attached `jvm-micrometer_rev8.json`. File has been pulled from `https://grafana.com/grafana/dashboards/4701`.
 
 Please note application will be run with `local` Spring profile to setup some initial data.
 
