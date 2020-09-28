@@ -9,7 +9,6 @@ class BookTitleAuthorISBNTest extends Specification {
             Title title = new Title("   to trim  ")
         expect:
             title.title == "to trim"
-
     }
 
     def "author should be trimmed"() {
@@ -68,5 +67,3 @@ class BookTitleAuthorISBNTest extends Specification {
             thrown(IllegalArgumentException)
     }
 }
-
-

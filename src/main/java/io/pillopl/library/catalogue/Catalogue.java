@@ -37,7 +37,4 @@ public class Catalogue {
         domainEvents.publish(new BookInstanceAddedToCatalogue(bookInstance));
         return bookInstance;
     }
-
-
 }
-
