@@ -276,13 +276,13 @@ When you look at the code you might find a scent of **functional programming**. 
 _Please note that this is not a reference project for FP._
 
 #### Immutable objects
-**Each class that represents a business concept is immutable**, thanks to which we:
+Each class that represents a **business concept** is immutable, thanks to which we:
 * provide full encapsulation and objects' states protection;
 * secure objects for multithreaded access;
 * control all side effects much clearer;
 
 #### Pure functions
-We model **domain operations**, discovered in Design Level Event Storming, as **pure functions**, and declare them in both domain and application layers in the form of **Java's functional interfaces**. Their implementations are placed in infrastructure layer as ordinary methods with side effects. Thanks to this approach we can follow the abstraction of **ubiquitous language** explicitly, and keep this abstraction implementation-agnostic.
+We model **domain operations**, discovered in Design Level Event Storming, as **pure functions**, and declare them in both domain and application layers in the form of **Java's functional interfaces**. Their implementations are placed in infrastructure layer as ordinary methods with side effects. Thanks to this approach we can follow the abstraction of **ubiquitous language explicitly**, and keep this **abstraction implementation-agnostic**.
 
 As an example, you could have a look at `FindAvailableBook` interface and its implementation:
 ```java
@@ -340,7 +340,7 @@ public Either<BookHoldFailed, BookPlacedOnHoldEvents> placeOnHold(AvailableBook 
     ...
 }
 ```  
-The more errors we discover at compile time the **better**.
+_The more errors we discover at compile time the **better**._
 
 Yet another advantage of applying such type system is that we can **represent business flows and state transitions with functions** much easier.
 
@@ -361,75 +361,63 @@ Moreover if you think of your domain as a **set of operations** (functions) that
 
 #### Monads
 Business methods might have different results. One might return a value or a `null`, throw an exception when something
-unexpected happens or just return different objects under different circumstances. All those situations are typical
-to object-oriented languages like Java, but do not fit into functional style. We are dealing with this issues
-with monads (monadic containers provided by [Vavr](https://www.vavr.io)):
-* When a method returns optional value, we use the `Option` monad:
+unexpected happens or just return different objects under different circumstances. All those situations are typical to object-oriented languages like Java, but do not fit into functional style. We are dealing with this issues with monads (**monadic containers** provided by [Vavr](https://www.vavr.io)):
 
+* When a method returns **optional value**, we use the `Option` monad:
     ```java
     Option<Book> findBy(BookId bookId) {
         ...
     }
     ```
 
-* When a method might return one of two possible values, we use the `Either` monad:
-
+* When a method might return **one of two possible values**, we use the `Either` monad:
     ```java
     Either<BookHoldFailed, BookPlacedOnHoldEvents> placeOnHold(AvailableBook book) {
         ...
     }
     ```
 
-* When an exception might occur, we use `Try` monad:
-
+* When an **exception** might occur, we use `Try` monad:
     ```java
     Try<Result> placeOnHold(@NonNull PlaceOnHoldCommand command) {
         ...
     }
     ```
 
-Thanks to this, we can follow the functional programming style, but we also enrich our domain language and
-make our code much more readable for the clients.
+Thanks to this, we can follow the functional programming style, but we also **enrich our domain language** and make our code much more **readable** for the clients.
 
 #### Pattern Matching
-Depending on a type of a given book object we often need to perform different actions. Series of if/else or switch/case statements
-could be a choice, but it is the pattern matching that provides the most conciseness and flexibility. With the code
-like below we can check numerous patterns against objects and access their constituents, so our code has a minimal dose
-of language-construct noise:
+Depending on a **type** of a given book object we often need to perform different **actions**. Series of if/else or switch/case statements could be a choice, but it is the pattern matching that provides the most **conciseness and flexibility**.
+
+With the code like below we can check numerous **patterns** against objects and access their constituents, so our code has a minimal dose of language-construct noise:
 ```java
 private Book handleBookPlacedOnHold(Book book, BookPlacedOnHold bookPlacedOnHold) {
     return API.Match(book).of(
         Case($(instanceOf(AvailableBook.class)), availableBook -> availableBook.handle(bookPlacedOnHold)),
-        Case($(instanceOf(BookOnHold.class)), bookOnHold -> raiseDuplicateHoldFoundEvent(bookOnHold, bookPlacedOnHold)),
+        Case($(instanceOf(BookOnHold.class)), bookOnHold -> raiseDuplicateHoldFoundEvent(bookOnHold, bookPlacedOnHold),
         Case($(), () -> book)
     );
 }
 ```
 
 ### (No) ORM
-If you run `mvn dependency:tree` you won't find any JPA implementation. Although we think that ORM solutions (like Hibernate)
-are very powerful and useful, we decided not to use them, as we wouldn't utilize their features. What features are
-talking about? Lazy loading, caching, dirty checking. Why don't we need them? We want to have more control
-over SQL queries and minimize the object-relational impedance mismatch ourselves. Moreover, thanks to relatively
-small aggregates, containing as little data as it is required to protect the invariants, we don't need the
-lazy loading mechanism either.
-With Hexagonal Architecture we have the ability to separate domain and persistence models and test them
-independently. Moreover, we can also introduce different persistence strategies for different aggregates. 
-In this project, we utilize both plain SQL queries and `JdbcTemplate` and use new and very promising 
-project called Spring Data JDBC, that is free from the JPA-related overhead mentioned before.
-Please find below an example of a repository:
+If you run `mvn dependency:tree` you won't find any JPA implementation. Although we think that ORM solutions (like Hibernate) are very powerful and useful, we decided not to use them, as we wouldn't utilize their features.
 
+What features are talking about? Lazy loading, caching, dirty checking... Why don't we need them? We want to have more **control** over SQL queries and **minimize** the object-relational impedance mismatch ourselves. Moreover, thanks to **relatively small aggregates**, containing as little data as it is required to protect the invariants, we don't need the lazy loading mechanism either.
+
+With **Hexagonal Architecture** we have the ability to separate domain and persistence models and test them independently. Moreover, we can also introduce different persistence strategies for different aggregates. 
+In this project, we utilize both plain SQL queries and `JdbcTemplate` and use new and very promising project called `Spring Data JDBC`, that is free from the JPA-related overhead mentioned before.
+
+Please find below an example of a repository:
 ```java
 interface PatronEntityRepository extends CrudRepository<PatronDatabaseEntity, Long> {
 
     @Query("SELECT p.* FROM patron_database_entity p where p.patron_id = :patronId")
     PatronDatabaseEntity findByPatronId(@Param("patronId") UUID patronId);
-
 }
 ```
 
-At the same time we propose other way of persisting aggregates, with plain SQL queries and `JdbcTemplate`:  
-
+At the same time we propose other **way of persisting aggregates**, with plain SQL queries and `JdbcTemplate`:  
 ```java
 @AllArgsConstructor
 class BookDatabaseRepository implements BookRepository, FindAvailableBook, FindBookOnHold {
@@ -448,22 +436,15 @@ class BookDatabaseRepository implements BookRepository, FindAvailableBook, FindB
                                      new BeanPropertyRowMapper<>(BookDatabaseEntity.class), bookId.getBookId())))
                 .getOrElse(none());
     }
-    
     ...
 }
 ```
-_Please note that despite having the ability to choose different persistence implementations for aggregates
-it is recommended to stick to one option within the app/team_ 
+_Please note that despite having the ability to **choose different persistence implementations** for aggregates it is recommended to stick to one option within the app/team._ 
     
 ### Architecture-code gap
-We put a lot of attention to keep the consistency between the overall architecture (including diagrams)
-and the code structure. Having identified bounded contexts we could organize them in modules (packages, to
-be more specific). Thanks to this we gain the famous microservices' autonomy, while having a monolithic
-application. Each package has well defined public API, encapsulating all implementation details by using
-package-protected or private scopes.
+We put a lot of attention to keep the **consistency** between the overall architecture (including diagrams) and the code structure. Having identified bounded contexts we could **organize** them in modules (packages, to be more specific). Thanks to this we gain the famous **microservices' autonomy**, while having a monolithic application. Each package has **well defined public API**, encapsulating all implementation details by using package-protected or private scopes.
 
 Just by looking at the package structure:
-
 ```
 └── library
     ├── catalogue
@@ -491,29 +472,25 @@ Just by looking at the package structure:
             ├── model
             └── web
 ```
-you can see that the architecture is screaming that it has two bounded contexts: **catalogue**
-and **lending**. Moreover, the **lending context** is built around five business objects: **book**,
-**dailysheet**, **librarybranch**, **patron**, and **patronprofile**, while **catalogue** has no subpackages,
-which suggests that it might be a CRUD with no complex logic inside. Please find the architecture diagram
-below.
+
+You can see that the architecture is screaming that it has two bounded contexts: **catalogue** and **lending**.
+
+Moreover, the **lending context** is built around five business objects: **book**, **dailysheet**, **librarybranch**, **patron**, and **patronprofile**, while **catalogue** has no subpackages, which suggests that it might be a CRUD with no complex logic inside.
+
+Please find the **architecture diagram** below:
 
 ![Component diagram](docs/c4/component-diagram.png)
 
-Yet another advantage of this approach comparing to packaging by layer for example is that in order to 
-deliver a functionality you would usually need to do it in one package only, which is the aforementioned
-autonomy. This autonomy, then, could be transferred to the level of application as soon as we split our
-_context-packages_ into separate microservices. Following this considerations, autonomy can be given away
-to a product team that can take care of the whole business area end-to-end.
+Yet another advantage of this approach comparing to packaging by layer for example is that in order to deliver a functionality you would usually need to do it in one package only, which is the aforementioned **autonomy**. This autonomy, then, could be transferred to the level of application as soon as we split our _context-packages_ into separate microservices. Following this considerations, autonomy can be given away to a product team that can take care of the whole business area end-to-end.
 
 ### Model-code gap
 In our project we do our best to reduce _model-code gap_ to bare minimum. It means we try to put equal attention
-to both the model and the code and keep them consistent. Below you will find some examples.
+to both the model and the code and keep them **consistent**. Below you will find some examples.
 
 #### Placing on hold
 ![Placing on hold](docs/images/placing_on_hold.jpg)
 
 Starting with the easiest part, below you will find the model classes corresponding to depicted command and events:
-
 ```java
 @Value
 class PlaceOnHoldCommand {
@@ -539,10 +516,7 @@ class BookHoldFailed implements PatronEvent {
 }
 ```
 
-We know it might not look impressive now, but if you have a look at the implementation of an aggregate,
-you will see that the code reflects not only the aggregate name, but also the whole scenario of `PlaceOnHold` 
-command handling. Let us uncover the details:
-
+We know it might not look impressive now, but if you have a look at the implementation of an aggregate, you will see that the code reflects not only the aggregate name, but also the whole scenario of `PlaceOnHold` command handling. Let us uncover the details:
 ```java
 public class Patron {
 
@@ -554,10 +528,8 @@ public class Patron {
 }    
 ```
 
-The signature of `placeOnHold` method screams, that it is possible to place a book on hold only when it
-is available (more information about protecting invariants by compiler you will find in [Type system section](#type-system)).
-Moreover, if you try to place available book on hold it can **either** fail (`BookHoldFailed`) or produce some events -
-what events?
+The signature of `placeOnHold` method screams, that it is possible to place a book on hold only when it is available (more information about protecting invariants by compiler you will find in [Type system section](#type-system)).
+Moreover, if you try to place available book on hold it can **either** fail (`BookHoldFailed`) or produce some events - what events?
 
 ```java
 @Value
@@ -576,8 +548,10 @@ class BookPlacedOnHoldEvents implements PatronEvent {
         return new BookPlacedOnHoldEvents(bookPlacedOnHold.getPatronId(), bookPlacedOnHold, Option.none());
     }
 
-    public static BookPlacedOnHoldEvents events(BookPlacedOnHold bookPlacedOnHold, MaximumNumberOfHoldsReached maximumNumberOfHoldsReached) {
-        return new BookPlacedOnHoldEvents(bookPlacedOnHold.patronId, bookPlacedOnHold, Option.of(maximumNumberOfHoldsReached));
+    public static BookPlacedOnHoldEvents events(BookPlacedOnHold bookPlacedOnHold,
+                                                MaximumNumberOfHoldsReached maximumNumberOfHoldsReached) {
+        return new BookPlacedOnHoldEvents(bookPlacedOnHold.patronId, bookPlacedOnHold, 
+                                          Option.of(maximumNumberOfHoldsReached));
     }
 
     public List<DomainEvent> normalize() {
@@ -586,9 +560,7 @@ class BookPlacedOnHoldEvents implements PatronEvent {
 }
 ```
 
-`BookPlacedOnHoldEvents` is a container for `BookPlacedOnHold` event, and - if patron has 5 book placed on hold already -
-`MaximumNumberOfHoldsReached` (please mind the `Option` monad). You can see now how perfectly the code reflects
-the model.
+`BookPlacedOnHoldEvents` is a container for `BookPlacedOnHold` event, and - if patron has 5 book placed on hold already - `MaximumNumberOfHoldsReached` (please mind the `Option` monad). You can see now how perfectly **the code reflects the model**.
 
 It is not everything, though. In the picture above you can also see a big rectangular yellow card with rules (policies)
 that define the conditions that need to be fulfilled in order to get the given result. All those rules are implemented 
