@@ -25,7 +25,7 @@ public class ModularArchitectureTest {
     public static final ArchRule commons_should_not_depend_on_catalogue =
             noClasses()
                     .that()
-                    .resideInAPackage("..common..")
+                    .resideInAPackage("..commons..")
                     .should()
                     .dependOnClassesThat()
                     .resideInAPackage("..catalogue..");
@@ -34,7 +34,7 @@ public class ModularArchitectureTest {
     public static final ArchRule commons_should_not_depend_on_lending =
             noClasses()
                     .that()
-                    .resideInAPackage("..common..")
+                    .resideInAPackage("..commons..")
                     .should()
                     .dependOnClassesThat()
                     .resideInAPackage("..lending..");
