@@ -9,7 +9,6 @@ id INTEGER IDENTITY PRIMARY KEY,
   checked_out_at_branch UUID,
   checkout_till TIMESTAMP);
 
-
 CREATE TABLE IF NOT EXISTS holds_sheet (
 id INTEGER IDENTITY PRIMARY KEY,
   book_id UUID NOT NULL,
@@ -25,4 +24,3 @@ id INTEGER IDENTITY PRIMARY KEY,
 
 CREATE SEQUENCE holds_sheet_seq;
 CREATE SEQUENCE checkouts_sheet_seq;
-

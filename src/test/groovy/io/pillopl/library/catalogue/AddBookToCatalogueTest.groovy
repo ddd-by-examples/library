@@ -23,7 +23,6 @@ class AddBookToCatalogueTest extends Specification {
         then:
             result.isSuccess()
             result.get() == Result.Success
-
     }
 
     def 'should add a new book instance to catalogue'() {
@@ -38,7 +37,6 @@ class AddBookToCatalogueTest extends Specification {
             result.get() == Result.Success
         and:
             1 * domainEvents.publish(_ as BookInstanceAddedToCatalogue)
-
     }
 
     def 'should reject adding a new book instance to catalogue when book isbn does not exist'() {
@@ -53,7 +51,6 @@ class AddBookToCatalogueTest extends Specification {
             result.get() == Result.Rejection
         and:
             0 * domainEvents.publish(_ as BookInstanceAddedToCatalogue)
-
     }
 
     def 'should fail when adding a book if database fails'() {
@@ -81,13 +78,11 @@ class AddBookToCatalogueTest extends Specification {
     void databaseWorks() {
         catalogueDatabase.saveNew(_ as Book) >> null
         catalogueDatabase.saveNew(_ as BookInstance) >> null
-
     }
 
     void databaseDoesNotWork() {
         catalogueDatabase.saveNew(_ as Book) >> { (new IllegalStateException()) }
         catalogueDatabase.saveNew(_ as BookInstance) >> { (new IllegalStateException()) }
-
     }
 
     void thereIsBookWith(String isbn) {

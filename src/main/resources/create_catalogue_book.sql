@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS catalogue_book (
   title VARCHAR(100) NOT NULL,
   author VARCHAR(100) NOT NULL);
 
-
 CREATE TABLE IF NOT EXISTS catalogue_book_instance (
   id INTEGER IDENTITY PRIMARY KEY,
   isbn VARCHAR(100) NOT NULL,
@@ -12,5 +11,3 @@ CREATE TABLE IF NOT EXISTS catalogue_book_instance (
 
 CREATE SEQUENCE catalogue_book_seq;
 CREATE SEQUENCE catalogue_book_instance_seq;
-
-

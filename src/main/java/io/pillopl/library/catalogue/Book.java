@@ -23,7 +23,6 @@ class Book {
     }
 }
 
-
 @Value
 class Title {
 
@@ -35,7 +34,6 @@ class Title {
         }
         this.title = title.trim();
     }
-
 }
 
 @Value

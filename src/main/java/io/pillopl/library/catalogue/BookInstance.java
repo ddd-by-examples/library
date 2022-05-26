@@ -20,6 +20,5 @@ class BookInstance {
 
     static BookInstance instanceOf(Book book, BookType bookType) {
         return new BookInstance(book.getBookIsbn(), new BookId(UUID.randomUUID()), bookType);
-
     }
 }

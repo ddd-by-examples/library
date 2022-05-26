@@ -38,6 +38,4 @@ public class ModularArchitectureTest {
                     .should()
                     .dependOnClassesThat()
                     .resideInAPackage("..lending..");
-
-
 }
