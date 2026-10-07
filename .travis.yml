@@ -1,0 +1,39 @@
+language: java
+
+# Specify JDK versions to test against
+jdk:
+  - openjdk11
+ 
+# Cache Maven dependencies to speed up builds
+cache:
+  directories:
+    - $HOME/.mvn/wrapper/
+ 
+stages:
+  - name: Building
+  - name: Testing
+ 
+jobs:
+  include:
+    - stage: Building
+      before_script:
+        - echo "Starting build process..."
+      script:
+        - mvn clean install
+    - stage: Testing
+      before_script:
+        - echo "Starting test process..."
+      script:
+        - mvn verify
+      after_failure:
+        - echo "Tests failed. Check the test results for details."
+      after_success:
+        - echo "Tests passed successfully."
+ 
+# Enable notifications via email
+notifications:
+  email:
+    recipients:
+      - tinghee0815@1utar.my
+    on_success: always
+    on_failure: always
